@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>top.zhjh</groupId>
+  <artifactId>wuyou-boot</artifactId>
+  <version>0.0.1</version>
+  <name>${project.artifactId}</name>
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>framework</module>
+    <module>system</module>
+    <module>admin</module>
+  </modules>
+
+  <properties>
+    <java.version>8</java.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <zutil.version>2.0.0-alpha7</zutil.version>
+    <fastjson.version>2.0.30</fastjson.version>
+    <spring.boot.version>2.7.17</spring.boot.version>
+    <mybatis.plus.version>3.5.3.2</mybatis.plus.version>
+    <mybatis.plus.gen.version>3.5.3.2</mybatis.plus.gen.version>
+    <mariadb.version>3.4.1</mariadb.version>
+    <satoken.version>1.33.0</satoken.version>
+    <springdoc.version>1.6.14</springdoc.version>
+    <knife4j.version>3.0.3</knife4j.version>
+    <mapstruct.version>1.5.3.Final</mapstruct.version>
+  </properties>
+
+  <!-- 依赖版本管理：https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#dependency-management -->
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>top.csaf</groupId>
+        <artifactId>zutil-all</artifactId>
+        <version>${zutil.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>com.alibaba.fastjson2</groupId>
+        <artifactId>fastjson2</artifactId>
+        <version>${fastjson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.alibaba.fastjson2</groupId>
+        <artifactId>fastjson2-extension-spring5</artifactId>
+        <version>${fastjson.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>${spring.boot.version}</version>
+        <type>pom</type>
+        <!-- 导入 spring-boot-dependencies 中所有的 dependencyManagement.dependencies：https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#dependency-scope -->
+        <scope>import</scope>
+      </dependency>
+
+      <!-- MyBatis Plus -->
+      <dependency>
+        <groupId>com.baomidou</groupId>
+        <artifactId>mybatis-plus-boot-starter</artifactId>
+        <version>${mybatis.plus.version}</version>
+      </dependency>
+      <!-- MyBatis Plus 代码生成 -->
+      <dependency>
+        <groupId>com.baomidou</groupId>
+        <artifactId>mybatis-plus-generator</artifactId>
+        <version>${mybatis.plus.gen.version}</version>
+      </dependency>
+
+      <!-- JDBC -->
+      <dependency>
+        <groupId>org.mariadb.jdbc</groupId>
+        <artifactId>mariadb-java-client</artifactId>
+        <version>${mariadb.version}</version>
+      </dependency>
+
+      <!-- 权限认证 -->
+      <dependency>
+        <groupId>cn.dev33</groupId>
+        <artifactId>sa-token-spring-boot-starter</artifactId>
+        <version>${satoken.version}</version>
+      </dependency>
+
+      <!-- API 接口文档 -->
+      <dependency>
+        <groupId>org.springdoc</groupId>
+        <artifactId>springdoc-openapi-ui</artifactId>
+        <version>${springdoc.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.github.xiaoymin</groupId>
+        <artifactId>knife4j-springdoc-ui</artifactId>
+        <version>${knife4j.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.mapstruct</groupId>
+        <artifactId>mapstruct</artifactId>
+        <version>${mapstruct.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mapstruct</groupId>
+        <artifactId>mapstruct-processor</artifactId>
+        <version>${mapstruct.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <!--
+  全局依赖
+  lombok 每个模块都有，但是依旧单独引用，因为 lombok 依赖顺序必须在 mapstruct 上面，否则实现类中不会 set 属性
+  -->
+  <dependencies>
+  </dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <!-- Apache Maven Compiler Plugin：配置 compiler:compile、compiler:testCompile https://maven.apache.org/plugins/maven-compiler-plugin/index.html -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.10.1</version>
+          <!-- compiler:compile https://maven.apache.org/plugins/maven-compiler-plugin/compile-mojo.html -->
+          <configuration>
+            <!-- Setting the -source and -target of the Java Compiler https://maven.apache.org/plugins/maven-compiler-plugin/examples/set-compiler-source-and-target.html -->
+            <!-- Java 编译器的 -source 参数 https://maven.apache.org/plugins/maven-compiler-plugin/compile-mojo.html#source -->
+            <source>${java.version}</source>
+            <!-- Java 编译器的 -target 参数 https://maven.apache.org/plugins/maven-compiler-plugin/compile-mojo.html#target -->
+            <target>${java.version}</target>
+            <!-- 显示编译警告 https://maven.apache.org/plugins/maven-compiler-plugin/compile-mojo.html#showWarnings -->
+            <showWarnings>true</showWarnings>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+
+  <repositories>
+    <!--<repository>-->
+    <!--  <id>huaweicloud</id>-->
+    <!--  <url>https://repo.huaweicloud.com/repository/maven/</url>-->
+    <!--</repository>-->
+    <!--<repository>-->
+    <!--  <id>aliyunmaven</id>-->
+    <!--  <url>https://maven.aliyun.com/repository/public</url>-->
+    <!--</repository>-->
+    <repository>
+      <id>maven_central</id>
+      <name>Maven Central</name>
+      <url>https://repo.maven.apache.org/maven2/</url>
+    </repository>
+    <repository>
+      <id>snapshots</id>
+      <name>Snapshot Repository</name>
+      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <!--<pluginRepository>-->
+    <!--  <id>huaweicloud</id>-->
+    <!--  <url>https://repo.huaweicloud.com/repository/maven/</url>-->
+    <!--</pluginRepository>-->
+    <!--<pluginRepository>-->
+    <!--  <id>aliyunmaven</id>-->
+    <!--  <url>https://maven.aliyun.com/repository/public</url>-->
+    <!--</pluginRepository>-->
+    <pluginRepository>
+      <id>maven_central</id>
+      <url>https://repo.maven.apache.org/maven2/</url>
+    </pluginRepository>
+  </pluginRepositories>
+</project>

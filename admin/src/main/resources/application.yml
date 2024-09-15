@@ -1,0 +1,50 @@
+server:
+  # 服务启动端口号
+  port: 8790
+  servlet:
+    encoding:
+      charset: utf-8
+
+spring:
+  jackson:
+    # 忽略值为 null 的字段
+    default-property-inclusion: non_null
+  # 数据库
+  datasource:
+    # 驱动（数据库类型）
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://localhost:3307/wuyou_boot
+    username: wuyou_boot
+    password: 123
+
+mybatis-plus:
+  configuration:
+    # 日志实现类，以打印 SQL 日志
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      # 主键类型：https://baomidou.com/reference/#idtype
+      id-type: ASSIGN_ID
+
+# Sa-Token 配置
+sa-token:
+  # token 名称 (同时也是 cookie 名称)
+  token-name: token
+  # token 有效期，单位：秒，默认 30 天, -1 代表永不过期
+  timeout: 2592000
+  # token 临时有效期 (指定时间内无操作就视为 token 过期) 单位: 秒
+  activity-timeout: -1
+  # 是否允许同一账号并发登录 (为 true 时允许一起登录, 为 false 时新登录挤掉旧登录)
+  is-concurrent: true
+  # 在多人登录同一账号时，是否共用一个 token (为 true 时所有登录共用一个 token, 为 false 时每次登录新建一个 token)
+  is-share: false
+  # token 风格
+  token-style: uuid
+  # 是否输出操作日志
+  is-log: true
+
+# api-docs 默认路径：/v3/api-docs/
+# UI 默认路径：/swagger-ui.html
+springdoc:
+  swagger-ui:
+    display-request-duration: true

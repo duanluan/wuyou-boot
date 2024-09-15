@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.zhjh.mapper.SysMenuMapper">
+
+  <select id="listTree" resultType="top.csaf.tree.TreeNode">
+    select
+      id,
+      name,
+      order_num as 'order',
+      parent_id as parentId,
+      icon,
+      path
+    from sys_menu
+    where deleted = 0
+    <if test="types != null">
+      <foreach collection="types.split(',')" item="type" open="and (" separator="or" close=")">
+        type = #{type}
+      </foreach>
+    </if>
+    order by order_num
+  </select>
+</mapper>
