@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -45,7 +44,6 @@ public class SysMenuController extends BaseController {
     return ok(sysMenuService.page(query, queryWrapper));
   }
 
-  @Cacheable(value = "menuTree", key = "#query.types", condition = "#query.isNotBlankTypes()")
   @Operation(summary = "菜单树")
   @GetMapping("/tree")
   public R<List<TreeNode>> listTree(@Validated SysMenuTreeQO query) {
