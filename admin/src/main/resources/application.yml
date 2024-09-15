@@ -23,6 +23,9 @@ spring:
   # 缓存
   cache:
     type: redis
+    redis:
+      # Key 前缀
+      key-prefix: "wuyou-boot:"
 
 mybatis-plus:
   configuration:
