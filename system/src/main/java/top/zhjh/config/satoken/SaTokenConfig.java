@@ -3,6 +3,7 @@ package top.zhjh.config.satoken;
 import cn.dev33.satoken.interceptor.SaInterceptor;
 import cn.dev33.satoken.router.SaHttpMethod;
 import cn.dev33.satoken.router.SaRouter;
+import cn.dev33.satoken.router.SaRouterStaff;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,16 +37,38 @@ public class SaTokenConfig implements WebMvcConfigurer {
       // 从数据库查询有路径的菜单
       List<SysMenu> menuList = sysMenuService.list(new LambdaQueryWrapper<SysMenu>().isNotNull(SysMenu::getPath));
       for (SysMenu menu : menuList) {
-        String method = menu.getMethod();
         String path = menu.getPath();
+        if (StrUtil.isBlank(path)) {
+          continue;
+        }
+        String method = menu.getMethod();
         String permission = menu.getPermission();
 
+        // 校验权限
         if (StrUtil.isNotBlank(permission)) {
-          // 校验权限
-          SaRouter.match(SaHttpMethod.toEnum(method)).match(path).check(r -> StpUtil.checkPermission(menu.getPermission()));
-        } else if (Boolean.TRUE.equals(menu.getNeedToLogin())) {
-          // 登录校验
-          SaRouter.match(SaHttpMethod.toEnum(method)).match(path, r -> StpUtil.checkLogin());
+          SaRouterStaff saRouterStaff = null;
+          if (StrUtil.isNotBlank(method)) {
+            saRouterStaff = SaRouter.match(SaHttpMethod.toEnum(method));
+          }
+          if (saRouterStaff != null) {
+            saRouterStaff = saRouterStaff.match(path);
+          } else {
+            saRouterStaff = SaRouter.match(path);
+          }
+          saRouterStaff.check(r -> StpUtil.checkPermission(menu.getPermission()));
+        }
+        // 登录校验
+        else if (Boolean.TRUE.equals(menu.getNeedToLogin())) {
+          SaRouterStaff saRouterStaff = null;
+          if (StrUtil.isNotBlank(method)) {
+            saRouterStaff = SaRouter.match(SaHttpMethod.toEnum(method));
+          }
+          if (saRouterStaff != null) {
+            saRouterStaff = saRouterStaff.match(path);
+          } else {
+            saRouterStaff = SaRouter.match(path);
+          }
+          saRouterStaff.check(r -> StpUtil.checkLogin());
         }
       }
     })).addPathPatterns("/**");
