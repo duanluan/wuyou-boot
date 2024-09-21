@@ -1,5 +1,6 @@
 package top.zhjh.controller;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,6 +32,27 @@ public class SysUserController extends BaseController {
 
   @Autowired
   private SysUserService sysUserService;
+
+  @Operation(summary = "注册")
+  @PostMapping("/register")
+  public R register(@Validated SysUserRegisterQO query) {
+    sysUserService.register(query.getNickname(), query.getUsername(), query.getPassword());
+    return ok();
+  }
+
+  @Operation(summary = "登录")
+  @PostMapping("/login")
+  public R login(@Validated SysUserLoginQO query) {
+    SysUser loggedInUser = sysUserService.login(query.getUsername(), query.getPassword());
+    return ok(SysUserStruct.INSTANCE.toDetailVO(loggedInUser));
+  }
+
+  @Operation(summary = "登出")
+  @PostMapping("/logout")
+  public R logout() {
+    StpUtil.logout();
+    return ok();
+  }
 
   @Operation(summary = "用户列表")
   @GetMapping
@@ -67,20 +89,6 @@ public class SysUserController extends BaseController {
   @DeleteMapping("/{ids}")
   public R remove(@Validated SysUserRemoveQO query) {
     return removeR(sysUserService.removeByIds(Arrays.asList(query.getIds().split(","))));
-  }
-
-  @Operation(summary = "注册")
-  @PostMapping("/register")
-  public R register(@Validated SysUserRegisterQO query) {
-    sysUserService.register(query.getNickname(), query.getUsername(), query.getPassword());
-    return ok();
-  }
-
-  @Operation(summary = "登录")
-  @PostMapping("/login")
-  public R login(@Validated SysUserLoginQO query) {
-    SysUser loggedInUser = sysUserService.login(query.getUsername(), query.getPassword());
-    return ok(SysUserStruct.INSTANCE.toDetailVO(loggedInUser));
   }
 
   // @Operation(summary = "当前登录用户")
