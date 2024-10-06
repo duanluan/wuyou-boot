@@ -1,5 +1,6 @@
 package top.zhjh.controller;
 
+import cn.dev33.satoken.annotation.SaIgnore;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,6 +41,7 @@ public class SysUserController extends BaseController {
     return ok();
   }
 
+  @SaIgnore
   @Operation(summary = "登录")
   @PostMapping("/login")
   public R login(@Validated SysUserLoginQO query) {
