@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import top.csaf.lang.StrUtil;
 import top.zhjh.base.model.R;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.net.ConnectException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -65,16 +67,31 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(status).body(new R(status.value(), e.getMessage()));
   }
 
-  @ExceptionHandler({NotLoginException.class})
+  @ExceptionHandler(NotLoginException.class)
   @ResponseBody
-  public ResponseEntity<R> handleNotLoginException(NotLoginException e) {
-    log.error("Sa-Token 未能通过登录异常", e);
-    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new R(e.getCode(), e.getMessage()));
+  public ResponseEntity<R> handlerNotLoginException(NotLoginException nle, HttpServletRequest request, HttpServletResponse response) {
+    log.error("登录异常", nle);
+    // 判断场景值，定制化异常信息
+    String message = "";
+    if (nle.getType().equals(NotLoginException.NOT_TOKEN)) {
+      message = "未提供Token";
+    } else if (nle.getType().equals(NotLoginException.INVALID_TOKEN)) {
+      message = "Token无效";
+    } else if (nle.getType().equals(NotLoginException.TOKEN_TIMEOUT)) {
+      message = "Token已过期";
+    } else if (nle.getType().equals(NotLoginException.BE_REPLACED)) {
+      message = "Token已被顶下线";
+    } else if (nle.getType().equals(NotLoginException.KICK_OUT)) {
+      message = "Token已被踢下线";
+    } else {
+      message = "当前会话未登录";
+    }
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new R(nle.getCode(), message));
   }
 
-  // @ExceptionHandler({Exception.class})
-  // @ResponseBody
-  // public ResponseEntity<R> handleException(Exception e) {
-  //   return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new R(HttpStatus.INTERNAL_SERVER_ERROR.value(), "系统异常"));
-  // }
+  @ExceptionHandler({Exception.class})
+  @ResponseBody
+  public ResponseEntity<R> handleException(Exception e) {
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new R(HttpStatus.INTERNAL_SERVER_ERROR.value(), "系统异常"));
+  }
 }
