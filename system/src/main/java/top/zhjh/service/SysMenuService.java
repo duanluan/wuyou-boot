@@ -1,5 +1,6 @@
 package top.zhjh.service;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -25,6 +26,7 @@ public class SysMenuService extends ServiceImpl<SysMenuMapper, SysMenu> {
 
   @Cacheable(value = "menuTree", key = "#query.types", condition = "#query.isNotBlankTypes()")
   public List<TreeNode> listTree(SysMenuTreeQO query) {
+    query.setRoleCodeList(StpUtil.getRoleList());
     return TreeUtil.build(sysMenuMapper.listTree(query));
   }
 }

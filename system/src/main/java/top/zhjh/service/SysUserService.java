@@ -5,6 +5,7 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,10 +26,12 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
   @Autowired
   private SysUserMapper sysUserMapper;
 
+  @Cacheable(value = "userRoleCodes", key = "#id", condition = "#id != null && #id != ''")
   public List<String> listRoleCodes(String id) {
     return sysUserMapper.listRoleCodes(id);
   }
 
+  @Cacheable(value = "userPermissions", key = "#id", condition = "#id != null && #id != ''")
   public List<String> listPermission(String id) {
     return sysUserMapper.listPermission(id);
   }
