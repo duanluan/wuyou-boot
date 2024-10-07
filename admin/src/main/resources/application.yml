@@ -20,6 +20,18 @@ spring:
     host: localhost
     port: 6379
     password: 123
+    # 连接超时时间
+    timeout: 10s
+    lettuce:
+      pool:
+        # 连接池最大连接数
+        max-active: 200
+        # 连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-wait: -1ms
+        # 连接池中的最大空闲连接
+        max-idle: 10
+        # 连接池中的最小空闲连接
+        min-idle: 0
   # 缓存
   cache:
     type: redis
@@ -43,8 +55,8 @@ sa-token:
   # token 有效期，单位：秒，默认 30 天, -1 代表永不过期
   timeout: 2592000
   # token 临时有效期 (指定时间内无操作就视为 token 过期) 单位: 秒
-  activity-timeout: -1
-  # 是否允许同一账号并发登录 (为 true 时允许一起登录, 为 false 时新登录挤掉旧登录)
+  active-timeout: -1
+  # 是否允许同一账号多地同时登录 （为 true 时允许一起登录, 为 false 时新登录挤掉旧登录）
   is-concurrent: true
   # 在多人登录同一账号时，是否共用一个 token (为 true 时所有登录共用一个 token, 为 false 时每次登录新建一个 token)
   is-share: false
