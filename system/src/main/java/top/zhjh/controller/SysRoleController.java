@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import top.csaf.lang.StrUtil;
 import top.zhjh.base.BaseController;
 import top.zhjh.base.model.R;
 import top.zhjh.model.entity.SysRole;
@@ -26,7 +27,7 @@ import java.util.List;
  */
 @Tag(name = "角色")
 @Slf4j
-@RequestMapping("/sysRoles")
+@RequestMapping("/sys/roles")
 @RestController
 public class SysRoleController extends BaseController {
 
@@ -36,7 +37,10 @@ public class SysRoleController extends BaseController {
   @Operation(summary = "角色列表")
   @GetMapping
   public R<List<SysRole>> list(@Validated SysRolePageQO query) {
-    LambdaQueryWrapper<SysRole> queryWrapper = new LambdaQueryWrapper<SysRole>().orderByDesc(SysRole::getId);
+    LambdaQueryWrapper<SysRole> queryWrapper = new LambdaQueryWrapper<SysRole>()
+      .like(StrUtil.isNotBlank(query.getName()), SysRole::getName, query.getName())
+      .like(StrUtil.isNotBlank(query.getCode()), SysRole::getCode, query.getCode())
+      .orderByDesc(SysRole::getId);
     if (query.getCurrent() == 0) {
       return ok(sysRoleService.list(queryWrapper));
     }

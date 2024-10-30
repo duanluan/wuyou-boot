@@ -3,7 +3,7 @@ package top.zhjh.model.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 用户详情响应
@@ -17,11 +17,11 @@ public class SysUserDetailVO {
   @Schema(title = "创建人")
   private String createdBy;
   @Schema(title = "创建时间")
-  private Date createdTime;
+  private LocalDateTime createdTime;
   @Schema(title = "更新人")
   private String updatedBy;
   @Schema(title = "更新时间")
-  private Date updatedTime;
+  private LocalDateTime updatedTime;
   @Schema(title = "用户名")
   private String username;
   @Schema(title = "昵称")

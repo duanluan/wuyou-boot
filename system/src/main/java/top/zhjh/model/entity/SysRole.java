@@ -27,4 +27,9 @@ public class SysRole extends BaseEntity {
    */
   @Schema(title = "名称")
   private String name;
+  /**
+   * 描述
+   */
+  @Schema(title = "描述")
+  private String description;
 }

@@ -28,12 +28,12 @@ public class BaseEntity implements Serializable {
   @Schema(title = "创建人")
   private Long createdBy;
   @Schema(title = "创建时间")
-  private Date createdTime;
+  private LocalDateTime createdTime;
   @TableField(fill = FieldFill.UPDATE)
   @Schema(title = "更新人")
   private Long updatedBy;
   @Schema(title = "更新时间")
-  private Date updatedTime;
+  private LocalDateTime updatedTime;
   @Schema(title = "是否删除")
   private Boolean deleted;
 }
