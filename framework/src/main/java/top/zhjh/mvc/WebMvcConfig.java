@@ -15,7 +15,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.alibaba.fastjson2.JSONReader.Feature.*;
-import static com.alibaba.fastjson2.JSONWriter.Feature.WriteLongAsString;
 
 /**
  * Web MVC 配置
@@ -44,11 +43,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
       SupportAutoType,
       // 支持数据映射的方式
       SupportArrayToBean);
-    // 序列化
-    config.setWriterFeatures(
-      // Long 转字符串
-      WriteLongAsString
-    );
     converter.setFastJsonConfig(config);
     converter.setDefaultCharset(StandardCharsets.UTF_8);
     converter.setSupportedMediaTypes(Collections.singletonList(MediaType.APPLICATION_JSON));

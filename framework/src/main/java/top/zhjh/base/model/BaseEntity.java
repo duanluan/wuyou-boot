@@ -1,20 +1,25 @@
 package top.zhjh.base.model;
 
+import com.alibaba.fastjson2.JSONWriter;
+import com.alibaba.fastjson2.annotation.JSONField;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 基础实体
  */
 @Data
 public class BaseEntity implements Serializable {
+
+  @JSONField(serializeFeatures = {JSONWriter.Feature.WriteLongAsString})
   @Schema(title = "ID")
   private Long id;
+  @JSONField(serializeFeatures = {JSONWriter.Feature.WriteLongAsString})
   @Schema(title = "租户 ID")
   private Long tenantId;
   @Schema(title = "乐观锁")
