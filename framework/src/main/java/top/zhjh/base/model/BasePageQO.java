@@ -11,7 +11,6 @@ import java.util.List;
  * 分页入参，用于隐藏 Swagger 中的非分页参数
  *
  * @param <T> 实体类型
- * @author ZhongJianhao
  */
 public class BasePageQO<T> extends Page<T> implements Serializable {
 

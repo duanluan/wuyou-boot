@@ -8,8 +8,6 @@ import top.zhjh.base.model.BaseEntity;
 
 /**
  * 菜单
- *
- * @author ZhongJianhao
  */
 @Schema(title = "菜单")
 @TableName("sys_menu")

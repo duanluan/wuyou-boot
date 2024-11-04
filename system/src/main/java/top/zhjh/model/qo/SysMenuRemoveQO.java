@@ -10,8 +10,6 @@ import java.time.LocalDateTime;
 
 /**
  * 菜单删除入参
- *
- * @author ZhongJianhao
  */
 @Schema(title = "菜单 删除入参")
 @EqualsAndHashCode(callSuper = false)

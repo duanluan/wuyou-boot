@@ -11,8 +11,6 @@ import java.time.LocalDateTime;
 
 /**
  * 角色更新入参
- *
- * @author ZhongJianhao
  */
 @Schema(title = "角色 更新入参")
 @EqualsAndHashCode(callSuper = false)

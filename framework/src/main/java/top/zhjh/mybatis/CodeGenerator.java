@@ -94,7 +94,7 @@ public class CodeGenerator {
         // 输出目录，默认 windows: D://  linux or mac: /tmp
         .outputDir(OUTPUT_DIR)
         // 作者，默认无
-        .author("ZhongJianhao")
+        // .author("ZhongJianhao")
         // 注释时间（@since），默认 yyyy-MM-dd
         .commentDate("")
         // 开启 swagger 模式，默认 false

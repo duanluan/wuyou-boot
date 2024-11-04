@@ -8,8 +8,6 @@ import top.zhjh.base.model.BaseEntity;
 
 /**
  * 角色
- *
- * @author ZhongJianhao
  */
 @Schema(title = "角色")
 @TableName("sys_role")

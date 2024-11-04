@@ -10,8 +10,6 @@ import java.time.LocalDateTime;
 
 /**
  * 菜单保存入参
- *
- * @author ZhongJianhao
  */
 @Schema(title = "菜单 保存入参")
 @EqualsAndHashCode(callSuper = false)

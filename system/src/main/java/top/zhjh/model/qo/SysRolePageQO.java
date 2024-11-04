@@ -8,8 +8,6 @@ import top.zhjh.model.entity.SysRole;
 
 /**
  * 角色分页入参
- *
- * @author ZhongJianhao
  */
 @Schema(title = "角色 分页入参")
 @EqualsAndHashCode(callSuper = true)

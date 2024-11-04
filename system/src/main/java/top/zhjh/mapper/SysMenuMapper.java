@@ -9,8 +9,6 @@ import java.util.List;
 
 /**
  * 菜单 Mapper
- *
- * @author ZhongJianhao
  */
 public interface SysMenuMapper extends BaseMapper<SysMenu> {
 

@@ -10,8 +10,6 @@ import java.time.LocalDateTime;
 
 /**
  * 角色保存入参
- *
- * @author ZhongJianhao
  */
 @Schema(title = "角色 保存入参")
 @EqualsAndHashCode(callSuper = false)

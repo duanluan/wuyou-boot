@@ -8,8 +8,6 @@ import javax.validation.constraints.NotBlank;
 
 /**
  * 角色删除入参
- *
- * @author ZhongJianhao
  */
 @Schema(title = "角色 删除入参")
 @EqualsAndHashCode(callSuper = false)

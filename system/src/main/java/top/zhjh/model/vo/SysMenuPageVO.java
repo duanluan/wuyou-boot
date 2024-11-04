@@ -7,8 +7,6 @@ import lombok.EqualsAndHashCode;
 
 /**
  * 菜单响应
- *
- * @author ZhongJianhao
  */
 @Schema(title = "菜单 分页响应")
 @EqualsAndHashCode(callSuper = true)

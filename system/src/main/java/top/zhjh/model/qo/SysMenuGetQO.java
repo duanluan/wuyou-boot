@@ -11,8 +11,6 @@ import java.time.LocalDateTime;
 
 /**
  * 菜单详情入参
- *
- * @author ZhongJianhao
  */
 @Schema(title = "菜单 详情入参")
 @EqualsAndHashCode(callSuper = false)

@@ -7,8 +7,6 @@ import lombok.EqualsAndHashCode;
 
 /**
  * 角色响应
- *
- * @author ZhongJianhao
  */
 @Schema(title = "角色 分页响应")
 @EqualsAndHashCode(callSuper = true)
