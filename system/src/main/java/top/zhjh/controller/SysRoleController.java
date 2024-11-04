@@ -61,7 +61,7 @@ public class SysRoleController extends BaseController {
   @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
   @PutMapping("/{id}")
   public R update(@RequestBody @Validated SysRoleUpdateQO obj) {
-    return updateR(sysRoleService.updateById(SysRoleStruct.INSTANCE.to(obj)));
+    return updateR(sysRoleService.update(obj));
   }
 
   @Operation(summary = "删除角色")

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import top.csaf.lang.StrUtil;
 import top.zhjh.enums.RoleEnum;
 import top.zhjh.exception.ServiceException;
@@ -12,6 +13,9 @@ import top.zhjh.model.entity.SysRole;
 import top.zhjh.model.entity.SysRoleUser;
 import top.zhjh.model.qo.SysRoleRemoveQO;
 import top.zhjh.model.qo.SysRoleUpdateQO;
+import top.zhjh.struct.SysRoleStruct;
+
+import java.util.Arrays;
 
 /**
  * 角色 服务实现
@@ -25,6 +29,19 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
   @Autowired
   private SysRoleUserService sysRoleUserService;
 
+  public boolean update(SysRoleUpdateQO obj) {
+    SysRole role = this.getById(obj.getId());
+    if (role == null) {
+      log.error("角色不存在: {}", obj.getId());
+      throw new ServiceException("角色不存在");
+    }
+    if (!role.getCode().equals(obj.getCode())) {
+      throw new ServiceException("不能修改编码为" + RoleEnum.SUPER_ADMIN.getCode() + "角色的编码");
+    }
+    return this.updateById(SysRoleStruct.INSTANCE.to(obj));
+  }
+
+  @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
   public boolean remove(SysRoleRemoveQO query) {
     String idsStr = query.getIds();
     if (StrUtil.isBlank(idsStr)) {
