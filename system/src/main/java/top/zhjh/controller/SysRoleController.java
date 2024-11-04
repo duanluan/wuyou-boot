@@ -17,7 +17,6 @@ import top.zhjh.model.vo.SysRoleGetVO;
 import top.zhjh.service.SysRoleService;
 import top.zhjh.struct.SysRoleStruct;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -71,6 +70,6 @@ public class SysRoleController extends BaseController {
   @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
   @DeleteMapping("/{ids}")
   public R remove(@Validated SysRoleRemoveQO query) {
-    return removeR(sysRoleService.removeByIds(Arrays.asList(query.getIds().split(","))));
+    return removeR(sysRoleService.remove(query));
   }
 }

@@ -12,10 +12,15 @@ import org.springframework.http.HttpStatus;
 @Data
 public class ServiceException extends RuntimeException {
 
-    private HttpStatus status;
+  private HttpStatus status;
 
-    public ServiceException(@NonNull final HttpStatus status, @NonNull String message) {
-        super(message);
-        this.status = status;
-    }
+  public ServiceException(@NonNull final HttpStatus status, @NonNull String message) {
+    super(message);
+    this.status = status;
+  }
+
+  public ServiceException(@NonNull String message) {
+    super(message);
+    this.status = HttpStatus.INTERNAL_SERVER_ERROR;
+  }
 }

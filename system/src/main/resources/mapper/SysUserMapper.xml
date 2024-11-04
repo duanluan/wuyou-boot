@@ -3,14 +3,14 @@
 <mapper namespace="top.zhjh.mapper.SysUserMapper">
   <select id="listRoleCodes" resultType="java.lang.String">
     select code from sys_role where id in (
-      select role_id from sys_user_role where user_id = #{id}
+      select role_id from sys_role_user where user_id = #{id}
     )
   </select>
 
   <select id="listPermission" resultType="java.lang.String">
     select permission from sys_menu where id in (
       select menu_id from sys_role_menu where role_id in (
-        select role_id from sys_user_role where user_id = #{id}
+        select role_id from sys_role_user where user_id = #{id}
       )
     )
   </select>
