@@ -39,13 +39,13 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
         log.error("角色不存在: {}", id);
         throw new ServiceException("角色不存在");
       }
-      if (RoleEnum.SUPER_ADMIN.getCode().equals(id)) {
+      if (RoleEnum.SUPER_ADMIN.getCode().equals(role.getCode())) {
         throw new ServiceException("不能删除编码为" + RoleEnum.SUPER_ADMIN.getCode() + "的角色");
       }
       if (sysRoleUserService.lambdaQuery().eq(SysRoleUser::getRoleId, id).count() > 0) {
         throw new ServiceException("不能删除关联了用户的角色");
       }
     }
-    return this.removeById(ids);
+    return this.removeBatchByIds(Arrays.asList(ids));
   }
 }
