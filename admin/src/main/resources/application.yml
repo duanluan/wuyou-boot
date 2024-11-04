@@ -15,6 +15,10 @@ spring:
     url: jdbc:mariadb://localhost:3307/wuyou_boot
     username: wuyou_boot
     password: 123
+    hikari:
+      # idle-timeout、max-lifetime 不能大于数据库的 interactive_timeout、wait_timeout，否则报错 Failed to validate connection org.mariadb.jdbc.Connection@xxx ((conn=xxx) Connection.setNetworkTimeout cannot be called on a closed connection). Possibly consider using a shorter maxLifetime value.
+      idle-timeout: 25000
+      max-lifetime: 25000
   # Redis
   redis:
     host: localhost
