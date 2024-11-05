@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import top.csaf.coll.CollUtil;
 import top.csaf.lang.StrUtil;
 import top.zhjh.enums.RoleEnum;
 import top.zhjh.exception.ServiceException;
@@ -12,10 +13,13 @@ import top.zhjh.mapper.SysRoleMapper;
 import top.zhjh.model.entity.SysRole;
 import top.zhjh.model.entity.SysRoleUser;
 import top.zhjh.model.qo.SysRoleRemoveQO;
+import top.zhjh.model.qo.SysRoleSaveQO;
 import top.zhjh.model.qo.SysRoleUpdateQO;
 import top.zhjh.struct.SysRoleStruct;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * 角色 服务实现
@@ -35,7 +39,7 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
       log.error("角色不存在: {}", obj.getId());
       throw new ServiceException("角色不存在");
     }
-    if (!role.getCode().equals(obj.getCode())) {
+    if (RoleEnum.SUPER_ADMIN.getCode().equals(role.getCode()) && !role.getCode().equals(obj.getCode())) {
       throw new ServiceException("不能修改编码为" + RoleEnum.SUPER_ADMIN.getCode() + "角色的编码");
     }
     return this.updateById(SysRoleStruct.INSTANCE.to(obj));
@@ -62,5 +66,26 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
       }
     }
     return this.removeBatchByIds(Arrays.asList(ids));
+  }
+
+  public boolean save(SysRoleSaveQO obj) {
+    // 名称或编码是否重复
+    List<SysRole> roleList = this.lambdaQuery().select(SysRole::getName, SysRole::getCode)
+      .and(c -> c.eq(SysRole::getName, obj.getName()).or().eq(SysRole::getCode, obj.getCode()))
+      .list();
+    if (CollUtil.isNotEmpty(roleList)) {
+      List<String> errorMsgFields = new ArrayList<>();
+      for (SysRole role : roleList) {
+        if (role.getName().equals(obj.getName())) {
+          errorMsgFields.add("名称");
+        }
+        if (role.getCode().equals(obj.getCode())) {
+          errorMsgFields.add("编码");
+        }
+      }
+      throw new ServiceException(StrUtil.join(errorMsgFields, "、") + "已存在");
+    }
+
+    return this.save(SysRoleStruct.INSTANCE.to(obj));
   }
 }

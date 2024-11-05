@@ -15,7 +15,6 @@ import top.zhjh.model.entity.SysRole;
 import top.zhjh.model.qo.*;
 import top.zhjh.model.vo.SysRoleGetVO;
 import top.zhjh.service.SysRoleService;
-import top.zhjh.struct.SysRoleStruct;
 
 import java.util.List;
 
@@ -54,7 +53,7 @@ public class SysRoleController extends BaseController {
   @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
   @PostMapping
   public R save(@RequestBody @Validated SysRoleSaveQO obj) {
-    return saveR(sysRoleService.save(SysRoleStruct.INSTANCE.to(obj)));
+    return saveR(sysRoleService.save(obj));
   }
 
   @Operation(summary = "更新角色")
