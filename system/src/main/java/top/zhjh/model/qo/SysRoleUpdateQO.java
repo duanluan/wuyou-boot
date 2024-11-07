@@ -34,6 +34,9 @@ public class SysRoleUpdateQO {
   private String name;
   @Schema(title = "描述")
   private String description;
+  @Schema(title = "顺序")
+  @NotNull(message = "顺序不能为空", groups = {UpdateGroup.class})
+  private Long sort;
   @Schema(title = "状态")
   @NotNull(message = "状态不能为空", groups = {UpdateGroup.class, UpdateStatusGroup.class})
   private RoleStatus status;

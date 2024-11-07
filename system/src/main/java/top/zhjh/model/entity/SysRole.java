@@ -31,9 +31,9 @@ public class SysRole extends BaseEntity {
   @Schema(title = "描述")
   private String description;
   /**
-   * 排序
+   * 顺序
    */
-  @Schema(title = "排序")
+  @Schema(title = "顺序")
   private Long sort;
   /**
    * 状态：0: 禁用, 1: 启用
