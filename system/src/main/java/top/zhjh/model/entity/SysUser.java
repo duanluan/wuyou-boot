@@ -24,11 +24,6 @@ public class SysUser extends BaseEntity {
   @Schema(title = "密码")
   private String password;
   /**
-   * 密码盐
-   */
-  @Schema(title = "密码盐")
-  private String passwordSalt;
-  /**
    * 昵称
    */
   @Schema(title = "昵称")
