@@ -50,21 +50,24 @@ public class SysRoleController extends BaseController {
   }
 
   @Operation(summary = "保存角色")
-  @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
   @PostMapping
   public R save(@RequestBody @Validated SysRoleSaveQO obj) {
     return saveR(sysRoleService.save(obj));
   }
 
   @Operation(summary = "更新角色")
-  @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
   @PutMapping("/{id}")
-  public R update(@RequestBody @Validated SysRoleUpdateQO obj) {
+  public R update(@RequestBody @Validated(SysRoleUpdateQO.UpdateGroup.class) SysRoleUpdateQO obj) {
     return updateR(sysRoleService.update(obj));
   }
 
+  @Operation(summary = "更新角色状态")
+  @PatchMapping("/{id}/status")
+  public R updateStatus(@RequestBody @Validated(SysRoleUpdateQO.UpdateStatusGroup.class) SysRoleUpdateQO obj) {
+    return updateR(sysRoleService.updateStatus(obj));
+  }
+
   @Operation(summary = "删除角色")
-  @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
   @DeleteMapping("/{ids}")
   public R remove(@Validated SysRoleRemoveQO query) {
     return removeR(sysRoleService.remove(query));

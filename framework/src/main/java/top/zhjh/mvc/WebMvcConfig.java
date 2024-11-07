@@ -1,5 +1,6 @@
 package top.zhjh.mvc;
 
+import com.alibaba.fastjson2.JSONWriter;
 import com.alibaba.fastjson2.support.config.FastJsonConfig;
 import com.alibaba.fastjson2.support.spring.http.converter.FastJsonHttpMessageConverter;
 import com.alibaba.fastjson2.support.spring.webservlet.view.FastJsonJsonView;
@@ -43,6 +44,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
       SupportAutoType,
       // 支持数据映射的方式
       SupportArrayToBean);
+    // config.setWriterFeatures(
+    //   // 序列化枚举值为前端返回值
+    //   JSONWriter.Feature.WriteEnumUsingToString);
     converter.setFastJsonConfig(config);
     converter.setDefaultCharset(StandardCharsets.UTF_8);
     converter.setSupportedMediaTypes(Collections.singletonList(MediaType.APPLICATION_JSON));

@@ -92,6 +92,7 @@ public class GlobalExceptionHandler {
   @ExceptionHandler({Exception.class})
   @ResponseBody
   public ResponseEntity<R> handleException(Exception e) {
+    log.error("系统异常", e);
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new R(HttpStatus.INTERNAL_SERVER_ERROR.value(), "系统异常"));
   }
 }

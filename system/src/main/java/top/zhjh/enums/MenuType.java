@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 系统菜单类型枚举
+ * 菜单类型枚举
  */
 @AllArgsConstructor
 @Getter

@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import top.csaf.coll.CollUtil;
 import top.csaf.lang.StrUtil;
 import top.zhjh.enums.RoleEnum;
+import top.zhjh.enums.RoleStatus;
 import top.zhjh.exception.ServiceException;
 import top.zhjh.mapper.SysRoleMapper;
 import top.zhjh.model.entity.SysRole;
@@ -33,18 +34,58 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
   @Autowired
   private SysRoleUserService sysRoleUserService;
 
+  /**
+   * 更新
+   *
+   * @param obj 更新入参
+   * @return 是否成功
+   */
+  @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
   public boolean update(SysRoleUpdateQO obj) {
     SysRole role = this.getById(obj.getId());
     if (role == null) {
       log.error("角色不存在: {}", obj.getId());
       throw new ServiceException("角色不存在");
     }
-    if (RoleEnum.SUPER_ADMIN.getCode().equals(role.getCode()) && !role.getCode().equals(obj.getCode())) {
-      throw new ServiceException("不能修改编码为" + RoleEnum.SUPER_ADMIN.getCode() + "角色的编码");
+    if (RoleEnum.SUPER_ADMIN.getCode().equals(role.getCode())) {
+      if (!role.getCode().equals(obj.getCode())) {
+        throw new ServiceException("不能修改编码为" + RoleEnum.SUPER_ADMIN.getCode() + "角色的编码");
+      }
+      if (!role.getStatus().equals(obj.getStatus())) {
+        throw new ServiceException("不能修改编码为" + RoleEnum.SUPER_ADMIN.getCode() + "角色的状态");
+      }
     }
     return this.updateById(SysRoleStruct.INSTANCE.to(obj));
   }
 
+  /**
+   * 更新状态
+   *
+   * @param obj 更新入参
+   * @return 是否成功
+   */
+  @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
+  public boolean updateStatus(SysRoleUpdateQO obj) {
+    if (RoleStatus.isInEnum(obj.getStatus())) {
+      throw new ServiceException("角色状态错误");
+    }
+    SysRole role = this.getById(obj.getId());
+    if (role == null) {
+      log.error("角色不存在: {}", obj.getId());
+      throw new ServiceException("角色不存在");
+    }
+    if (RoleEnum.SUPER_ADMIN.getCode().equals(role.getCode())) {
+      throw new ServiceException("不能修改编码为" + RoleEnum.SUPER_ADMIN.getCode() + "角色的状态");
+    }
+    return this.updateById(SysRoleStruct.INSTANCE.to(obj));
+  }
+
+  /**
+   * 删除
+   *
+   * @param query 删除入参
+   * @return 是否成功
+   */
   @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
   public boolean remove(SysRoleRemoveQO query) {
     String idsStr = query.getIds();
@@ -68,6 +109,13 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
     return this.removeBatchByIds(Arrays.asList(ids));
   }
 
+  /**
+   * 保存
+   *
+   * @param obj 保存入参
+   * @return 是否成功
+   */
+  @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
   public boolean save(SysRoleSaveQO obj) {
     // 名称或编码是否重复
     List<SysRole> roleList = this.lambdaQuery().select(SysRole::getName, SysRole::getCode)
@@ -85,7 +133,6 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
       }
       throw new ServiceException(StrUtil.join(errorMsgFields, "、") + "已存在");
     }
-
     return this.save(SysRoleStruct.INSTANCE.to(obj));
   }
 }

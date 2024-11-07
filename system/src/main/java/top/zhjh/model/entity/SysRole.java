@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import top.zhjh.base.model.BaseEntity;
+import top.zhjh.enums.RoleStatus;
 
 /**
  * 角色
@@ -14,7 +15,6 @@ import top.zhjh.base.model.BaseEntity;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class SysRole extends BaseEntity {
-
   /**
    * 编码
    */
@@ -30,4 +30,14 @@ public class SysRole extends BaseEntity {
    */
   @Schema(title = "描述")
   private String description;
+  /**
+   * 排序
+   */
+  @Schema(title = "排序")
+  private Long sort;
+  /**
+   * 状态：0: 禁用, 1: 启用
+   */
+  @Schema(title = "状态")
+  private RoleStatus status;
 }
