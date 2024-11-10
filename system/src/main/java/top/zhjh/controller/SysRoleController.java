@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import top.csaf.lang.StrUtil;
@@ -15,6 +14,7 @@ import top.zhjh.model.qo.*;
 import top.zhjh.model.vo.SysRoleGetVO;
 import top.zhjh.service.SysRoleService;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -26,7 +26,7 @@ import java.util.List;
 @RestController
 public class SysRoleController extends BaseController {
 
-  @Autowired
+  @Resource
   private SysRoleService sysRoleService;
 
   @Operation(summary = "角色列表")

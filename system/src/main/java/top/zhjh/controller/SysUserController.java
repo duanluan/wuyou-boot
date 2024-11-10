@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -19,6 +18,7 @@ import top.zhjh.model.vo.SysUserDetailVO;
 import top.zhjh.service.SysUserService;
 import top.zhjh.struct.SysUserStruct;
 
+import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.List;
 
@@ -31,7 +31,7 @@ import java.util.List;
 @RestController
 public class SysUserController extends BaseController {
 
-  @Autowired
+  @Resource
   private SysUserService sysUserService;
 
   @Operation(summary = "注册")

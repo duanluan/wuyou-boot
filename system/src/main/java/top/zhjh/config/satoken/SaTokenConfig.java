@@ -3,12 +3,13 @@ package top.zhjh.config.satoken;
 import cn.dev33.satoken.interceptor.SaInterceptor;
 import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import top.zhjh.model.entity.SysMenu;
 import top.zhjh.service.SysMenuService;
+
+import javax.annotation.Resource;
 
 /**
  * Sa-Token 配置
@@ -16,7 +17,7 @@ import top.zhjh.service.SysMenuService;
 @Configuration
 public class SaTokenConfig implements WebMvcConfigurer {
 
-  @Autowired
+  @Resource
   private SysMenuService sysMenuService;
 
   /**

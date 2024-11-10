@@ -1,10 +1,10 @@
 package top.zhjh.config.satoken;
 
 import cn.dev33.satoken.stp.StpInterface;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import top.zhjh.service.SysUserService;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -13,7 +13,7 @@ import java.util.List;
 @Component
 public class StpInterfaceImpl implements StpInterface {
 
-  @Autowired
+  @Resource
   private SysUserService sysUserService;
 
   /**

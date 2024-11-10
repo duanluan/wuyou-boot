@@ -2,7 +2,6 @@ package top.zhjh.service;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import top.csaf.tree.TreeNode;
@@ -11,6 +10,7 @@ import top.zhjh.mapper.SysMenuMapper;
 import top.zhjh.model.entity.SysMenu;
 import top.zhjh.model.qo.SysMenuTreeQO;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -19,7 +19,7 @@ import java.util.List;
 @Service
 public class SysMenuService extends ServiceImpl<SysMenuMapper, SysMenu> {
 
-  @Autowired
+  @Resource
   private SysMenuMapper sysMenuMapper;
 
   @Cacheable(value = "menuTree", key = "#query.types", condition = "#query.isNotBlankTypes()")

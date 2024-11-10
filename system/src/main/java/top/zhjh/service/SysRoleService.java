@@ -2,7 +2,6 @@ package top.zhjh.service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import top.csaf.coll.CollUtil;
@@ -12,12 +11,14 @@ import top.zhjh.enums.RoleStatus;
 import top.zhjh.exception.ServiceException;
 import top.zhjh.mapper.SysRoleMapper;
 import top.zhjh.model.entity.SysRole;
+import top.zhjh.model.entity.SysRoleMenu;
 import top.zhjh.model.entity.SysRoleUser;
 import top.zhjh.model.qo.SysRoleRemoveQO;
 import top.zhjh.model.qo.SysRoleSaveQO;
 import top.zhjh.model.qo.SysRoleUpdateQO;
 import top.zhjh.struct.SysRoleStruct;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,9 +30,9 @@ import java.util.List;
 @Service
 public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
 
-  @Autowired
+  @Resource
   private SysRoleMapper sysRoleMapper;
-  @Autowired
+  @Resource
   private SysRoleUserService sysRoleUserService;
 
   /**

@@ -49,7 +49,7 @@ public class ${table.controllerName} extends ${superControllerClass} {
 public class ${table.controllerName} {
 </#if>
 
-  @Autowired
+  @Resource
   private ${table.serviceName} ${table.serviceName?substring(1, 2)?lower_case}${table.serviceName?substring(2)};
 
   @Operation(summary = "${table.comment!}列表")
