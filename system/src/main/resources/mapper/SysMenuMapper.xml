@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="top.zhjh.mapper.SysMenuMapper">
 
-  <select id="listTree" resultType="top.csaf.tree.TreeNode">
+  <sql id="listTreeSql">
     select
       id,
       name,
@@ -28,5 +28,28 @@
       </foreach>
     </if>
     order by order_num
+  </sql>
+
+  <select id="listTree" resultType="top.csaf.tree.TreeNode">
+    <choose>
+      <when test="isAllAndChecked">
+        select
+          sm.id,
+          sm.name,
+          sm.order_num as 'order',
+          sm.parent_id as parentId,
+          sm.icon,
+          sm.path,
+          case
+            when sm.id in (select id from (<include refid="listTreeSql"/>) t) then true
+            else false
+          end as checked
+        from sys_menu sm
+        where sm.deleted = 0
+      </when>
+      <otherwise>
+        <include refid="listTreeSql"/>
+      </otherwise>
+    </choose>
   </select>
 </mapper>

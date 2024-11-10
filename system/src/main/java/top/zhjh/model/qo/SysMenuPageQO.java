@@ -6,8 +6,6 @@ import lombok.EqualsAndHashCode;
 import top.zhjh.base.model.BasePageQO;
 import top.zhjh.model.entity.SysMenu;
 
-import java.time.LocalDateTime;
-
 /**
  * 菜单分页入参
  */
@@ -16,10 +14,6 @@ import java.time.LocalDateTime;
 @Data
 public class SysMenuPageQO extends BasePageQO<SysMenu> {
 
-  @Schema(title = "创建时间")
-  private LocalDateTime createdTime;
-  @Schema(title = "父级 ID")
-  private String parentId;
   @Schema(title = "类型：1: 目录, 2: 菜单, 3: 按钮")
   private Boolean type;
   @Schema(title = "名称")
@@ -34,8 +28,6 @@ public class SysMenuPageQO extends BasePageQO<SysMenu> {
   private String permission;
   @Schema(title = "是否需要登录")
   private Boolean needToLogin;
-  @Schema(title = "顺序")
-  private Integer orderNum;
   @Schema(title = "状态：1: 启用, 2: 禁用")
   private Integer status;
 }

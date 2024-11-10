@@ -15,6 +15,8 @@ public class SysMenuTreeQO {
   private String types;
   @Schema(title = "角色编码列表")
   private List<String> roleCodeList;
+  @Schema(title = "是否获取全部和选中")
+  private Boolean isAllAndChecked;
 
   public boolean isNotBlankTypes() {
     return StrUtil.isNotBlank(types);
