@@ -3,7 +3,7 @@ package top.zhjh.model.entity;
 import lombok.Data;
 
 /**
- * 角色用户关联表
+ * 角色用户关联
  */
 @Data
 public class SysRoleUser {

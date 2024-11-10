@@ -67,6 +67,12 @@ public class SysRoleController extends BaseController {
     return updateR(sysRoleService.updateStatus(obj));
   }
 
+  @Operation(summary = "更新角色菜单")
+  @PatchMapping("/{id}/menus")
+  public R updateMenus(@RequestBody @Validated(SysRoleUpdateQO.UpdateMenusGroup.class) SysRoleUpdateQO obj) {
+    return updateR(sysRoleService.updateMenus(obj));
+  }
+
   @Operation(summary = "删除角色")
   @DeleteMapping("/{ids}")
   public R remove(@Validated SysRoleRemoveQO query) {

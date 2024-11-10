@@ -23,8 +23,11 @@ public class SysRoleUpdateQO {
   public interface UpdateStatusGroup {
   }
 
+  public interface UpdateMenusGroup {
+  }
+
   @Schema(title = "ID")
-  @Min(value = 1, message = "角色ID错误", groups = {UpdateGroup.class, UpdateStatusGroup.class})
+  @Min(value = 1, message = "角色ID错误", groups = {UpdateGroup.class, UpdateStatusGroup.class, UpdateMenusGroup.class})
   private Long id;
   @Schema(title = "编码")
   @NotBlank(message = "编码不能为空", groups = {UpdateGroup.class})
@@ -37,7 +40,12 @@ public class SysRoleUpdateQO {
   @Schema(title = "顺序")
   @NotNull(message = "顺序不能为空", groups = {UpdateGroup.class})
   private Long sort;
+
   @Schema(title = "状态")
   @NotNull(message = "状态不能为空", groups = {UpdateGroup.class, UpdateStatusGroup.class})
   private RoleStatus status;
+
+  @Schema(title = "菜单ID数组")
+  @NotNull(message = "菜单ID数组不能为空", groups = {UpdateMenusGroup.class})
+  private Long[] menuIds;
 }

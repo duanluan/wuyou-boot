@@ -34,6 +34,8 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
   private SysRoleMapper sysRoleMapper;
   @Resource
   private SysRoleUserService sysRoleUserService;
+  @Resource
+  private SysRoleMenuService sysRoleMenuService;
 
   /**
    * 更新
@@ -82,6 +84,36 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
   }
 
   /**
+   * 更新角色菜单
+   *
+   * @param obj 更新入参
+   * @return 是否成功
+   */
+  @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
+  public boolean updateMenus(SysRoleUpdateQO obj) {
+    Long id = obj.getId();
+    SysRole role = this.getById(id);
+    if (role == null) {
+      log.error("角色不存在: {}", id);
+      throw new ServiceException("角色不存在");
+    }
+    if (RoleEnum.SUPER_ADMIN.getCode().equals(role.getCode())) {
+      throw new ServiceException("不能修改编码为" + RoleEnum.SUPER_ADMIN.getCode() + "角色的菜单");
+    }
+    sysRoleMenuService.lambdaUpdate().eq(SysRoleMenu::getRoleId, obj.getId()).remove();
+    if (CollUtil.sizeIsNotEmpty(obj.getMenuIds())) {
+      List<SysRoleMenu> roleMenuList = new ArrayList<>();
+      for (Long menuId : obj.getMenuIds()) {
+        roleMenuList.add(new SysRoleMenu(id, menuId));
+      }
+      if (!sysRoleMenuService.saveBatch(roleMenuList)) {
+        throw new ServiceException("保存角色菜单失败");
+      }
+    }
+    return true;
+  }
+
+  /**
    * 删除
    *
    * @param query 删除入参
@@ -106,6 +138,8 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
       if (sysRoleUserService.lambdaQuery().eq(SysRoleUser::getRoleId, id).count() > 0) {
         throw new ServiceException("不能删除关联了用户的角色");
       }
+      // 删除关联菜单
+      sysRoleMenuService.lambdaUpdate().eq(SysRoleMenu::getRoleId, id).remove();
     }
     return this.removeBatchByIds(Arrays.asList(ids));
   }
