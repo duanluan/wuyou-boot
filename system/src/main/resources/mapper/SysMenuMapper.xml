@@ -12,18 +12,18 @@
       path
     from sys_menu
     where deleted = 0
-    <if test="roleCodeList != null">
+    <if test="roleCodes != null">
       and id in (
         select menu_id from sys_role_menu where role_id in (
           select id from sys_role where code in
-          <foreach collection="roleCodeList" item="roleCode" open="(" separator="," close=")">
+          <foreach collection="roleCodes" item="roleCode" open="(" separator="," close=")">
             #{roleCode}
           </foreach>
         )
       )
     </if>
     <if test="types != null">
-      <foreach collection="types.split(',')" item="type" open="and (" separator="or" close=")">
+      <foreach collection="types" item="type" open="and (" separator="or" close=")">
         type = #{type}
       </foreach>
     </if>
