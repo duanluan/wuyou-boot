@@ -6,7 +6,7 @@
     select
       id,
       name,
-      order_num as 'order',
+      sort,
       parent_id as parentId,
       icon,
       path
@@ -27,7 +27,7 @@
         type = #{type}
       </foreach>
     </if>
-    order by order_num
+    order by sort
   </sql>
 
   <select id="listTree" resultType="top.csaf.tree.TreeNode">
@@ -36,7 +36,7 @@
         select
           sm.id,
           sm.name,
-          sm.order_num as 'order',
+          sm.sort,
           sm.parent_id as parentId,
           sm.icon,
           sm.path,

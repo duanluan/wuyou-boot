@@ -30,7 +30,7 @@ public class SysMenuGetVO extends BaseEntity {
   @Schema(title = "是否需要登录")
   private Boolean needToLogin;
   @Schema(title = "顺序")
-  private Integer orderNum;
+  private Integer sort;
   @Schema(title = "状态：1: 启用, 2: 禁用")
   private Integer status;
 }

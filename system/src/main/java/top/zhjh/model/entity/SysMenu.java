@@ -59,7 +59,7 @@ public class SysMenu extends BaseEntity {
    * 顺序
    */
   @Schema(title = "顺序")
-  private Integer orderNum;
+  private Integer sort;
   /**
    * 状态：1: 启用, 2: 禁用
    */
