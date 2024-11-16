@@ -26,6 +26,7 @@ import top.zhjh.model.vo.SysUserPageVO;
 import top.zhjh.struct.SysUserStruct;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -151,7 +152,21 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
     }
     SysUser sysUser = SysUserStruct.INSTANCE.to(obj);
     sysUser.setPassword(DigestUtil.sha512Hex(sysUser.getPassword()));
-    return this.save(sysUser);
+    if (!this.save(sysUser)) {
+      throw new ServiceException("保存失败");
+    }
+
+    // 关联角色
+    List<SysRoleUser> roleUserList = new ArrayList<>();
+    for (Long roleId : obj.getRoleIds()) {
+      SysRole role = sysRoleService.getById(roleId);
+      if (role == null) {
+        log.error("角色不存在: {}", roleId);
+        throw new ServiceException("角色不存在");
+      }
+      roleUserList.add(new SysRoleUser(roleId, sysUser.getId()));
+    }
+    return sysRoleUserService.saveBatch(roleUserList);
   }
 
   /**
