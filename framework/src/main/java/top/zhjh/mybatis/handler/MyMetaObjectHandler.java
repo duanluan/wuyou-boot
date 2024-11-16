@@ -1,4 +1,4 @@
-package top.zhjh.mybatis;
+package top.zhjh.mybatis.handler;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;

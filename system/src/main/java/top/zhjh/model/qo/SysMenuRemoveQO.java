@@ -1,11 +1,11 @@
 package top.zhjh.model.qo;
 
-import top.zhjh.model.entity.SysMenu;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 /**
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Schema(title = "菜单 删除入参")
 @EqualsAndHashCode(callSuper = false)
 @Data
-public class SysMenuRemoveQO  {
+public class SysMenuRemoveQO {
 
   @Schema(title = "多个菜单 ID，逗号分隔")
   private String ids;

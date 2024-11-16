@@ -16,10 +16,10 @@ import java.time.LocalDateTime;
 @Data
 public class BaseEntity implements Serializable {
 
-  @JSONField(serializeFeatures = {JSONWriter.Feature.WriteLongAsString})
+  // @JSONField(serializeFeatures = {JSONWriter.Feature.WriteLongAsString})
   @Schema(title = "ID")
   private Long id;
-  @JSONField(serializeFeatures = {JSONWriter.Feature.WriteLongAsString})
+  // @JSONField(serializeFeatures = {JSONWriter.Feature.WriteLongAsString})
   @Schema(title = "租户 ID")
   private Long tenantId;
   @Schema(title = "乐观锁")

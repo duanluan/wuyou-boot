@@ -1,10 +1,12 @@
 package top.zhjh.model.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
  * 角色用户关联
  */
+@AllArgsConstructor
 @Data
 public class SysRoleUser {
   /**

@@ -1,6 +1,5 @@
 package top.zhjh.mvc;
 
-import com.alibaba.fastjson2.JSONWriter;
 import com.alibaba.fastjson2.support.config.FastJsonConfig;
 import com.alibaba.fastjson2.support.spring.http.converter.FastJsonHttpMessageConverter;
 import com.alibaba.fastjson2.support.spring.webservlet.view.FastJsonJsonView;
@@ -16,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.alibaba.fastjson2.JSONReader.Feature.*;
+import static com.alibaba.fastjson2.JSONWriter.Feature.WriteLongAsString;
 
 /**
  * Web MVC 配置
@@ -36,17 +36,22 @@ public class WebMvcConfig implements WebMvcConfigurer {
     // 时间格式化
     config.setDateFormat("yyyy-MM-dd HH:mm:ss");
     // 通过 Features 配置序列化和反序列化的行为：https://alibaba.github.io/fastjson2/features_cn.html
-    // 反序列化
+    // 反序列化：转对象
     config.setReaderFeatures(
       // 基于非 static 的 field（包括 private）做反序列化
       FieldBased,
       // 支持自动类型
       SupportAutoType,
       // 支持数据映射的方式
-      SupportArrayToBean);
-    // config.setWriterFeatures(
-    //   // 序列化枚举值为前端返回值
-    //   JSONWriter.Feature.WriteEnumUsingToString);
+      SupportArrayToBean
+    );
+    // 序列化：转 JSON
+    config.setWriterFeatures(
+      // // 序列化枚举值为前端返回值
+      // JSONWriter.Feature.WriteEnumUsingToString
+      // 将 Long 序列化为 String
+      WriteLongAsString
+    );
     converter.setFastJsonConfig(config);
     converter.setDefaultCharset(StandardCharsets.UTF_8);
     converter.setSupportedMediaTypes(Collections.singletonList(MediaType.APPLICATION_JSON));

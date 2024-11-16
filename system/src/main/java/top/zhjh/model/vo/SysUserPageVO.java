@@ -5,6 +5,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import top.zhjh.base.model.PageVO;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 /**
  * 用户分页响应
  */
@@ -13,12 +16,16 @@ import top.zhjh.base.model.PageVO;
 @Data
 public class SysUserPageVO extends PageVO {
 
+  @Schema(title = "ID")
+  private Long id;
   @Schema(title = "用户名")
   private String username;
-  @Schema(title = "密码")
-  private String password;
-  @Schema(title = "密码盐")
-  private String passwordSalt;
   @Schema(title = "昵称")
   private String nickName;
+  @Schema(title = "角色ID列表")
+  private List<Long> roleIds;
+  @Schema(title = "角色名称列表")
+  private List<String> roleNames;
+  @Schema(title = "创建时间")
+  private LocalDateTime createdTime;
 }

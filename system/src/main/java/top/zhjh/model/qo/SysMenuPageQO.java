@@ -3,7 +3,7 @@ package top.zhjh.model.qo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import top.zhjh.base.model.BasePageQO;
+import top.zhjh.base.model.MyPage;
 import top.zhjh.model.entity.SysMenu;
 
 /**
@@ -12,7 +12,7 @@ import top.zhjh.model.entity.SysMenu;
 @Schema(title = "菜单 分页入参")
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class SysMenuPageQO extends BasePageQO<SysMenu> {
+public class SysMenuPageQO extends MyPage<SysMenu> {
 
   @Schema(title = "类型：1: 目录, 2: 菜单, 3: 按钮")
   private Boolean type;

@@ -2,7 +2,10 @@ package top.zhjh.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
+import top.zhjh.base.model.MyPage;
 import top.zhjh.model.entity.SysUser;
+import top.zhjh.model.qo.SysUserPageQO;
+import top.zhjh.model.vo.SysUserPageVO;
 
 import java.util.List;
 
@@ -11,7 +14,11 @@ import java.util.List;
  */
 public interface SysUserMapper extends BaseMapper<SysUser> {
 
-  List<String> listRoleCodes(@Param("id") String id);
+  List<String> listRoleCodes(@Param("id") Long id);
 
-  List<String> listPermission(@Param("id") String id);
+  List<String> listPermission(@Param("id") Long id);
+
+  List<SysUserPageVO> list(SysUserPageQO query);
+
+  MyPage<SysUserPageVO> page(SysUserPageQO query);
 }

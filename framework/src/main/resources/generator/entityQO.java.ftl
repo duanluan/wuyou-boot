@@ -1,7 +1,7 @@
 package ${package.Entity}.qo;
 
 <#if fileNameSuffix?contains('PageQO')>
-import top.zhjh.base.model.BasePageQO;
+import java.io.Serializable;
 <#elseif fileNameSuffix?contains('GetQO')>
 import top.zhjh.base.model.BaseGetQO;
 </#if>
@@ -48,7 +48,7 @@ import java.time.LocalDateTime;
 @Data
 </#if>
 <#if fileNameSuffix?contains("PageQO")>
-public class ${entity}${fileNameSuffix} extends BasePageQO<${entity}> {
+public class ${entity}${fileNameSuffix} implements Serializable {
 <#elseif fileNameSuffix?contains("GetQO")>
 public class ${entity}${fileNameSuffix} extends BaseGetQO {
 <#else>

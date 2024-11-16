@@ -3,28 +3,45 @@ package top.zhjh.service;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import top.csaf.crypto.DigestUtil;
+import top.csaf.lang.StrUtil;
+import top.zhjh.base.model.MyPage;
+import top.zhjh.enums.RoleEnum;
 import top.zhjh.exception.ServiceException;
 import top.zhjh.mapper.SysUserMapper;
+import top.zhjh.model.entity.SysRole;
+import top.zhjh.model.entity.SysRoleUser;
 import top.zhjh.model.entity.SysUser;
+import top.zhjh.model.qo.SysUserPageQO;
+import top.zhjh.model.qo.SysUserRemoveQO;
 import top.zhjh.model.qo.SysUserSaveQO;
+import top.zhjh.model.qo.SysUserUpdateQO;
+import top.zhjh.model.vo.SysUserPageVO;
 import top.zhjh.struct.SysUserStruct;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * 用户 服务实现
  */
+@Slf4j
 @Service
 public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
 
   @Resource
   private SysUserMapper sysUserMapper;
+  @Resource
+  private SysRoleUserService sysRoleUserService;
+  @Autowired
+  private SysRoleService sysRoleService;
 
   /**
    * 列出用户角色编码
@@ -33,7 +50,7 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
    * @return 用户角色编码列表
    */
   @Cacheable(value = "userRoleCodes", key = "#id", condition = "#id != null && #id != ''")
-  public List<String> listRoleCodes(String id) {
+  public List<String> listRoleCodes(Long id) {
     return sysUserMapper.listRoleCodes(id);
   }
 
@@ -44,7 +61,7 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
    * @return 用户权限列表
    */
   @Cacheable(value = "userPermissions", key = "#id", condition = "#id != null && #id != ''")
-  public List<String> listPermission(String id) {
+  public List<String> listPermission(Long id) {
     return sysUserMapper.listPermission(id);
   }
 
@@ -65,19 +82,19 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
     if (user != null) {
       throw new ServiceException(HttpStatus.CONFLICT, "用户名已存在");
     }
-    SysUserSaveQO saveObj = new SysUserSaveQO();
-    saveObj.setNickName(nickName);
-    saveObj.setUsername(username);
-    saveObj.setPassword(DigestUtil.sha512Hex(password));
-    if (!save(saveObj)) {
-      throw new ServiceException(HttpStatus.INTERNAL_SERVER_ERROR, "注册失败");
+    SysUser user1 = new SysUser();
+    user1.setNickName(nickName);
+    user1.setUsername(username);
+    user1.setPassword(DigestUtil.sha512Hex(password));
+    if (!this.save(user1)) {
+      throw new ServiceException("注册失败");
     }
-    Long id = saveObj.getId();
+    Long id = user1.getId();
     SysUser updateObj = new SysUser();
     updateObj.setId(id);
     updateObj.setPassword(DigestUtil.sha512Hex(password));
     if (!this.updateById(updateObj)) {
-      throw new ServiceException(HttpStatus.INTERNAL_SERVER_ERROR, "注册失败");
+      throw new ServiceException("注册失败");
     }
   }
 
@@ -101,15 +118,105 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
   }
 
   /**
+   * 列出
+   *
+   * @param query 查询参数
+   * @return 列表
+   */
+  public List<SysUserPageVO> list(SysUserPageQO query) {
+    return sysUserMapper.list(query);
+  }
+
+  /**
+   * 分页
+   *
+   * @param query 查询参数
+   * @return 分页列表
+   */
+  public MyPage<SysUserPageVO> page(SysUserPageQO query) {
+    return sysUserMapper.page(query);
+  }
+
+  /**
    * 保存
    *
    * @param obj 保存入参
    * @return 是否成功
    */
+  @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
   public boolean save(SysUserSaveQO obj) {
+    // 用户名是否重复
+    if (this.lambdaQuery().eq(SysUser::getUsername, obj.getUsername()).count() > 0) {
+      throw new ServiceException("用户名已存在");
+    }
     SysUser sysUser = SysUserStruct.INSTANCE.to(obj);
-    boolean result = this.save(sysUser);
-    obj.setId(sysUser.getId());
-    return result;
+    sysUser.setPassword(DigestUtil.sha512Hex(sysUser.getPassword()));
+    return this.save(sysUser);
+  }
+
+  /**
+   * 更新
+   *
+   * @param obj 更新入参
+   * @return 是否成功
+   */
+  @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
+  public boolean update(SysUserUpdateQO obj) {
+    Long id = obj.getId();
+    SysUser user = this.getById(id);
+    if (user == null) {
+      log.error("用户不存在: {}", id);
+      throw new ServiceException("用户不存在");
+    }
+    List<Long> roleIds = obj.getRoleIds();
+    for (Long roleId : roleIds) {
+      SysRole role = sysRoleService.getById(roleId);
+      if (role == null) {
+        log.error("角色不存在: {}", roleId);
+        throw new ServiceException("角色不存在");
+      }
+    }
+    SysRole superAdminRole = sysRoleService.lambdaQuery().eq(SysRole::getCode, RoleEnum.SUPER_ADMIN.getCode()).one();
+    List<SysRoleUser> roleUserList = sysRoleUserService.lambdaQuery().eq(SysRoleUser::getRoleId, superAdminRole.getId()).list();
+    if (roleUserList.size() == 1 && roleUserList.get(0).getUserId().equals(user.getId()) && !roleIds.contains(superAdminRole.getId())) {
+      throw new ServiceException("至少保留一个编码为" + RoleEnum.SUPER_ADMIN.getCode() + "角色的用户");
+    }
+    // 重新关联角色
+    sysRoleUserService.lambdaUpdate().eq(SysRoleUser::getUserId, id).remove();
+    for (Long roleId : roleIds) {
+      sysRoleUserService.save(new SysRoleUser(roleId, id));
+    }
+    return this.updateById(SysUserStruct.INSTANCE.to(obj));
+  }
+
+  /**
+   * 删除
+   *
+   * @param query 删除入参
+   * @return 是否成功
+   */
+  @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
+  public boolean remove(SysUserRemoveQO query) {
+    String idsStr = query.getIds();
+    if (StrUtil.isBlank(idsStr)) {
+      return false;
+    }
+    SysRole superAdminRole = sysRoleService.lambdaQuery().eq(SysRole::getCode, RoleEnum.SUPER_ADMIN.getCode()).one();
+    List<SysRoleUser> roleUserList = sysRoleUserService.lambdaQuery().eq(SysRoleUser::getRoleId, superAdminRole.getId()).list();
+
+    String[] ids = idsStr.split(",");
+    for (String id : ids) {
+      SysUser user = this.getById(id);
+      if (user == null) {
+        log.error("用户不存在: {}", id);
+        throw new ServiceException("用户不存在");
+      }
+      if (roleUserList.size() == 1 && roleUserList.get(0).getUserId().equals(user.getId())) {
+        throw new ServiceException("至少保留一个编码为" + RoleEnum.SUPER_ADMIN.getCode() + "角色的用户");
+      }
+      // 删除关联角色
+      sysRoleUserService.lambdaUpdate().eq(SysRoleUser::getUserId, id).remove();
+    }
+    return this.removeBatchByIds(Arrays.asList(ids));
   }
 }
