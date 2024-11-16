@@ -159,12 +159,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <compilerArgs>
-            <!-- JPS 增量注解进程 -->
-            <arg>-Djps.track.ap.dependencies=true</arg>
-          </compilerArgs>
-        </configuration>
       </plugin>
     </plugins>
   </build>
