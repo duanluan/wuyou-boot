@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.support.config.FastJsonConfig;
 import com.alibaba.fastjson2.support.spring.http.converter.FastJsonHttpMessageConverter;
 import com.alibaba.fastjson2.support.spring.webservlet.view.FastJsonJsonView;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -34,7 +35,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     com.alibaba.fastjson2.support.spring.http.converter.FastJsonHttpMessageConverter converter = new FastJsonHttpMessageConverter();
     FastJsonConfig config = new FastJsonConfig();
     // 时间格式化
-    config.setDateFormat("yyyy-MM-dd HH:mm:ss");
+    // config.setDateFormat("yyyy-MM-dd HH:mm:ss");
     // 通过 Features 配置序列化和反序列化的行为：https://alibaba.github.io/fastjson2/features_cn.html
     // 反序列化：转对象
     config.setReaderFeatures(
@@ -89,5 +90,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
       .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
       // 允许跨域访问的请求头
       .allowedHeaders("*");
+  }
+
+  @Override
+  public void addFormatters(FormatterRegistry registry) {
+    // 接口入参枚举值转换为枚举类型
+    registry.addConverterFactory(new EnumConverterFactory());
   }
 }

@@ -29,21 +29,21 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(ConnectException.class)
   @ResponseBody
-  public ResponseEntity<R> handleConnectException(ConnectException e) {
+  public ResponseEntity<R<?>> handleConnectException(ConnectException e) {
     log.error("连接异常", e);
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new R(HttpStatus.INTERNAL_SERVER_ERROR.value(), "系统维护中"));
   }
 
   @ExceptionHandler(SQLException.class)
   @ResponseBody
-  public ResponseEntity<R> handleSqlExcxeption(SQLException e) {
+  public ResponseEntity<R<?>> handleSqlExcxeption(SQLException e) {
     log.error("数据库异常", e);
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new R(HttpStatus.INTERNAL_SERVER_ERROR.value(), "系统维护中"));
   }
 
   @ExceptionHandler({BindException.class})
   @ResponseBody
-  public ResponseEntity<R> handleBindException(BindException e) {
+  public ResponseEntity<R<?>> handleBindException(BindException e) {
     log.error("参数异常", e);
     HttpStatus status = HttpStatus.BAD_REQUEST;
     List<ObjectError> errorList = e.getAllErrors();
@@ -51,7 +51,8 @@ public class GlobalExceptionHandler {
     for (ObjectError error : errorList) {
       // 绑定失败
       if (((FieldError) error).isBindingFailure()) {
-        msgList.add("参数 " + ((FieldError) error).getField() + " 绑定失败");
+        // msgList.add("参数" + ((FieldError) error).getField() + "绑定失败");
+        msgList.add("参数异常：" + ((FieldError) error).getField());
       } else {
         msgList.add(error.getDefaultMessage());
       }
@@ -61,7 +62,7 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler({ServiceException.class})
   @ResponseBody
-  public ResponseEntity<R> handleServiceException(ServiceException e) {
+  public ResponseEntity<R<?>> handleServiceException(ServiceException e) {
     log.error("服务异常", e);
     HttpStatus status = e.getStatus();
     return ResponseEntity.status(status).body(new R(status.value(), e.getMessage()));
@@ -69,10 +70,10 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(NotLoginException.class)
   @ResponseBody
-  public ResponseEntity<R> handlerNotLoginException(NotLoginException nle, HttpServletRequest request, HttpServletResponse response) {
+  public ResponseEntity<R<?>> handlerNotLoginException(NotLoginException nle, HttpServletRequest request, HttpServletResponse response) {
     log.error("登录异常", nle);
     // 判断场景值，定制化异常信息
-    String message = "";
+    String message;
     if (nle.getType().equals(NotLoginException.NOT_TOKEN)) {
       message = "未提供Token";
     } else if (nle.getType().equals(NotLoginException.INVALID_TOKEN)) {
@@ -91,7 +92,7 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler({Exception.class})
   @ResponseBody
-  public ResponseEntity<R> handleException(Exception e) {
+  public ResponseEntity<R<?>> handleException(Exception e) {
     log.error("系统异常", e);
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new R(HttpStatus.INTERNAL_SERVER_ERROR.value(), "系统异常"));
   }

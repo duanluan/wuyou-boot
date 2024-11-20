@@ -18,7 +18,7 @@ import java.util.List;
 public class SysUserUpdateQO {
 
   @Schema(title = "ID")
-  @Min(value = 1, message = "用户 ID 错误")
+  @Min(value = 1, message = "用户ID错误")
   private Long id;
   @Schema(title = "昵称")
   @NotBlank(message = "昵称不能为空")

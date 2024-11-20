@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import top.csaf.coll.CollUtil;
 import top.csaf.lang.StrUtil;
 import top.zhjh.enums.RoleEnum;
-import top.zhjh.enums.RoleStatus;
+import top.zhjh.enums.CommonStatus;
 import top.zhjh.exception.ServiceException;
 import top.zhjh.mapper.SysRoleMapper;
 import top.zhjh.model.entity.SysRole;
@@ -69,7 +69,7 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
    */
   @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
   public boolean updateStatus(SysRoleUpdateQO obj) {
-    if (RoleStatus.isInEnum(obj.getStatus())) {
+    if (CommonStatus.isInEnum(obj.getStatus())) {
       throw new ServiceException("角色状态错误");
     }
     SysRole role = this.getById(obj.getId());
@@ -121,12 +121,11 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
    */
   @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
   public boolean remove(SysRoleRemoveQO query) {
-    String idsStr = query.getIds();
-    if (StrUtil.isBlank(idsStr)) {
+    List<Long> ids = query.getIds();
+    if (CollUtil.isEmpty(ids)) {
       return false;
     }
-    String[] ids = idsStr.split(",");
-    for (String id : ids) {
+    for (Long id : ids) {
       SysRole role = this.getById(id);
       if (role == null) {
         log.error("角色不存在: {}", id);

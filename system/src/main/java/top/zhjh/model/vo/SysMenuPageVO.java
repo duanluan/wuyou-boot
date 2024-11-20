@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 /**
  * 菜单响应
  */
-@Schema(title = "菜单 分页响应")
+@Schema(title = "菜单分页响应")
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class SysMenuPageVO extends PageVO {

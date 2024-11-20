@@ -51,31 +51,31 @@ public class SysRoleController extends BaseController {
 
   @Operation(summary = "保存角色")
   @PostMapping
-  public R save(@RequestBody @Validated SysRoleSaveQO obj) {
+  public R<?> save(@RequestBody @Validated SysRoleSaveQO obj) {
     return saveR(sysRoleService.save(obj));
   }
 
   @Operation(summary = "更新角色")
   @PutMapping("/{id}")
-  public R update(@RequestBody @Validated(SysRoleUpdateQO.UpdateGroup.class) SysRoleUpdateQO obj) {
+  public R<?> update(@RequestBody @Validated(SysRoleUpdateQO.UpdateGroup.class) SysRoleUpdateQO obj) {
     return updateR(sysRoleService.update(obj));
   }
 
   @Operation(summary = "更新角色状态")
   @PatchMapping("/{id}/status")
-  public R updateStatus(@RequestBody @Validated(SysRoleUpdateQO.UpdateStatusGroup.class) SysRoleUpdateQO obj) {
+  public R<?> updateStatus(@RequestBody @Validated(SysRoleUpdateQO.UpdateStatusGroup.class) SysRoleUpdateQO obj) {
     return updateR(sysRoleService.updateStatus(obj));
   }
 
   @Operation(summary = "更新角色菜单")
   @PatchMapping("/{id}/menus")
-  public R updateMenus(@RequestBody @Validated(SysRoleUpdateQO.UpdateMenusGroup.class) SysRoleUpdateQO obj) {
+  public R<?> updateMenus(@RequestBody @Validated(SysRoleUpdateQO.UpdateMenusGroup.class) SysRoleUpdateQO obj) {
     return updateR(sysRoleService.updateMenus(obj));
   }
 
   @Operation(summary = "删除角色")
   @DeleteMapping("/{ids}")
-  public R remove(@Validated SysRoleRemoveQO query) {
+  public R<?> remove(@Validated SysRoleRemoveQO query) {
     return removeR(sysRoleService.remove(query));
   }
 }

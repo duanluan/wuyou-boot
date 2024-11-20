@@ -9,8 +9,7 @@ import java.io.Serializable;
 @Data
 public class BaseGetQO implements Serializable {
 
-  // @JSONField(serializeFeatures = {JSONWriter.Feature.WriteLongAsString})
   @Schema(title = "ID")
-  @Min(value = 1, message = "ID 错误")
+  @Min(value = 1, message = "ID错误")
   private Long id;
 }

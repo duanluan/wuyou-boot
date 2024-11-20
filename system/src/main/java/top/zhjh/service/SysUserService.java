@@ -9,8 +9,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import top.csaf.coll.CollUtil;
 import top.csaf.crypto.DigestUtil;
-import top.csaf.lang.StrUtil;
 import top.zhjh.base.model.MyPage;
 import top.zhjh.enums.RoleEnum;
 import top.zhjh.exception.ServiceException;
@@ -212,15 +212,14 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
    */
   @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
   public boolean remove(SysUserRemoveQO query) {
-    String idsStr = query.getIds();
-    if (StrUtil.isBlank(idsStr)) {
+    List<Long> ids = query.getIds();
+    if (CollUtil.isEmpty(ids)) {
       return false;
     }
     SysRole superAdminRole = sysRoleService.lambdaQuery().eq(SysRole::getCode, RoleEnum.SUPER_ADMIN.getCode()).one();
     List<SysRoleUser> roleUserList = sysRoleUserService.lambdaQuery().eq(SysRoleUser::getRoleId, superAdminRole.getId()).list();
 
-    String[] ids = idsStr.split(",");
-    for (String id : ids) {
+    for (Long id : ids) {
       SysUser user = this.getById(id);
       if (user == null) {
         log.error("用户不存在: {}", id);

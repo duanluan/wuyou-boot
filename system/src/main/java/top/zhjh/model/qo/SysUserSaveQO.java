@@ -2,7 +2,6 @@ package top.zhjh.model.qo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -12,7 +11,6 @@ import java.util.List;
  * 用户保存入参
  */
 @Schema(title = "SysUser 保存入参")
-@EqualsAndHashCode(callSuper = false)
 @Data
 public class SysUserSaveQO  {
 

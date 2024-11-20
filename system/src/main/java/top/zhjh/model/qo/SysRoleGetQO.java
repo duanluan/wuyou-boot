@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 public class SysRoleGetQO extends BaseGetQO {
 
   @Schema(title = "ID")
-  @Min(value = 1, message = "角色 ID 错误")
+  @Min(value = 1, message = "角色ID错误")
   private Long id;
   @Schema(title = "创建时间")
   @NotNull(message = "创建时间不能为空")

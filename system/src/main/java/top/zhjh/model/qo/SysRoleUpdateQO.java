@@ -3,7 +3,7 @@ package top.zhjh.model.qo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import top.zhjh.enums.RoleStatus;
+import top.zhjh.enums.CommonStatus;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
@@ -38,12 +38,12 @@ public class SysRoleUpdateQO {
   @Schema(title = "描述")
   private String description;
   @Schema(title = "顺序")
-  @NotNull(message = "顺序不能为空", groups = {UpdateGroup.class})
+  @Min(value = 1, message = "顺序不能为空", groups = {UpdateGroup.class})
   private Long sort;
 
   @Schema(title = "状态")
   @NotNull(message = "状态不能为空", groups = {UpdateGroup.class, UpdateStatusGroup.class})
-  private RoleStatus status;
+  private CommonStatus status;
 
   @Schema(title = "菜单ID数组")
   @NotNull(message = "菜单ID数组不能为空", groups = {UpdateMenusGroup.class})

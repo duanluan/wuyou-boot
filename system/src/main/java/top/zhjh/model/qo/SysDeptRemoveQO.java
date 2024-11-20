@@ -7,13 +7,13 @@ import javax.validation.constraints.Size;
 import java.util.List;
 
 /**
- * 角色删除入参
+ * 部门删除入参
  */
-@Schema(title = "角色删除入参")
+@Schema(title = "部门删除入参")
 @Data
-public class SysRoleRemoveQO {
+public class SysDeptRemoveQO {
 
-  @Schema(title = "角色ID列表")
-  @Size(min = 1, message = "角色ID列表不能为空")
+  @Schema(title = "部门ID列表")
+  @Size(min = 1, message = "部门ID列表不能为空")
   private List<Long> ids;
 }

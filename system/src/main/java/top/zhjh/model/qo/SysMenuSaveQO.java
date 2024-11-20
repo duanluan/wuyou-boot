@@ -20,7 +20,7 @@ public class SysMenuSaveQO  {
   @NotNull(message = "创建时间不能为空")
   private LocalDateTime createdTime;
   @Schema(title = "父级 ID")
-  @NotBlank(message = "父级 ID不能为空")
+  @NotBlank(message = "父级ID不能为空")
   private String parentId;
   @Schema(title = "类型：1: 目录, 2: 菜单, 3: 按钮")
   private Integer type;

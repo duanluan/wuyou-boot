@@ -27,7 +27,7 @@
         type = #{type}
       </foreach>
     </if>
-    order by sort
+    order by sort, created_time desc
   </sql>
 
   <select id="listTree" resultType="top.csaf.tree.TreeNode">

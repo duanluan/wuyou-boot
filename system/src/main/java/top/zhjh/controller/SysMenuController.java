@@ -17,7 +17,6 @@ import top.zhjh.service.SysMenuService;
 import top.zhjh.struct.SysMenuStruct;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -72,6 +71,6 @@ public class SysMenuController extends BaseController {
   @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
   @DeleteMapping("/{ids}")
   public R remove(@Validated SysMenuRemoveQO query) {
-    return removeR(sysMenuService.removeByIds(Arrays.asList(query.getIds().split(","))));
+    return removeR(sysMenuService.removeByIds(query.getIds()));
   }
 }

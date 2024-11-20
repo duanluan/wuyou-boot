@@ -59,15 +59,16 @@ public class ${entity}${fileNameSuffix} <#if entitySerialVersionUID>implements S
   private static final long serialVersionUID = 1L;
 
 </#if>
-<#-- 如果包含是删除，添加多个 ID 的字段 -->
+<#-- 如果包含是删除，添加 ID 列表字段 -->
 <#if fileNameSuffix?contains('Remove')>
-  @Schema(title = "多个${table.comment!} ID，逗号分隔")
-  private String ids;
+  @Schema(title = "${table.comment!}ID列表")
+  @Size(min = 1, message = "${table.comment!}ID列表不能为空")
+  private List<Long> ids;
 </#if>
 <#-- 临时写法 -->
 <#if fileNameSuffix?contains('Get') || fileNameSuffix?contains('Update')>
   @Schema(title = "ID")
-  @Min(value = 1, message = "${table.comment!} ID 错误")
+  @Min(value = 1, message = "${table.comment!} ID错误")
   private Long id;
 </#if>
 <#-- ----------  BEGIN 字段循环遍历  -------- -->
@@ -83,7 +84,7 @@ public class ${entity}${fileNameSuffix} <#if entitySerialVersionUID>implements S
   <#-- 校验 -->
   <#if field.propertyType == 'Long'>
   @NotNull(message = "${field.comment}不能为空")
-  @Min(value = 1, message = "${field.comment} 错误")
+  @Min(value = 1, message = "${field.comment}错误")
   <#elseif field.propertyType == 'String'>
   @NotBlank(message = "${field.comment}不能为空")
   <#elseif field.propertyType == 'LocalDateTime'>

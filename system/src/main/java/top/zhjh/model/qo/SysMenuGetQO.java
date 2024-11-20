@@ -18,13 +18,13 @@ import java.time.LocalDateTime;
 public class SysMenuGetQO extends BaseGetQO {
 
   @Schema(title = "ID")
-  @Min(value = 1, message = "菜单 ID 错误")
+  @Min(value = 1, message = "菜单ID错误")
   private Long id;
   @Schema(title = "创建时间")
   @NotNull(message = "创建时间不能为空")
   private LocalDateTime createdTime;
   @Schema(title = "父级 ID")
-  @NotBlank(message = "父级 ID不能为空")
+  @NotBlank(message = "父级ID不能为空")
   private String parentId;
   @Schema(title = "类型：1: 目录, 2: 菜单, 3: 按钮")
   private Boolean type;

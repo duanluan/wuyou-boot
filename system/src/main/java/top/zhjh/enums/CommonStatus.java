@@ -6,11 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 角色状态枚举
+ * 通用状态枚举
  */
 @Getter
 @AllArgsConstructor
-public enum RoleStatus {
+public enum CommonStatus {
 
   DISABLE(0, "禁用"),
   ENABLE(1, "启用"),
@@ -25,9 +25,9 @@ public enum RoleStatus {
    * value 是否在枚举中
    */
   public static boolean isInEnum(Object value) {
-    for (RoleStatus roleStatus : RoleStatus.values()) {
-      if ((value instanceof Integer && roleStatus.getValue().equals(value))
-        || (value instanceof RoleStatus && roleStatus.getValue().equals(value))
+    for (CommonStatus status : CommonStatus.values()) {
+      if ((value instanceof Integer && status.getValue().equals(value))
+        || (value instanceof CommonStatus && status.getValue().equals(value))
       ) {
         return true;
       }
