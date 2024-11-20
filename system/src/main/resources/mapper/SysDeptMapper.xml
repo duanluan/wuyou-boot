@@ -41,14 +41,4 @@
     </if>
     order by sd.sort, sd.created_time desc
   </select>
-
-  <select id="listTreeSelect" resultType="top.csaf.tree.TreeNode">
-    select
-      sd.id value,
-      sd.name label,
-      sd.parent_id parentId
-    from sys_dept sd
-    where sd.deleted = 0
-    order by sd.sort, sd.created_time desc
-  </select>
 </mapper>

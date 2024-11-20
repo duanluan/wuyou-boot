@@ -55,10 +55,6 @@ public class SysDeptService extends ServiceImpl<SysDeptMapper, SysDept> {
     return TreeUtil.build(sysDeptMapper.listTree(query));
   }
 
-  public List<TreeNode> listTreeSelect(SysDeptTreeQO query) {
-    return TreeUtil.build(sysDeptMapper.listTreeSelect(query));
-  }
-
   /**
    * 保存
    *
@@ -91,6 +87,19 @@ public class SysDeptService extends ServiceImpl<SysDeptMapper, SysDept> {
       .eq(SysDept::getName, obj.getName())
       .ne(SysDept::getId, obj.getId()).count() > 0) {
       throw new ServiceException("同级部门名称不能重复");
+    }
+    return this.updateById(SysDeptStruct.INSTANCE.to(obj));
+  }
+
+  /**
+   * 更新状态
+   *
+   * @param obj 更新入参
+   * @return 是否成功
+   */
+  public boolean updateStatus(SysDeptUpdateQO obj) {
+    if (this.lambdaQuery().eq(SysDept::getId, obj.getId()).count() == 0) {
+      throw new ServiceException("部门不存在");
     }
     return this.updateById(SysDeptStruct.INSTANCE.to(obj));
   }

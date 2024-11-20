@@ -43,12 +43,6 @@ public class SysDeptController extends BaseController {
     return ok(sysDeptService.listTree(query));
   }
 
-  @Operation(summary = "部门树选择")
-  @GetMapping("/treeSelect")
-  public R<List<TreeNode>> listTreeSelect(@Validated SysDeptTreeQO query) {
-    return ok(sysDeptService.listTreeSelect(query));
-  }
-
   @Operation(summary = "保存部门")
   @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
   @PostMapping
@@ -59,8 +53,14 @@ public class SysDeptController extends BaseController {
   @Operation(summary = "更新部门")
   @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
   @PutMapping("/{id}")
-  public R<?> update(@RequestBody @Validated SysDeptUpdateQO obj) {
+  public R<?> update(@RequestBody @Validated(SysDeptUpdateQO.UpdateGroup.class) SysDeptUpdateQO obj) {
     return updateR(sysDeptService.update(obj));
+  }
+
+  @Operation(summary = "更新部门状态")
+  @PatchMapping("/{id}/status")
+  public R<?> updateStatus(@RequestBody @Validated(SysDeptUpdateQO.UpdateStatusGroup.class) SysDeptUpdateQO obj) {
+    return updateR(sysDeptService.updateStatus(obj));
   }
 
   @Operation(summary = "删除部门")

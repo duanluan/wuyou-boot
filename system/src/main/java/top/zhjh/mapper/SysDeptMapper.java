@@ -17,6 +17,4 @@ public interface SysDeptMapper extends BaseMapper<SysDept> {
   MyPage<SysDeptPageVO> page(SysDeptPageQO query);
 
   List<TreeNode> listTree(SysDeptTreeQO query);
-
-  List<TreeNode> listTreeSelect(SysDeptTreeQO query);
 }
