@@ -13,4 +13,8 @@ public interface SysRoleStruct {
   SysRole to(SysRoleSaveQO obj);
 
   SysRole to(SysRoleUpdateQO obj);
+
+  SysRole to(SysRoleUpdateStatusQO obj);
+
+  SysRole to(SysRoleUpdateDataScopeQO obj);
 }

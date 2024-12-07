@@ -57,20 +57,26 @@ public class SysRoleController extends BaseController {
 
   @Operation(summary = "更新角色")
   @PutMapping("/{id}")
-  public R<?> update(@RequestBody @Validated(SysRoleUpdateQO.UpdateGroup.class) SysRoleUpdateQO obj) {
+  public R<?> update(@RequestBody @Validated SysRoleUpdateQO obj) {
     return updateR(sysRoleService.update(obj));
   }
 
   @Operation(summary = "更新角色状态")
   @PatchMapping("/{id}/status")
-  public R<?> updateStatus(@RequestBody @Validated(SysRoleUpdateQO.UpdateStatusGroup.class) SysRoleUpdateQO obj) {
+  public R<?> updateStatus(@RequestBody @Validated SysRoleUpdateStatusQO obj) {
     return updateR(sysRoleService.updateStatus(obj));
   }
 
-  @Operation(summary = "更新角色菜单")
+  @Operation(summary = "更新角色菜单权限")
   @PatchMapping("/{id}/menus")
-  public R<?> updateMenus(@RequestBody @Validated(SysRoleUpdateQO.UpdateMenusGroup.class) SysRoleUpdateQO obj) {
+  public R<?> updateMenus(@RequestBody @Validated SysRoleUpdateMenusQO obj) {
     return updateR(sysRoleService.updateMenus(obj));
+  }
+
+  @Operation(summary = "更新角色数据权限")
+  @PatchMapping("/{id}/dataScope")
+  public R<?> updateDataScope(@RequestBody @Validated SysRoleUpdateDataScopeQO obj) {
+    return updateR(sysRoleService.updateDataScope(obj));
   }
 
   @Operation(summary = "删除角色")

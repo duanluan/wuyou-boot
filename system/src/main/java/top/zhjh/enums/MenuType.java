@@ -23,5 +23,5 @@ public enum MenuType {
   BTN(3),
   ;
 
-  private final Integer code;
+  private final Integer value;
 }

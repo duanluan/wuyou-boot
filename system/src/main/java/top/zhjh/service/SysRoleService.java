@@ -6,16 +6,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import top.csaf.coll.CollUtil;
 import top.csaf.lang.StrUtil;
-import top.zhjh.enums.RoleEnum;
 import top.zhjh.enums.CommonStatus;
+import top.zhjh.enums.DataScopeActionType;
+import top.zhjh.enums.DataScopeType;
+import top.zhjh.enums.RoleEnum;
 import top.zhjh.exception.ServiceException;
 import top.zhjh.mapper.SysRoleMapper;
 import top.zhjh.model.entity.SysRole;
+import top.zhjh.model.entity.SysRoleDept;
 import top.zhjh.model.entity.SysRoleMenu;
 import top.zhjh.model.entity.SysRoleUser;
-import top.zhjh.model.qo.SysRoleRemoveQO;
-import top.zhjh.model.qo.SysRoleSaveQO;
-import top.zhjh.model.qo.SysRoleUpdateQO;
+import top.zhjh.model.qo.*;
 import top.zhjh.struct.SysRoleStruct;
 
 import javax.annotation.Resource;
@@ -36,6 +37,8 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
   private SysRoleUserService sysRoleUserService;
   @Resource
   private SysRoleMenuService sysRoleMenuService;
+  @Resource
+  private SysRoleDeptService sysRoleDeptService;
 
   /**
    * 更新
@@ -58,17 +61,18 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
         throw new ServiceException("不能修改编码为" + RoleEnum.SUPER_ADMIN.getCode() + "角色的状态");
       }
     }
-    return this.updateById(SysRoleStruct.INSTANCE.to(obj));
+    this.updateById(SysRoleStruct.INSTANCE.to(obj));
+    return true;
   }
 
   /**
    * 更新状态
    *
-   * @param obj 更新入参
+   * @param obj 更新状态入参
    * @return 是否成功
    */
   @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
-  public boolean updateStatus(SysRoleUpdateQO obj) {
+  public boolean updateStatus(SysRoleUpdateStatusQO obj) {
     if (CommonStatus.isInEnum(obj.getStatus())) {
       throw new ServiceException("角色状态错误");
     }
@@ -84,13 +88,13 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
   }
 
   /**
-   * 更新角色菜单
+   * 更新角色菜单权限
    *
-   * @param obj 更新入参
+   * @param obj 更新角色菜单权限入参
    * @return 是否成功
    */
   @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
-  public boolean updateMenus(SysRoleUpdateQO obj) {
+  public boolean updateMenus(SysRoleUpdateMenusQO obj) {
     Long id = obj.getId();
     SysRole role = this.getById(id);
     if (role == null) {
@@ -98,18 +102,58 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
       throw new ServiceException("角色不存在");
     }
     if (RoleEnum.SUPER_ADMIN.getCode().equals(role.getCode())) {
-      throw new ServiceException("不能修改编码为" + RoleEnum.SUPER_ADMIN.getCode() + "角色的菜单");
+      throw new ServiceException("不能修改编码为" + RoleEnum.SUPER_ADMIN.getCode() + "角色的菜单权限");
     }
     sysRoleMenuService.lambdaUpdate().eq(SysRoleMenu::getRoleId, obj.getId()).remove();
-    if (CollUtil.sizeIsNotEmpty(obj.getMenuIds())) {
+    if (CollUtil.isNotEmpty(obj.getMenuIds())) {
       List<SysRoleMenu> roleMenuList = new ArrayList<>();
       for (Long menuId : obj.getMenuIds()) {
         roleMenuList.add(new SysRoleMenu(id, menuId));
       }
       if (!sysRoleMenuService.saveBatch(roleMenuList)) {
-        throw new ServiceException("保存角色菜单失败");
+        throw new ServiceException("保存角色菜单权限失败");
       }
     }
+    return true;
+  }
+
+  /**
+   * 更新角色数据权限
+   *
+   * @param obj 更新角色数据权限入参
+   * @return 是否成功
+   */
+  @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
+  public boolean updateDataScope(SysRoleUpdateDataScopeQO obj) {
+    Long id = obj.getId();
+    SysRole role = this.getById(id);
+    if (role == null) {
+      log.error("角色不存在: {}", id);
+      throw new ServiceException("角色不存在");
+    }
+    if (RoleEnum.SUPER_ADMIN.getCode().equals(role.getCode())) {
+      throw new ServiceException("不能修改编码为" + RoleEnum.SUPER_ADMIN.getCode() + "角色的数据权限");
+    }
+    sysRoleDeptService.lambdaUpdate().eq(SysRoleDept::getRoleId, obj.getId()).remove();
+    if (DataScopeType.CUSTOM.equals(obj.getQueryDataScope()) && CollUtil.isNotEmpty(obj.getQueryDataScopeDeptIds())) {
+      List<SysRoleDept> roleDeptList = new ArrayList<>();
+      for (Long deptId : obj.getQueryDataScopeDeptIds()) {
+        roleDeptList.add(new SysRoleDept(id, deptId, DataScopeActionType.QUERY));
+      }
+      if (!sysRoleDeptService.saveBatch(roleDeptList)) {
+        throw new ServiceException("保存角色查询数据权限失败");
+      }
+    }
+    if (DataScopeType.CUSTOM.equals(obj.getUpdateDataScope()) && CollUtil.isNotEmpty(obj.getUpdateDataScopeDeptIds())) {
+      List<SysRoleDept> roleDeptList = new ArrayList<>();
+      for (Long deptId : obj.getUpdateDataScopeDeptIds()) {
+        roleDeptList.add(new SysRoleDept(id, deptId, DataScopeActionType.UPDATE));
+      }
+      if (!sysRoleDeptService.saveBatch(roleDeptList)) {
+        throw new ServiceException("保存角色增删改数据权限失败");
+      }
+    }
+    this.updateById(SysRoleStruct.INSTANCE.to(obj));
     return true;
   }
 
