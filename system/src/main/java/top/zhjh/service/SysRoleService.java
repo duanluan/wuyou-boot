@@ -184,7 +184,7 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
       // 删除关联菜单
       sysRoleMenuService.lambdaUpdate().eq(SysRoleMenu::getRoleId, id).remove();
     }
-    return this.removeBatchByIds(Arrays.asList(ids));
+    return this.removeBatchByIds(ids);
   }
 
   /**

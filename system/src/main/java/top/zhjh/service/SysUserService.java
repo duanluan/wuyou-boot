@@ -27,7 +27,6 @@ import top.zhjh.struct.SysUserStruct;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -231,6 +230,6 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
       // 删除关联角色
       sysRoleUserService.lambdaUpdate().eq(SysRoleUser::getUserId, id).remove();
     }
-    return this.removeBatchByIds(Arrays.asList(ids));
+    return this.removeBatchByIds(ids);
   }
 }
