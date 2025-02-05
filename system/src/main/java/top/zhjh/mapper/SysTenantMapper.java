@@ -1,0 +1,16 @@
+package top.zhjh.mapper;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import top.zhjh.base.model.MyPage;
+import top.zhjh.model.entity.SysTenant;
+import top.zhjh.model.qo.SysTenantPageQO;
+import top.zhjh.model.vo.SysTenantPageVO;
+
+import java.util.List;
+
+public interface SysTenantMapper extends BaseMapper<SysTenant> {
+
+  List<SysTenantPageVO> list(SysTenantPageQO query);
+
+  MyPage<SysTenantPageVO> page(SysTenantPageQO query);
+}

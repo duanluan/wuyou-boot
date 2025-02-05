@@ -4,18 +4,19 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import top.zhjh.base.model.MyPage;
+import top.zhjh.enums.CommonStatus;
 import top.zhjh.model.entity.SysDept;
 
 /**
- * 部门分页入参
+ * 租户分页入参
  */
-@Schema(title = "部门分页入参")
+@Schema(title = "租户分页入参")
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class SysDeptPageQO extends MyPage<SysDept> {
+public class SysTenantPageQO extends MyPage<SysDept> {
 
   @Schema(title = "名称")
   private String name;
-  @Schema(title = "父级 ID")
-  private Long parentId;
+  @Schema(title = "状态")
+  private CommonStatus status;
 }
