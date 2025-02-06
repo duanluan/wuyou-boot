@@ -2,18 +2,14 @@ package top.zhjh.model.qo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import top.zhjh.base.model.MyPage;
 import top.zhjh.enums.CommonStatus;
-import top.zhjh.model.entity.SysDept;
 
 /**
- * 岗位分页入参
+ * 岗位列表入参
  */
-@Schema(title = "岗位分页入参")
-@EqualsAndHashCode(callSuper = true)
+@Schema(title = "岗位列表入参")
 @Data
-public class SysPostPageQO extends MyPage<SysDept> {
+public class SysPostListQO {
 
   @Schema(title = "编码")
   private String code;

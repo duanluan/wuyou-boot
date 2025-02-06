@@ -28,7 +28,7 @@ public class SysDeptService extends ServiceImpl<SysDeptMapper, SysDept> {
    * @param query 查询参数
    * @return 列表
    */
-  public List<SysDeptPageVO> list(SysDeptPageQO query) {
+  public List<SysDeptPageVO> list(SysDeptListQO query) {
     return sysDeptMapper.list(query);
   }
 

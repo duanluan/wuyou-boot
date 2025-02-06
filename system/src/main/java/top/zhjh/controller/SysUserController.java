@@ -15,6 +15,7 @@ import top.zhjh.model.entity.SysUser;
 import top.zhjh.model.qo.*;
 import top.zhjh.service.SysUserService;
 import top.zhjh.struct.SysUserStruct;
+import top.zhjh.util.StpExtUtil;
 
 import javax.annotation.Resource;
 
@@ -41,7 +42,8 @@ public class SysUserController extends BaseController {
   @Operation(summary = "登录")
   @PostMapping("/login")
   public R login(@Validated SysUserLoginQO query) {
-    SysUser loggedInUser = sysUserService.login(query.getUsername(), query.getPassword());
+    SysUser loggedInUser = sysUserService.login(query.getUsername(), query.getPassword(), query.getTenantId());
+    log.info("登录成功: {}", StpExtUtil.getTenantId());
     return ok(SysUserStruct.INSTANCE.toDetailVO(loggedInUser));
   }
 
@@ -56,7 +58,7 @@ public class SysUserController extends BaseController {
   @GetMapping
   public R<?> list(@Validated SysUserPageQO query) {
     if (query.getCurrent() == 0) {
-      return ok(sysUserService.list(query));
+      return ok(sysUserService.list(SysUserStruct.INSTANCE.to(query)));
     }
     return ok(sysUserService.page(query));
   }

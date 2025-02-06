@@ -1,5 +1,6 @@
 package top.zhjh.service;
 
+import cn.dev33.satoken.stp.SaLoginConfig;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -9,8 +10,10 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import top.csaf.bean.BeanUtil;
 import top.csaf.coll.CollUtil;
 import top.csaf.crypto.DigestUtil;
+import top.zhjh.base.model.BaseEntity;
 import top.zhjh.base.model.MyPage;
 import top.zhjh.enums.RoleEnum;
 import top.zhjh.exception.ServiceException;
@@ -18,10 +21,7 @@ import top.zhjh.mapper.SysUserMapper;
 import top.zhjh.model.entity.SysRole;
 import top.zhjh.model.entity.SysRoleUser;
 import top.zhjh.model.entity.SysUser;
-import top.zhjh.model.qo.SysUserPageQO;
-import top.zhjh.model.qo.SysUserRemoveQO;
-import top.zhjh.model.qo.SysUserSaveQO;
-import top.zhjh.model.qo.SysUserUpdateQO;
+import top.zhjh.model.qo.*;
 import top.zhjh.model.vo.SysUserPageVO;
 import top.zhjh.struct.SysUserStruct;
 
@@ -103,9 +103,10 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
    *
    * @param username 用户名
    * @param password 密码
+   * @param tenantId
    * @return 登录用户
    */
-  public SysUser login(String username, String password) {
+  public SysUser login(String username, String password, Long tenantId) {
     SysUser user = this.getOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUsername, username));
     if (user == null) {
       throw new ServiceException(HttpStatus.UNAUTHORIZED, "用户名或密码错误");
@@ -113,7 +114,9 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
     if (!user.getPassword().equals(DigestUtil.sha512Hex(password))) {
       throw new ServiceException(HttpStatus.UNAUTHORIZED, "用户名或密码错误");
     }
-    StpUtil.login(user.getId());
+    StpUtil.login(user.getId(),
+      // 扩展参数
+      SaLoginConfig.setExtra(BeanUtil.getPropertyName(BaseEntity::getTenantId), tenantId));
     return user;
   }
 
@@ -123,7 +126,7 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
    * @param query 查询参数
    * @return 列表
    */
-  public List<SysUserPageVO> list(SysUserPageQO query) {
+  public List<SysUserPageVO> list(SysUserListQO query) {
     return sysUserMapper.list(query);
   }
 

@@ -14,6 +14,7 @@ import top.zhjh.model.qo.SysTenantRemoveQO;
 import top.zhjh.model.qo.SysTenantSaveQO;
 import top.zhjh.model.qo.SysTenantUpdateQO;
 import top.zhjh.service.SysTenantService;
+import top.zhjh.struct.SysTenantStruct;
 
 import javax.annotation.Resource;
 
@@ -33,7 +34,7 @@ public class SysTenantController extends BaseController {
   @GetMapping
   public R<?> list(@Validated SysTenantPageQO query) {
     if (query.getCurrent() == 0) {
-      return ok(sysTenantService.list(query));
+      return ok(sysTenantService.list(SysTenantStruct.INSTANCE.to(query)));
     }
     return ok(sysTenantService.page(query));
   }

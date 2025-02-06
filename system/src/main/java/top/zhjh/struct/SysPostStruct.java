@@ -2,7 +2,9 @@ package top.zhjh.struct;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
+import top.zhjh.model.qo.SysPostListQO;
 import top.zhjh.model.entity.SysPost;
+import top.zhjh.model.qo.SysPostPageQO;
 import top.zhjh.model.qo.SysPostSaveQO;
 import top.zhjh.model.qo.SysPostUpdateQO;
 
@@ -14,4 +16,6 @@ public interface SysPostStruct {
   SysPost to(SysPostSaveQO obj);
 
   SysPost to(SysPostUpdateQO obj);
+
+  SysPostListQO to(SysPostPageQO query);
 }

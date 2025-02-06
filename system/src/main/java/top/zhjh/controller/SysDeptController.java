@@ -12,6 +12,7 @@ import top.zhjh.base.BaseController;
 import top.zhjh.base.model.R;
 import top.zhjh.model.qo.*;
 import top.zhjh.service.SysDeptService;
+import top.zhjh.struct.SysDeptStruct;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -32,7 +33,7 @@ public class SysDeptController extends BaseController {
   @GetMapping
   public R<?> list(@Validated SysDeptPageQO query) {
     if (query.getCurrent() == 0) {
-      return ok(sysDeptService.list(query));
+      return ok(sysDeptService.list(SysDeptStruct.INSTANCE.to(query)));
     }
     return ok(sysDeptService.page(query));
   }

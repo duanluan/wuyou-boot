@@ -3,6 +3,8 @@ package top.zhjh.struct;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 import top.zhjh.model.entity.SysTenant;
+import top.zhjh.model.qo.SysTenantListQO;
+import top.zhjh.model.qo.SysTenantPageQO;
 import top.zhjh.model.qo.SysTenantSaveQO;
 import top.zhjh.model.qo.SysTenantUpdateQO;
 
@@ -14,4 +16,6 @@ public interface SysTenantStruct {
   SysTenant to(SysTenantSaveQO obj);
 
   SysTenant to(SysTenantUpdateQO obj);
+
+  SysTenantListQO to(SysTenantPageQO obj);
 }

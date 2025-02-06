@@ -7,10 +7,7 @@ import top.zhjh.base.model.MyPage;
 import top.zhjh.exception.ServiceException;
 import top.zhjh.mapper.SysTenantMapper;
 import top.zhjh.model.entity.SysTenant;
-import top.zhjh.model.qo.SysTenantPageQO;
-import top.zhjh.model.qo.SysTenantRemoveQO;
-import top.zhjh.model.qo.SysTenantSaveQO;
-import top.zhjh.model.qo.SysTenantUpdateQO;
+import top.zhjh.model.qo.*;
 import top.zhjh.model.vo.SysTenantPageVO;
 import top.zhjh.struct.SysTenantStruct;
 
@@ -29,7 +26,7 @@ public class SysTenantService extends ServiceImpl<SysTenantMapper, SysTenant> {
    * @param query 查询参数
    * @return 列表
    */
-  public List<SysTenantPageVO> list(SysTenantPageQO query) {
+  public List<SysTenantPageVO> list(SysTenantListQO query) {
     return sysTenantMapper.list(query);
   }
 

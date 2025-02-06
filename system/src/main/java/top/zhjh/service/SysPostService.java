@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import top.zhjh.base.model.MyPage;
 import top.zhjh.exception.ServiceException;
 import top.zhjh.mapper.SysPostMapper;
+import top.zhjh.model.qo.SysPostListQO;
 import top.zhjh.model.entity.SysPost;
 import top.zhjh.model.qo.SysPostPageQO;
 import top.zhjh.model.qo.SysPostRemoveQO;
@@ -29,7 +30,7 @@ public class SysPostService extends ServiceImpl<SysPostMapper, SysPost> {
    * @param query 查询参数
    * @return 列表
    */
-  public List<SysPostPageVO> list(SysPostPageQO query) {
+  public List<SysPostPageVO> list(SysPostListQO query) {
     return sysPostMapper.list(query);
   }
 

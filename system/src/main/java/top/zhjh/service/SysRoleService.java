@@ -18,10 +18,10 @@ import top.zhjh.model.entity.SysRoleMenu;
 import top.zhjh.model.entity.SysRoleUser;
 import top.zhjh.model.qo.*;
 import top.zhjh.struct.SysRoleStruct;
+import top.zhjh.util.StpExtUtil;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -53,7 +53,7 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
       log.error("角色不存在: {}", obj.getId());
       throw new ServiceException("角色不存在");
     }
-    if (RoleEnum.SUPER_ADMIN.getCode().equals(role.getCode())) {
+    if (StpExtUtil.isSuperAdmin(role)) {
       if (!role.getCode().equals(obj.getCode())) {
         throw new ServiceException("不能修改编码为" + RoleEnum.SUPER_ADMIN.getCode() + "角色的编码");
       }
@@ -81,7 +81,7 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
       log.error("角色不存在: {}", obj.getId());
       throw new ServiceException("角色不存在");
     }
-    if (RoleEnum.SUPER_ADMIN.getCode().equals(role.getCode())) {
+    if (StpExtUtil.isSuperAdmin(role)) {
       throw new ServiceException("不能修改编码为" + RoleEnum.SUPER_ADMIN.getCode() + "角色的状态");
     }
     return this.updateById(SysRoleStruct.INSTANCE.to(obj));
@@ -101,7 +101,7 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
       log.error("角色不存在: {}", id);
       throw new ServiceException("角色不存在");
     }
-    if (RoleEnum.SUPER_ADMIN.getCode().equals(role.getCode())) {
+    if (StpExtUtil.isSuperAdmin(role)) {
       throw new ServiceException("不能修改编码为" + RoleEnum.SUPER_ADMIN.getCode() + "角色的菜单权限");
     }
     sysRoleMenuService.lambdaUpdate().eq(SysRoleMenu::getRoleId, obj.getId()).remove();
@@ -131,7 +131,7 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
       log.error("角色不存在: {}", id);
       throw new ServiceException("角色不存在");
     }
-    if (RoleEnum.SUPER_ADMIN.getCode().equals(role.getCode())) {
+    if (StpExtUtil.isSuperAdmin(role)) {
       throw new ServiceException("不能修改编码为" + RoleEnum.SUPER_ADMIN.getCode() + "角色的数据权限");
     }
     sysRoleDeptService.lambdaUpdate().eq(SysRoleDept::getRoleId, obj.getId()).remove();
@@ -175,7 +175,7 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
         log.error("角色不存在: {}", id);
         throw new ServiceException("角色不存在");
       }
-      if (RoleEnum.SUPER_ADMIN.getCode().equals(role.getCode())) {
+      if (StpExtUtil.isSuperAdmin(role)) {
         throw new ServiceException("不能删除编码为" + RoleEnum.SUPER_ADMIN.getCode() + "的角色");
       }
       if (sysRoleUserService.lambdaQuery().eq(SysRoleUser::getRoleId, id).count() > 0) {

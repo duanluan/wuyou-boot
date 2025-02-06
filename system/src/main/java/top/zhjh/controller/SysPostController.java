@@ -14,6 +14,7 @@ import top.zhjh.model.qo.SysPostRemoveQO;
 import top.zhjh.model.qo.SysPostSaveQO;
 import top.zhjh.model.qo.SysPostUpdateQO;
 import top.zhjh.service.SysPostService;
+import top.zhjh.struct.SysPostStruct;
 
 import javax.annotation.Resource;
 
@@ -33,7 +34,7 @@ public class SysPostController extends BaseController {
   @GetMapping
   public R<?> list(@Validated SysPostPageQO query) {
     if (query.getCurrent() == 0) {
-      return ok(sysPostService.list(query));
+      return ok(sysPostService.list(SysPostStruct.INSTANCE.to(query)));
     }
     return ok(sysPostService.page(query));
   }
