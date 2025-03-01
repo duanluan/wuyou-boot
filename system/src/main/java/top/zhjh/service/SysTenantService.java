@@ -3,7 +3,7 @@ package top.zhjh.service;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import top.zhjh.base.model.MyPage;
+import top.zhjh.base.model.PageVO;
 import top.zhjh.exception.ServiceException;
 import top.zhjh.mapper.SysTenantMapper;
 import top.zhjh.model.entity.SysTenant;
@@ -36,7 +36,7 @@ public class SysTenantService extends ServiceImpl<SysTenantMapper, SysTenant> {
    * @param query 查询参数
    * @return 分页列表
    */
-  public MyPage<SysTenantPageVO> page(SysTenantPageQO query) {
+  public PageVO<SysTenantPageVO> page(SysTenantPageQO query) {
     return sysTenantMapper.page(query);
   }
 

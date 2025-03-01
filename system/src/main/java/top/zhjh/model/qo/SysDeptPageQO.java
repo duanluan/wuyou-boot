@@ -3,7 +3,7 @@ package top.zhjh.model.qo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import top.zhjh.base.model.MyPage;
+import top.zhjh.base.model.PageQO;
 import top.zhjh.model.entity.SysDept;
 
 /**
@@ -12,7 +12,7 @@ import top.zhjh.model.entity.SysDept;
 @Schema(title = "部门分页入参")
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class SysDeptPageQO extends MyPage<SysDept> {
+public class SysDeptPageQO extends PageQO<SysDept> {
 
   @Schema(title = "名称")
   private String name;

@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @param <T> 实体类型
  */
-public class MyPage<T> extends Page<T> implements Serializable {
+public class PageQO<T> extends Page<T> implements Serializable {
 
   @Schema(hidden = true)
   protected List<T> records;

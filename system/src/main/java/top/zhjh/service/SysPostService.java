@@ -3,15 +3,11 @@ package top.zhjh.service;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import top.zhjh.base.model.MyPage;
+import top.zhjh.base.model.PageVO;
 import top.zhjh.exception.ServiceException;
 import top.zhjh.mapper.SysPostMapper;
-import top.zhjh.model.qo.SysPostListQO;
 import top.zhjh.model.entity.SysPost;
-import top.zhjh.model.qo.SysPostPageQO;
-import top.zhjh.model.qo.SysPostRemoveQO;
-import top.zhjh.model.qo.SysPostSaveQO;
-import top.zhjh.model.qo.SysPostUpdateQO;
+import top.zhjh.model.qo.*;
 import top.zhjh.model.vo.SysPostPageVO;
 import top.zhjh.struct.SysPostStruct;
 
@@ -40,7 +36,7 @@ public class SysPostService extends ServiceImpl<SysPostMapper, SysPost> {
    * @param query 查询参数
    * @return 分页列表
    */
-  public MyPage<SysPostPageVO> page(SysPostPageQO query) {
+  public PageVO<SysPostPageVO> page(SysPostPageQO query) {
     return sysPostMapper.page(query);
   }
 

@@ -14,7 +14,7 @@ import top.csaf.bean.BeanUtil;
 import top.csaf.coll.CollUtil;
 import top.csaf.crypto.DigestUtil;
 import top.zhjh.base.model.BaseEntity;
-import top.zhjh.base.model.MyPage;
+import top.zhjh.base.model.PageVO;
 import top.zhjh.enums.RoleEnum;
 import top.zhjh.exception.ServiceException;
 import top.zhjh.mapper.SysUserMapper;
@@ -136,7 +136,7 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
    * @param query 查询参数
    * @return 分页列表
    */
-  public MyPage<SysUserPageVO> page(SysUserPageQO query) {
+  public PageVO<SysUserPageVO> page(SysUserPageQO query) {
     return sysUserMapper.page(query);
   }
 

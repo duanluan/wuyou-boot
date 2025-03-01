@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import top.csaf.tree.TreeNode;
 import top.csaf.tree.TreeUtil;
-import top.zhjh.base.model.MyPage;
+import top.zhjh.base.model.PageVO;
 import top.zhjh.exception.ServiceException;
 import top.zhjh.mapper.SysDeptMapper;
 import top.zhjh.model.entity.SysDept;
@@ -38,7 +38,7 @@ public class SysDeptService extends ServiceImpl<SysDeptMapper, SysDept> {
    * @param query 查询参数
    * @return 分页列表
    */
-  public MyPage<SysDeptPageVO> page(SysDeptPageQO query) {
+  public PageVO<SysDeptPageVO> page(SysDeptPageQO query) {
     return sysDeptMapper.page(query);
   }
 
