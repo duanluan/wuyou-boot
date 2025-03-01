@@ -3,6 +3,7 @@ package top.zhjh.model.qo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 
 /**
@@ -18,4 +19,7 @@ public class SysUserLoginQO {
   @Schema(title = "密码")
   @NotBlank(message = "密码不能为空")
   private String password;
+  @Schema(title = "租户ID")
+  @Min(value = 1, message = "租户ID错误")
+  private Long tenantId;
 }

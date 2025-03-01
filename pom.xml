@@ -24,7 +24,7 @@
     <mybatis.plus.version>3.5.3.2</mybatis.plus.version>
     <mybatis.plus.gen.version>3.5.3.2</mybatis.plus.gen.version>
     <mariadb.version>3.4.1</mariadb.version>
-    <satoken.version>1.39.0</satoken.version>
+    <satoken.version>1.40.0</satoken.version>
     <springdoc.version>1.6.14</springdoc.version>
     <knife4j.version>3.0.3</knife4j.version>
     <mapstruct.version>1.5.3.Final</mapstruct.version>
@@ -98,6 +98,12 @@
       <dependency>
         <groupId>cn.dev33</groupId>
         <artifactId>sa-token-redis-jackson</artifactId>
+        <version>${satoken.version}</version>
+      </dependency>
+      <!-- Sa-Token 整合 jwt -->
+      <dependency>
+        <groupId>cn.dev33</groupId>
+        <artifactId>sa-token-jwt</artifactId>
         <version>${satoken.version}</version>
       </dependency>
 

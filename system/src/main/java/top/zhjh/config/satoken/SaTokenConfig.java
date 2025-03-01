@@ -1,8 +1,11 @@
 package top.zhjh.config.satoken;
 
 import cn.dev33.satoken.interceptor.SaInterceptor;
+import cn.dev33.satoken.jwt.StpLogicJwtForSimple;
 import cn.dev33.satoken.router.SaRouter;
+import cn.dev33.satoken.stp.StpLogic;
 import cn.dev33.satoken.stp.StpUtil;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -21,9 +24,19 @@ public class SaTokenConfig implements WebMvcConfigurer {
   private SysMenuService sysMenuService;
 
   /**
+   * Sa-Token 整合 JWT（Simple 简单模式）
+   *
+   * @return StpLogic
+   */
+  @Bean
+  public StpLogic getStpLogicJwt() {
+    return new StpLogicJwtForSimple();
+  }
+
+  /**
    * 注册 Sa-Token 拦截器，打开注解式鉴权功能
    *
-   * @param registry
+   * @param registry 用于注册拦截器
    */
   @Override
   public void addInterceptors(InterceptorRegistry registry) {

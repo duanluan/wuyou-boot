@@ -3,7 +3,7 @@ package top.zhjh.model.entity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import top.zhjh.base.model.BaseEntity;
+import top.zhjh.base.model.BaseEntityNoTenant;
 
 /**
  * 系统用户
@@ -11,7 +11,7 @@ import top.zhjh.base.model.BaseEntity;
 @Schema(title = "系统用户")
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class SysUser extends BaseEntity {
+public class SysUser extends BaseEntityNoTenant {
 
   /**
    * 用户名

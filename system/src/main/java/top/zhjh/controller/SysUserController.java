@@ -15,7 +15,6 @@ import top.zhjh.model.entity.SysUser;
 import top.zhjh.model.qo.*;
 import top.zhjh.service.SysUserService;
 import top.zhjh.struct.SysUserStruct;
-import top.zhjh.util.StpExtUtil;
 
 import javax.annotation.Resource;
 
@@ -43,7 +42,6 @@ public class SysUserController extends BaseController {
   @PostMapping("/login")
   public R login(@Validated SysUserLoginQO query) {
     SysUser loggedInUser = sysUserService.login(query.getUsername(), query.getPassword(), query.getTenantId());
-    log.info("登录成功: {}", StpExtUtil.getTenantId());
     return ok(SysUserStruct.INSTANCE.toDetailVO(loggedInUser));
   }
 
