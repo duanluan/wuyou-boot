@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import top.zhjh.base.model.PageQO;
 import top.zhjh.enums.CommonStatus;
 import top.zhjh.model.entity.SysDept;
+import top.zhjh.model.entity.SysTenant;
 
 /**
  * 租户分页入参
@@ -13,7 +14,7 @@ import top.zhjh.model.entity.SysDept;
 @Schema(title = "租户分页入参")
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class SysTenantPageQO extends PageQO<SysDept> {
+public class SysTenantPageQO extends PageQO<SysTenant> {
 
   @Schema(title = "名称")
   private String name;

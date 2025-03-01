@@ -39,7 +39,8 @@ public class SysDeptService extends ServiceImpl<SysDeptMapper, SysDept> {
    * @return 分页列表
    */
   public PageVO<SysDeptPageVO> page(SysDeptPageQO query) {
-    return sysDeptMapper.page(query);
+    List<SysDeptPageVO> records = sysDeptMapper.page(query);
+    return new PageVO<SysDeptPageVO>(query).setRecords(records);
   }
 
   /**

@@ -28,10 +28,15 @@ public class PageVO<T> implements Serializable {
   public PageVO() {
   }
 
-  public PageVO(Page<T> page) {
+  public PageVO(Page page) {
     this.records = page.getRecords();
     this.total = page.getTotal();
     this.size = page.getSize();
     this.current = page.getCurrent();
+  }
+
+  public PageVO<T> setRecords(List<T> records) {
+    this.records = records;
+    return this;
   }
 }

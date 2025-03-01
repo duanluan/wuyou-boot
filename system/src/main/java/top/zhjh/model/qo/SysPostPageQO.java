@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import top.zhjh.base.model.PageQO;
 import top.zhjh.enums.CommonStatus;
-import top.zhjh.model.entity.SysDept;
+import top.zhjh.model.entity.SysPost;
 
 /**
  * 岗位分页入参
@@ -13,7 +13,7 @@ import top.zhjh.model.entity.SysDept;
 @Schema(title = "岗位分页入参")
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class SysPostPageQO extends PageQO<SysDept> {
+public class SysPostPageQO extends PageQO<SysPost> {
 
   @Schema(title = "编码")
   private String code;

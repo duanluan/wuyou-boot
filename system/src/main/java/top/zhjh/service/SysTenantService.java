@@ -37,7 +37,8 @@ public class SysTenantService extends ServiceImpl<SysTenantMapper, SysTenant> {
    * @return 分页列表
    */
   public PageVO<SysTenantPageVO> page(SysTenantPageQO query) {
-    return sysTenantMapper.page(query);
+    List<SysTenantPageVO> records = sysTenantMapper.page(query);
+    return new PageVO<SysTenantPageVO>(query).setRecords(records);
   }
 
   /**

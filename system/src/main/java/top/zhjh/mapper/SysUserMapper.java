@@ -2,7 +2,6 @@ package top.zhjh.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
-import top.zhjh.base.model.PageVO;
 import top.zhjh.model.entity.SysUser;
 import top.zhjh.model.qo.SysUserListQO;
 import top.zhjh.model.qo.SysUserPageQO;
@@ -21,5 +20,5 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
 
   List<SysUserPageVO> list(SysUserListQO query);
 
-  PageVO<SysUserPageVO> page(SysUserPageQO query);
+  List<SysUserPageVO> page(SysUserPageQO query);
 }

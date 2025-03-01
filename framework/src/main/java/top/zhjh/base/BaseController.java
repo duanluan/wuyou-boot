@@ -43,10 +43,13 @@ public class BaseController {
     return r;
   }
 
-  protected <T> R<PageVO<T>> ok(PageVO<T> data) {
-    R<PageVO<T>> r = new R<>();
+  protected <T> R<List<T>> ok(PageVO<T> data) {
+    R<List<T>> r = new R<>();
     r.setCode(OK_VAL);
-    r.setData(data);
+    r.setCurrent(data.getCurrent());
+    r.setSize(data.getSize());
+    r.setTotal(data.getTotal());
+    r.setData(data.getRecords());
     return r;
   }
 

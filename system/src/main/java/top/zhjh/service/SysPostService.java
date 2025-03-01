@@ -37,7 +37,8 @@ public class SysPostService extends ServiceImpl<SysPostMapper, SysPost> {
    * @return 分页列表
    */
   public PageVO<SysPostPageVO> page(SysPostPageQO query) {
-    return sysPostMapper.page(query);
+    List<SysPostPageVO> records = sysPostMapper.page(query);
+    return new PageVO<SysPostPageVO>(query).setRecords(records);
   }
 
   /**

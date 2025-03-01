@@ -137,7 +137,8 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
    * @return 分页列表
    */
   public PageVO<SysUserPageVO> page(SysUserPageQO query) {
-    return sysUserMapper.page(query);
+    List<SysUserPageVO> records = sysUserMapper.page(query);
+    return new PageVO<SysUserPageVO>(query).setRecords(records);
   }
 
   /**
