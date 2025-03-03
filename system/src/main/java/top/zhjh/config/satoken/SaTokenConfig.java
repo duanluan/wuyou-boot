@@ -42,17 +42,18 @@ public class SaTokenConfig implements WebMvcConfigurer {
   public void addInterceptors(InterceptorRegistry registry) {
     // 注册路由拦截器，自定义认证规则
     registry.addInterceptor(new SaInterceptor(handler -> {
-      // 所有路由登录校验
-      SaRouter.match("/**", r -> StpUtil.checkLogin());
+        // 所有路由登录校验
+        SaRouter.match("/**", r -> StpUtil.checkLogin());
 
-      // 循环有路径、权限，需登录的菜单
-      for (SysMenu sysMenu : sysMenuService.lambdaQuery()
-        .isNotNull(SysMenu::getPath)
-        .isNotNull(SysMenu::getPermission)
-        .eq(SysMenu::getNeedToLogin, true).list()) {
-        // 校验权限
-        SaRouter.match(sysMenu.getPath(), r -> StpUtil.checkPermission(sysMenu.getPermission()));
-      }
-    })).addPathPatterns("/**");
+        // 循环有路径、权限，需登录的菜单
+        for (SysMenu sysMenu : sysMenuService.lambdaQuery()
+          .isNotNull(SysMenu::getPath)
+          .isNotNull(SysMenu::getPermission)
+          .eq(SysMenu::getNeedToLogin, true).list()) {
+          // 校验权限
+          SaRouter.match(sysMenu.getPath(), r -> StpUtil.checkPermission(sysMenu.getPermission()));
+        }
+      })).addPathPatterns("/**")
+      .excludePathPatterns("/sys/tenants");
   }
 }
