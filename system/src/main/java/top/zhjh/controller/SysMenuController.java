@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.CacheManager;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ import top.zhjh.struct.SysMenuStruct;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 菜单 控制器
@@ -30,6 +32,8 @@ public class SysMenuController extends BaseController {
 
   @Resource
   private SysMenuService sysMenuService;
+  @Resource
+  private CacheManager cacheManager;
 
   @Operation(summary = "菜单列表")
   @GetMapping
@@ -44,6 +48,10 @@ public class SysMenuController extends BaseController {
   @Operation(summary = "菜单树")
   @GetMapping("/tree")
   public R<List<TreeNode>> listTree(@Validated SysMenuTreeQO query) {
+    if (Boolean.TRUE.equals(query.getIsRefreshCache())) {
+      // 清除 @Cacheable 缓存
+      Objects.requireNonNull(cacheManager.getCache("menuTree")).clear();
+    }
     return ok(sysMenuService.listTree(query));
   }
 

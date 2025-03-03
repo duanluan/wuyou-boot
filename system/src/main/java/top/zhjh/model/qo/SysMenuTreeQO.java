@@ -11,6 +11,8 @@ import java.util.List;
  */
 @Data
 public class SysMenuTreeQO {
+  @Schema(title = "是否刷新缓存")
+  private Boolean isRefreshCache;
   @Schema(title = "类型列表：1: 目录, 2: 菜单, 3: 按钮，逗号分隔")
   private List<String> types;
   @Schema(title = "角色编码列表")
