@@ -22,7 +22,7 @@ public class SysPostPageVO extends PageVO {
   private String code;
   @Schema(title = "名称")
   private String name;
-  @Schema(title = "排序")
+  @Schema(title = "顺序")
   private Long sort;
   @Schema(title = "状态")
   private CommonStatus status;

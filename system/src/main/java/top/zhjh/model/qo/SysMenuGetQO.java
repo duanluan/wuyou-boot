@@ -1,7 +1,7 @@
 package top.zhjh.model.qo;
 
 import top.zhjh.base.model.BaseGetQO;
-import top.zhjh.model.entity.SysMenu;
+import top.zhjh.enums.CommonStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -25,7 +25,7 @@ public class SysMenuGetQO extends BaseGetQO {
   private LocalDateTime createdTime;
   @Schema(title = "父级 ID")
   @NotBlank(message = "父级ID不能为空")
-  private String parentId;
+  private Long parentId;
   @Schema(title = "类型：1: 目录, 2: 菜单, 3: 按钮")
   private Boolean type;
   @Schema(title = "名称")
@@ -47,6 +47,6 @@ public class SysMenuGetQO extends BaseGetQO {
   private Boolean needToLogin;
   @Schema(title = "顺序")
   private Integer sort;
-  @Schema(title = "状态：1: 启用, 2: 禁用")
-  private Integer status;
+  @Schema(title = "状态：0: 禁用, 1: 启用")
+  private CommonStatus status;
 }

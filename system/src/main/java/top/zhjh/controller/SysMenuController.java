@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -47,12 +48,22 @@ public class SysMenuController extends BaseController {
 
   @Operation(summary = "菜单树")
   @GetMapping("/tree")
-  public R<List<TreeNode>> listTree(@Validated SysMenuTreeQO query) {
-    if (Boolean.TRUE.equals(query.getIsRefreshCache())) {
-      // 清除 @Cacheable 缓存
-      Objects.requireNonNull(cacheManager.getCache("menuTree")).clear();
-    }
-    return ok(sysMenuService.listTree(query));
+  public R<List<TreeNode>> listTree() {
+    return ok(sysMenuService.listTree());
+  }
+
+  @Operation(summary = "刷新缓存")
+  @PostMapping("/refreshTreeCache")
+  public R<?> refreshTreeCache() {
+    // 清除 @Cacheable 缓存
+    Objects.requireNonNull(cacheManager.getCache("menuTree")).clear();
+    return ok();
+  }
+
+  @Operation(summary = "菜单树表格")
+  @GetMapping("/treeTable")
+  public R<List<TreeNode>> listTreeTable(@Validated SysMenuTreeTableQO query) {
+    return ok(sysMenuService.listTreeTable(query));
   }
 
   @Operation(summary = "菜单详情")
@@ -61,6 +72,7 @@ public class SysMenuController extends BaseController {
     return ok(sysMenuService.getById(query.getId()));
   }
 
+  @CacheEvict(value = "menuTree", keyGenerator = "roleCodesCacheKeyGen")
   @Operation(summary = "保存菜单")
   @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
   @PostMapping
@@ -68,13 +80,21 @@ public class SysMenuController extends BaseController {
     return saveR(sysMenuService.save(SysMenuStruct.INSTANCE.to(obj)));
   }
 
+  @CacheEvict(value = "menuTree", keyGenerator = "roleCodesCacheKeyGen")
   @Operation(summary = "更新菜单")
   @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
   @PutMapping("/{id}")
-  public R update(@RequestBody @Validated SysMenuUpdateQO obj) {
+  public R update(@RequestBody @Validated(SysMenuUpdateQO.UpdateGroup.class) SysMenuUpdateQO obj) {
     return updateR(sysMenuService.updateById(SysMenuStruct.INSTANCE.to(obj)));
   }
 
+  @Operation(summary = "更新菜单状态")
+  @PatchMapping("/{id}/status")
+  public R<?> updateStatus(@RequestBody @Validated(SysMenuUpdateQO.UpdateStatusGroup.class) SysMenuUpdateQO obj) {
+    return updateR(sysMenuService.updateStatus(obj));
+  }
+
+  @CacheEvict(value = "menuTree", keyGenerator = "roleCodesCacheKeyGen")
   @Operation(summary = "删除菜单")
   @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
   @DeleteMapping("/{ids}")

@@ -2,18 +2,36 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="top.zhjh.mapper.SysMenuMapper">
 
+  <!-- 因为在 TreeNode 中没有对应字段，所以 tinyint、datetime 需要映射 -->
+  <resultMap id="listTreeMap" type="top.csaf.tree.TreeNode">
+    <result column="createdTime" property="createdTime" javaType="java.time.LocalDateTime"/>
+    <result column="type" property="type" javaType="java.lang.Integer"/>
+    <result column="status" property="status" javaType="java.lang.Integer"/>
+  </resultMap>
+
   <sql id="listTreeSql">
     select
-      id,
-      name,
-      sort,
-      parent_id as parentId,
-      icon,
-      path
-    from sys_menu
-    where deleted = 0
+      sm.id,
+      sm.created_time createdTime,
+      sm.parent_id parentId,
+      sm.type,
+      sm.name,
+      sm.sort,
+      sm.status,
+      sm.icon,
+      sm.path,
+      sm.method,
+      sm.permission
+    from sys_menu sm
+    where sm.deleted = 0
+    <if test="name != null and name != ''">
+      and sm.name like concat('%', #{name}, '%')
+    </if>
+    <if test="status != null">
+      and sm.status = #{status}
+    </if>
     <if test="roleCodes != null">
-      and id in (
+      and sm.id in (
         select menu_id from sys_role_menu where role_id in (
           select id from sys_role where code in
           <foreach collection="roleCodes" item="roleCode" open="(" separator="," close=")">
@@ -24,22 +42,27 @@
     </if>
     <if test="types != null">
       <foreach collection="types" item="type" open="and (" separator="or" close=")">
-        type = #{type}
+        sm.type = #{type}
       </foreach>
     </if>
     order by sort, created_time desc
   </sql>
 
-  <select id="listTree" resultType="top.csaf.tree.TreeNode">
+  <select id="listTree" resultMap="listTreeMap">
     <choose>
       <when test="isAllAndChecked">
         select
           sm.id,
+          sm.created_time createdTime,
+          sm.parent_id parentId,
+          sm.type,
           sm.name,
           sm.sort,
-          sm.parent_id as parentId,
+          sm.status,
           sm.icon,
           sm.path,
+          sm.method,
+          sm.permission,
           case
             when sm.id in (select id from (<include refid="listTreeSql"/>) t) then true
             else false

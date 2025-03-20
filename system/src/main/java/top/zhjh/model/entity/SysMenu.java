@@ -1,16 +1,15 @@
 package top.zhjh.model.entity;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import top.zhjh.base.model.BaseEntity;
+import top.zhjh.enums.CommonStatus;
 
 /**
  * 菜单
  */
 @Schema(title = "菜单")
-@TableName("sys_menu")
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class SysMenu extends BaseEntity {
@@ -19,7 +18,7 @@ public class SysMenu extends BaseEntity {
    * 父级 ID
    */
   @Schema(title = "父级 ID")
-  private String parentId;
+  private Long parentId;
   /**
    * 类型：1: 目录, 2: 菜单, 3: 按钮
    */
@@ -61,8 +60,8 @@ public class SysMenu extends BaseEntity {
   @Schema(title = "顺序")
   private Integer sort;
   /**
-   * 状态：1: 启用, 2: 禁用
+   * 状态：0: 禁用, 1: 启用
    */
-  @Schema(title = "状态：1: 启用, 2: 禁用")
-  private Integer status;
+  @Schema(title = "状态：0: 禁用, 1: 启用")
+  private CommonStatus status;
 }

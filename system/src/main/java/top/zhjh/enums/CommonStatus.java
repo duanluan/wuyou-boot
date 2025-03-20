@@ -11,7 +11,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum CommonStatus {
-
+  //
   DISABLE(0, "禁用"),
   ENABLE(1, "启用"),
   ;

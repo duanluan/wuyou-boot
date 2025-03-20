@@ -4,6 +4,7 @@ import top.zhjh.base.model.BaseEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import top.zhjh.enums.CommonStatus;
 
 /**
  * 菜单详情响应
@@ -14,7 +15,7 @@ import lombok.EqualsAndHashCode;
 public class SysMenuGetVO extends BaseEntity {
 
   @Schema(title = "父级 ID")
-  private String parentId;
+  private Long parentId;
   @Schema(title = "类型：1: 目录, 2: 菜单, 3: 按钮")
   private Boolean type;
   @Schema(title = "名称")
@@ -31,6 +32,6 @@ public class SysMenuGetVO extends BaseEntity {
   private Boolean needToLogin;
   @Schema(title = "顺序")
   private Integer sort;
-  @Schema(title = "状态：1: 启用, 2: 禁用")
-  private Integer status;
+  @Schema(title = "状态：0: 禁用, 1: 启用")
+  private CommonStatus status;
 }

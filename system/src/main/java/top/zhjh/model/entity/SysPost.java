@@ -23,9 +23,9 @@ public class SysPost extends BaseEntity {
   @Schema(title = "名称")
   private String name;
   /**
-   * 排序
+   * 顺序
    */
-  @Schema(title = "排序")
+  @Schema(title = "顺序")
   private Integer sort;
   /**
    * 状态：0: 禁用, 1: 启用

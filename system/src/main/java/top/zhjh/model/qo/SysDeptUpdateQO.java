@@ -26,8 +26,8 @@ public class SysDeptUpdateQO {
   @Schema(title = "父级 ID")
   @Min(value = 1, message = "父级ID错误", groups = {UpdateGroup.class})
   private Long parentId;
-  @Schema(title = "排序")
-  @Min(value = 1, message = "排序错误", groups = {UpdateGroup.class})
+  @Schema(title = "顺序")
+  @Min(value = 1, message = "顺序错误", groups = {UpdateGroup.class})
   private Long sort;
   @Schema(title = "状态")
   @NotNull(message = "状态不能为空", groups = {UpdateGroup.class, UpdateStatusGroup.class})

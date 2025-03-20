@@ -20,8 +20,8 @@ public class SysPostSaveQO {
   @Schema(title = "名称")
   @NotBlank(message = "名称不能为空")
   private String name;
-  @Schema(title = "排序")
-  @Min(value = 1, message = "排序错误")
+  @Schema(title = "顺序")
+  @Min(value = 1, message = "顺序错误")
   private Long sort;
   /**
    * 状态：0: 禁用, 1: 启用

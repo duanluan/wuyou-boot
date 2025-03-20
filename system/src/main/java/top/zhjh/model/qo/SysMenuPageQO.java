@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import top.zhjh.base.model.PageQO;
+import top.zhjh.enums.CommonStatus;
 import top.zhjh.model.entity.SysMenu;
 
 /**
@@ -28,6 +29,6 @@ public class SysMenuPageQO extends PageQO<SysMenu> {
   private String permission;
   @Schema(title = "是否需要登录")
   private Boolean needToLogin;
-  @Schema(title = "状态：1: 启用, 2: 禁用")
-  private Integer status;
+  @Schema(title = "状态：0: 禁用, 1: 启用")
+  private CommonStatus status;
 }

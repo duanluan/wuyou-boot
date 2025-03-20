@@ -23,13 +23,13 @@ public class SysDept extends BaseEntity {
   @Schema(title = "父级 ID")
   private Long parentId;
   /**
-   * 排序
+   * 顺序
    */
-  @Schema(title = "排序")
+  @Schema(title = "顺序")
   private Integer sort;
   /**
    * 状态：0: 禁用, 1: 启用
    */
-  @Schema(title = "状态")
+  @Schema(title = "状态：0: 禁用, 1: 启用")
   private CommonStatus status;
 }

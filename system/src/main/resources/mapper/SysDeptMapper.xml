@@ -18,19 +18,14 @@
     <include refid="listSql"/>
   </select>
 
-  <resultMap id="listTreeMap" type="top.csaf.tree.TreeNode">
-    <result column="status" property="status" javaType="java.lang.Integer"/>
-    <result column="createdTime" property="createdTime" javaType="java.time.LocalDateTime"/>
-  </resultMap>
-
   <sql id="listTreeSql">
     select
       sd.id,
+      sd.created_time createdTime,
       sd.name,
       sd.parent_id parentId,
       sd.sort,
-      sd.status,
-      sd.created_time createdTime
+      sd.status
     from sys_dept sd
     where sd.deleted = 0
     <if test="name != null and name != ''">
@@ -55,16 +50,21 @@
     order by sd.sort, sd.created_time desc
   </sql>
 
+  <resultMap id="listTreeMap" type="top.csaf.tree.TreeNode">
+    <result column="status" property="status" javaType="java.lang.Integer"/>
+    <result column="createdTime" property="createdTime" javaType="java.time.LocalDateTime"/>
+  </resultMap>
+
   <select id="listTree" resultMap="listTreeMap">
     <choose>
       <when test="isAllAndChecked">
         select
         sd.id,
+        sd.created_time createdTime,
         sd.name,
         sd.parent_id parentId,
         sd.sort,
         sd.status,
-        sd.created_time createdTime,
         case
           when sd.id in (select id from (<include refid="listTreeSql"/>) t) then true
           else false
