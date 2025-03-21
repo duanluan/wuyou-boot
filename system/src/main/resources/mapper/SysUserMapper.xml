@@ -23,10 +23,14 @@
     select
       su.*,
       group_concat(sr.id order by sr.sort) as roleIds,
-      group_concat(sr.name order by sr.sort) as roleNames
+      group_concat(sr.name order by sr.sort) as roleNames,
+      group_concat(sp.id order by sp.sort) as postIds,
+      group_concat(sp.name order by sp.sort) as postNames
     from sys_user su
     left join sys_role_user sru on su.id = sru.user_id
     left join sys_role sr on sru.role_id = sr.id
+    left join sys_post_user spu on su.id = spu.user_id
+    left join sys_post sp on spu.post_id = sp.id
     where su.deleted = 0
     group by su.id
   </sql>
@@ -34,6 +38,8 @@
   <resultMap id="listMap" type="top.zhjh.model.vo.SysUserPageVO">
     <result property="roleIds" column="roleIds" typeHandler="top.zhjh.mybatis.handler.CommasToLongListTypeHandler"/>
     <result property="roleNames" column="roleNames" typeHandler="top.zhjh.mybatis.handler.CommasToStrListTypeHandler"/>
+    <result property="postIds" column="postIds" typeHandler="top.zhjh.mybatis.handler.CommasToLongListTypeHandler"/>
+    <result property="postNames" column="postNames" typeHandler="top.zhjh.mybatis.handler.CommasToStrListTypeHandler"/>
   </resultMap>
 
   <select id="list" resultMap="listMap">

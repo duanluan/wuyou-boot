@@ -18,15 +18,12 @@ import top.zhjh.base.model.PageVO;
 import top.zhjh.enums.RoleEnum;
 import top.zhjh.exception.ServiceException;
 import top.zhjh.mapper.SysUserMapper;
-import top.zhjh.model.entity.SysRole;
-import top.zhjh.model.entity.SysRoleUser;
-import top.zhjh.model.entity.SysUser;
+import top.zhjh.model.entity.*;
 import top.zhjh.model.qo.*;
 import top.zhjh.model.vo.SysUserPageVO;
 import top.zhjh.struct.SysUserStruct;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -42,6 +39,10 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
   private SysRoleUserService sysRoleUserService;
   @Autowired
   private SysRoleService sysRoleService;
+  @Resource
+  private SysPostUserService sysPostUserService;
+  @Resource
+  private SysPostService sysPostService;
 
   /**
    * 列出用户角色编码
@@ -158,18 +159,29 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
     if (!this.save(sysUser)) {
       throw new ServiceException("保存失败");
     }
+    Long sysUserId = sysUser.getId();
 
     // 关联角色
-    List<SysRoleUser> roleUserList = new ArrayList<>();
     for (Long roleId : obj.getRoleIds()) {
       SysRole role = sysRoleService.getById(roleId);
       if (role == null) {
         log.error("角色不存在: {}", roleId);
         throw new ServiceException("角色不存在");
       }
-      roleUserList.add(new SysRoleUser(roleId, sysUser.getId()));
+      sysRoleUserService.save(new SysRoleUser(roleId, sysUserId));
     }
-    return sysRoleUserService.saveBatch(roleUserList);
+
+    // 关联岗位
+    for (Long postId : obj.getPostIds()) {
+      SysPost sysPost = sysPostService.getById(postId);
+      if (sysPost == null) {
+        log.error("岗位不存在: {}", postId);
+        throw new ServiceException("岗位不存在");
+      }
+      sysPostUserService.save(new SysPostUser(postId, sysUserId));
+    }
+
+    return true;
   }
 
   /**
@@ -204,6 +216,13 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
     for (Long roleId : roleIds) {
       sysRoleUserService.save(new SysRoleUser(roleId, id));
     }
+
+    // 重新关联岗位
+    sysPostUserService.lambdaUpdate().eq(SysPostUser::getUserId, id).remove();
+    for (Long postId : obj.getPostIds()) {
+      sysPostUserService.save(new SysPostUser(postId, id));
+    }
+
     return this.updateById(SysUserStruct.INSTANCE.to(obj));
   }
 

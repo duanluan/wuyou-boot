@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * 用户保存入参
  */
-@Schema(title = "SysUser 保存入参")
+@Schema(title = "用户保存入参")
 @Data
 public class SysUserSaveQO  {
 
@@ -24,6 +24,8 @@ public class SysUserSaveQO  {
   @NotBlank(message = "密码不能为空")
   private String password;
   @Schema(title = "角色ID列表")
-  @Size(min = 1, message = "角色ID列表不能为空")
+  @Size(min = 1, message = "角色列表不能为空")
   private List<Long> roleIds;
+  @Schema(title = "岗位列表")
+  private List<Long> postIds;
 }

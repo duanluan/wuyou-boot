@@ -4,15 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
- * 角色-用户
+ * 岗位-用户
  */
 @AllArgsConstructor
 @Data
-public class SysRoleUser {
+public class SysPostUser {
   /**
-   * 角色 ID
+   * 岗位 ID
    */
-  private Long roleId;
+  private Long postId;
   /**
    * 用户 ID
    */
