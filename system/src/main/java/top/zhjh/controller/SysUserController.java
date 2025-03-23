@@ -11,8 +11,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import top.zhjh.base.BaseController;
 import top.zhjh.base.model.R;
-import top.zhjh.model.entity.SysUser;
 import top.zhjh.model.qo.*;
+import top.zhjh.model.vo.SysUserDetailVO;
 import top.zhjh.service.SysUserService;
 import top.zhjh.struct.SysUserStruct;
 
@@ -40,9 +40,8 @@ public class SysUserController extends BaseController {
   @SaIgnore
   @Operation(summary = "登录")
   @PostMapping("/login")
-  public R login(@Validated SysUserLoginQO query) {
-    SysUser loggedInUser = sysUserService.login(query.getUsername(), query.getPassword(), query.getTenantId());
-    return ok(SysUserStruct.INSTANCE.toDetailVO(loggedInUser));
+  public R<SysUserDetailVO> login(@Validated SysUserLoginQO query) {
+    return ok(sysUserService.login(query.getUsername(), query.getPassword(), query.getTenantId()));
   }
 
   @Operation(summary = "登出")
@@ -60,12 +59,6 @@ public class SysUserController extends BaseController {
     }
     return ok(sysUserService.page(query));
   }
-
-  // @Operation(summary = "用户详情")
-  // @GetMapping("/{id}")
-  // public R<SysUserDetailVO> get(@Validated SysUserGetQO query) {
-  //   return ok(sysUserService.getById(query.getId()));
-  // }
 
   @Operation(summary = "保存用户")
   @Transactional(rollbackFor = {Exception.class, RuntimeException.class})

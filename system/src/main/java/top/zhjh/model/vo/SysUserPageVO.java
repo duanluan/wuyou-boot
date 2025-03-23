@@ -22,6 +22,8 @@ public class SysUserPageVO extends PageVO {
   private String username;
   @Schema(title = "昵称")
   private String nickName;
+  @Schema(title = "创建时间")
+  private LocalDateTime createdTime;
   @Schema(title = "角色ID列表")
   private List<Long> roleIds;
   @Schema(title = "角色名称列表")
@@ -30,6 +32,4 @@ public class SysUserPageVO extends PageVO {
   private List<Long> postIds;
   @Schema(title = "岗位名称列表")
   private List<String> postNames;
-  @Schema(title = "创建时间")
-  private LocalDateTime createdTime;
 }

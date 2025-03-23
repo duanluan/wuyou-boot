@@ -4,6 +4,7 @@ import cn.dev33.satoken.stp.SaLoginConfig;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -20,6 +21,7 @@ import top.zhjh.exception.ServiceException;
 import top.zhjh.mapper.SysUserMapper;
 import top.zhjh.model.entity.*;
 import top.zhjh.model.qo.*;
+import top.zhjh.model.vo.SysUserDetailVO;
 import top.zhjh.model.vo.SysUserPageVO;
 import top.zhjh.struct.SysUserStruct;
 
@@ -104,11 +106,11 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
    *
    * @param username 用户名
    * @param password 密码
-   * @param tenantId
+   * @param tenantId 租户 ID
    * @return 登录用户
    */
-  public SysUser login(String username, String password, Long tenantId) {
-    SysUser user = this.getOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUsername, username));
+  public SysUserDetailVO login(@NonNull final String username, @NonNull final String password, final Long tenantId) {
+    SysUser user = this.lambdaQuery().select(SysUser::getId, SysUser::getPassword).eq(SysUser::getUsername, username).one();
     if (user == null) {
       throw new ServiceException(HttpStatus.UNAUTHORIZED, "用户名或密码错误");
     }
@@ -116,9 +118,9 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
       throw new ServiceException(HttpStatus.UNAUTHORIZED, "用户名或密码错误");
     }
     StpUtil.login(user.getId(),
-      // 扩展参数
+      // 扩展参数：租户 ID
       SaLoginConfig.setExtra(BeanUtil.getPropertyName(BaseEntity::getTenantId), tenantId));
-    return user;
+    return this.getDetail(user.getId());
   }
 
   /**
@@ -140,6 +142,20 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
   public PageVO<SysUserPageVO> page(SysUserPageQO query) {
     List<SysUserPageVO> records = sysUserMapper.page(query);
     return new PageVO<SysUserPageVO>(query).setRecords(records);
+  }
+
+  /**
+   * 获取详情
+   *
+   * @param id ID
+   * @return 详情
+   */
+  public SysUserDetailVO getDetail(@NonNull final Long id) {
+    SysUser sysUser = this.getById(id);
+    if (sysUser == null) {
+      throw new ServiceException("用户不存在");
+    }
+    return sysUserMapper.getDetail(id);
   }
 
   /**
