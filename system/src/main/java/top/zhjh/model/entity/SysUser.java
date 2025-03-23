@@ -28,4 +28,5 @@ public class SysUser extends BaseEntityNoTenant {
    */
   @Schema(title = "昵称")
   private String nickName;
+  // TODO 角色、部门、岗位冗余字段
 }

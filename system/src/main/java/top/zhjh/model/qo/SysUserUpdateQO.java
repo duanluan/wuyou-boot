@@ -28,6 +28,9 @@ public class SysUserUpdateQO {
   @Schema(title = "角色列表")
   @Size(min = 1, message = "角色列表不能为空")
   private List<Long> roleIds;
+  @Schema(title = "部门ID")
+  @Min(value = 1, message = "部门错误")
+  private Long deptId;
   @Schema(title = "岗位列表")
   private List<Long> postIds;
 }

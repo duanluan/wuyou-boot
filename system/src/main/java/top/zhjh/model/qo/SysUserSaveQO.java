@@ -3,6 +3,7 @@ package top.zhjh.model.qo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.List;
  */
 @Schema(title = "用户保存入参")
 @Data
-public class SysUserSaveQO  {
+public class SysUserSaveQO {
 
   @Schema(title = "用户名")
   @NotBlank(message = "用户名不能为空")
@@ -26,6 +27,9 @@ public class SysUserSaveQO  {
   @Schema(title = "角色ID列表")
   @Size(min = 1, message = "角色列表不能为空")
   private List<Long> roleIds;
+  @Schema(title = "部门ID")
+  @Min(value = 1, message = "部门错误")
+  private Long deptId;
   @Schema(title = "岗位ID列表")
   private List<Long> postIds;
 }

@@ -1,6 +1,5 @@
 package top.zhjh.service;
 
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import top.csaf.tree.TreeNode;
@@ -11,13 +10,14 @@ import top.zhjh.mapper.SysDeptMapper;
 import top.zhjh.model.entity.SysDept;
 import top.zhjh.model.qo.*;
 import top.zhjh.model.vo.SysDeptPageVO;
+import top.zhjh.mybatis.MyServiceImpl;
 import top.zhjh.struct.SysDeptStruct;
 
 import javax.annotation.Resource;
 import java.util.List;
 
 @Service
-public class SysDeptService extends ServiceImpl<SysDeptMapper, SysDept> {
+public class SysDeptService extends MyServiceImpl<SysDeptMapper, SysDept> {
 
   @Resource
   private SysDeptMapper sysDeptMapper;

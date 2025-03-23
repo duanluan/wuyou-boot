@@ -3,7 +3,6 @@ package top.zhjh.service;
 import cn.dev33.satoken.stp.SaLoginConfig;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +22,7 @@ import top.zhjh.model.entity.*;
 import top.zhjh.model.qo.*;
 import top.zhjh.model.vo.SysUserDetailVO;
 import top.zhjh.model.vo.SysUserPageVO;
+import top.zhjh.mybatis.MyServiceImpl;
 import top.zhjh.struct.SysUserStruct;
 
 import javax.annotation.Resource;
@@ -33,7 +33,7 @@ import java.util.List;
  */
 @Slf4j
 @Service
-public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
+public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
 
   @Resource
   private SysUserMapper sysUserMapper;
@@ -45,6 +45,10 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
   private SysPostUserService sysPostUserService;
   @Resource
   private SysPostService sysPostService;
+  @Resource
+  private SysDeptService sysDeptService;
+  @Resource
+  private SysDeptUserService sysDeptUserService;
 
   /**
    * 列出用户角色编码
@@ -187,6 +191,15 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
       sysRoleUserService.save(new SysRoleUser(roleId, sysUserId));
     }
 
+    // 关联部门
+    if (obj.getDeptId() != null) {
+      if (sysDeptService.countById(obj.getDeptId()) == 0) {
+        log.error("部门不存在: {}", obj.getDeptId());
+        throw new ServiceException("部门不存在");
+      }
+      sysDeptUserService.save(new SysDeptUser(obj.getDeptId(), sysUserId));
+    }
+
     // 关联岗位
     for (Long postId : obj.getPostIds()) {
       SysPost sysPost = sysPostService.getById(postId);
@@ -233,6 +246,16 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
       sysRoleUserService.save(new SysRoleUser(roleId, id));
     }
 
+    // 重新关联部门
+    if (obj.getDeptId() != null) {
+      if (sysDeptService.countById(obj.getDeptId()) == 0) {
+        log.error("部门不存在: {}", obj.getDeptId());
+        throw new ServiceException("部门不存在");
+      }
+      sysDeptUserService.lambdaUpdate().eq(SysDeptUser::getUserId, id).remove();
+      sysDeptUserService.save(new SysDeptUser(obj.getDeptId(), id));
+    }
+
     // 重新关联岗位
     sysPostUserService.lambdaUpdate().eq(SysPostUser::getUserId, id).remove();
     for (Long postId : obj.getPostIds()) {
@@ -268,6 +291,10 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
       }
       // 删除关联角色
       sysRoleUserService.lambdaUpdate().eq(SysRoleUser::getUserId, id).remove();
+      // 删除关联部门
+      sysDeptUserService.lambdaUpdate().eq(SysDeptUser::getUserId, id).remove();
+      // 删除关联岗位
+      sysPostUserService.lambdaUpdate().eq(SysPostUser::getUserId, id).remove();
     }
     return this.removeBatchByIds(ids);
   }

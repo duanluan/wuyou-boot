@@ -20,6 +20,8 @@ public class SysUserDetailVO {
   private String nickName;
   @Schema(title = "角色名称列表")
   private List<String> roleNames;
+  @Schema(title = "部门名称")
+  private String deptName;
   @Schema(title = "岗位名称列表")
   private List<String> postNames;
 }
