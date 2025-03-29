@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 
@@ -17,6 +18,7 @@ import java.util.List;
 public class SysUserRemoveQO {
 
   @Schema(title = "用户ID列表")
-  @Size(min = 1, message = "用户ID列表不能为空")
+  @Size(min = 1, message = "删除目标不能为空")
+  @NotNull(message = "删除目标不能为空")
   private List<Long> ids;
 }

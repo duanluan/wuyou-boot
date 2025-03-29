@@ -61,8 +61,9 @@ public class ${entity}${fileNameSuffix} <#if entitySerialVersionUID>implements S
 </#if>
 <#-- 如果包含是删除，添加 ID 列表字段 -->
 <#if fileNameSuffix?contains('Remove')>
-  @Schema(title = "${table.comment!}ID列表")
-  @Size(min = 1, message = "${table.comment!}ID列表不能为空")
+  @Schema(title = "${table.comment!}列表")
+  @Size(min = 1, message = "删除目标不能为空")
+  @NotNull(message = "删除目标不能为空")
   private List<Long> ids;
 </#if>
 <#-- 临时写法 -->

@@ -5,6 +5,7 @@ import lombok.Data;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 
@@ -26,6 +27,7 @@ public class SysUserSaveQO {
   private String password;
   @Schema(title = "角色ID列表")
   @Size(min = 1, message = "角色列表不能为空")
+  @NotNull(message = "角色列表不能为空")
   private List<Long> roleIds;
   @Schema(title = "部门ID")
   @Min(value = 1, message = "部门错误")
