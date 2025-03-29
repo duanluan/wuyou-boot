@@ -298,4 +298,32 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
     }
     return this.removeBatchByIds(ids);
   }
+
+  /**
+   * 修改密码
+   * @param obj 修改密码入参
+   * @return 是否成功
+   */
+  public boolean updatePwd(SysUserUpdatePwdQO obj) {
+    Long id = obj.getId();
+    SysUser user = this.getById(id);
+    if (user == null) {
+      log.error("用户不存在: {}", id);
+      throw new ServiceException("用户不存在");
+    }
+    if (!user.getPassword().equals(DigestUtil.sha512Hex(obj.getOldPassword()))) {
+      throw new ServiceException("旧密码错误");
+    }
+    if (!obj.getNewPassword().equals(obj.getConfirmPassword())) {
+      throw new ServiceException("新密码和确认密码不一致");
+    }
+    if (obj.getNewPassword().equals(obj.getOldPassword())) {
+      throw new ServiceException("新密码和旧密码不能相同");
+    }
+    SysUser updateObj = new SysUser();
+    updateObj.setId(id);
+    updateObj.setPassword(DigestUtil.sha512Hex(obj.getNewPassword()));
+
+    return this.updateById(updateObj);
+  }
 }

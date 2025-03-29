@@ -17,12 +17,15 @@ import java.util.List;
 @Data
 public class SysUserUpdateQO {
 
+  public interface UpdateProfileGroup {
+  }
+
   @Schema(title = "ID")
   @Min(value = 1, message = "ID错误")
-  @NotNull(message = "ID不能为空")
+  @NotNull(message = "ID不能为空", groups = {UpdateProfileGroup.class})
   private Long id;
   @Schema(title = "昵称")
-  @NotBlank(message = "昵称不能为空")
+  @NotBlank(message = "昵称不能为空", groups = {UpdateProfileGroup.class})
   private String nickName;
   @Schema(title = "角色列表")
   @Size(min = 1, message = "角色列表不能为空")

@@ -74,6 +74,20 @@ public class SysUserController extends BaseController {
     return updateR(sysUserService.update(obj));
   }
 
+  @Operation(summary = "更新用户")
+  @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
+  @PutMapping("/{id}/profile")
+  public R updateProfile(@RequestBody @Validated(SysUserUpdateQO.UpdateProfileGroup.class) SysUserUpdateQO obj) {
+    return updateR(sysUserService.updateById(SysUserStruct.INSTANCE.to(obj)));
+  }
+
+  @Operation(summary = "修改密码")
+  @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
+  @PutMapping("/{id}/pwd")
+  public R updatePwd(@RequestBody @Validated SysUserUpdatePwdQO obj) {
+    return updateR(sysUserService.updatePwd(obj));
+  }
+
   @Operation(summary = "删除用户")
   @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
   @DeleteMapping("/{ids}")
