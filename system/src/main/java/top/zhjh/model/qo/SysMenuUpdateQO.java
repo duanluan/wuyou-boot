@@ -13,7 +13,6 @@ import javax.validation.constraints.NotNull;
  * 菜单更新入参
  */
 @Schema(title = "菜单 更新入参")
-@EqualsAndHashCode(callSuper = false)
 @Data
 public class SysMenuUpdateQO {
 

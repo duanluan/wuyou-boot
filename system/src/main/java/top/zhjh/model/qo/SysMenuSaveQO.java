@@ -12,7 +12,6 @@ import javax.validation.constraints.NotBlank;
  * 菜单保存入参
  */
 @Schema(title = "菜单 保存入参")
-@EqualsAndHashCode(callSuper = false)
 @Data
 public class SysMenuSaveQO  {
 

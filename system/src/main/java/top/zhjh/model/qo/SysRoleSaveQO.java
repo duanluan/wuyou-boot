@@ -10,7 +10,6 @@ import javax.validation.constraints.NotBlank;
  * 角色保存入参
  */
 @Schema(title = "角色 保存入参")
-@EqualsAndHashCode(callSuper = false)
 @Data
 public class SysRoleSaveQO  {
 

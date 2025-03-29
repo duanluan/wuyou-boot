@@ -12,7 +12,6 @@ import java.util.List;
  * 角色更新菜单权限入参
  */
 @Schema(title = "角色更新菜单权限入参")
-@EqualsAndHashCode(callSuper = false)
 @Data
 public class SysRoleUpdateMenusQO {
 

@@ -12,7 +12,6 @@ import javax.validation.constraints.NotNull;
  * 角色更新状态入参
  */
 @Schema(title = "角色更新状态入参")
-@EqualsAndHashCode(callSuper = false)
 @Data
 public class SysRoleUpdateStatusQO {
 

@@ -12,7 +12,6 @@ import java.util.List;
  * 菜单删除入参
  */
 @Schema(title = "菜单删除入参")
-@EqualsAndHashCode(callSuper = false)
 @Data
 public class SysMenuRemoveQO {
 

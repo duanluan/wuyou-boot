@@ -13,7 +13,6 @@ import java.util.List;
  * 角色更新数据权限入参
  */
 @Schema(title = "角色更新数据权限入参")
-@EqualsAndHashCode(callSuper = false)
 @Data
 public class SysRoleUpdateDataScopeQO {
 

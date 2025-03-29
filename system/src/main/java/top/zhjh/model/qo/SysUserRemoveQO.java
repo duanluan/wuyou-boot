@@ -13,7 +13,6 @@ import java.util.List;
  * 用户删除入参
  */
 @Schema(title = "用户删除入参")
-@EqualsAndHashCode(callSuper = false)
 @Data
 public class SysUserRemoveQO {
 

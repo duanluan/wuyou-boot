@@ -14,7 +14,6 @@ import java.util.List;
  * 用户更新入参
  */
 @Schema(title = "用户更新入参")
-@EqualsAndHashCode(callSuper = false)
 @Data
 public class SysUserUpdateQO {
 
