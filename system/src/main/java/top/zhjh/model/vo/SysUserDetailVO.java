@@ -18,6 +18,8 @@ public class SysUserDetailVO {
   private String username;
   @Schema(title = "昵称")
   private String nickName;
+  @Schema(title="创建时间")
+  private String createdTime;
   @Schema(title = "角色名称列表")
   private List<String> roleNames;
   @Schema(title = "部门名称")

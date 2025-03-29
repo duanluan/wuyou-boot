@@ -2,6 +2,7 @@ package top.zhjh.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import top.csaf.tree.TreeConfig;
 import top.csaf.tree.TreeNode;
 import top.csaf.tree.TreeUtil;
 import top.zhjh.base.model.PageVO;
@@ -53,7 +54,7 @@ public class SysDeptService extends MyServiceImpl<SysDeptMapper, SysDept> {
     if (Boolean.TRUE.equals(query.getNotBuildTree())) {
       return sysDeptMapper.listTree(query);
     }
-    return TreeUtil.build(sysDeptMapper.listTree(query));
+    return TreeUtil.build(sysDeptMapper.listTree(query), TreeConfig.builder().idType(String.class).build());
   }
 
   /**
