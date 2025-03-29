@@ -12,8 +12,9 @@ import top.csaf.yaml.YamlUtil;
 import top.zhjh.base.BaseController;
 import top.zhjh.base.model.BaseEntity;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -83,7 +84,7 @@ public class CodeGenerator {
     customFile.put("struct:Struct", "/generator/struct.java");
 
     // 删除之前生成的文件
-    FileUtil.deleteDirectory(new File(OUTPUT_DIR));
+    Files.deleteIfExists(Path.of(OUTPUT_DIR));
 
     // 代码生成器
     new AutoGenerator(configBuilder(new DataSourceConfig.Builder(DB_URL, DB_USERNAME, DB_PASSWORD)))
