@@ -61,6 +61,11 @@
       <groupId>com.baomidou</groupId>
       <artifactId>mybatis-plus-generator</artifactId>
     </dependency>
+    <!-- MyBatis Plus 依赖 JSQLParser -->
+    <dependency>
+      <groupId>com.baomidou</groupId>
+      <artifactId>mybatis-plus-jsqlparser</artifactId>
+    </dependency>
     <!-- FreeMarker：MyBatis Plus 代码生成自定义引擎使用 -->
     <dependency>
       <groupId>org.freemarker</groupId>

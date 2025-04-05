@@ -2,7 +2,6 @@ package top.zhjh.model.qo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
@@ -32,8 +31,9 @@ public class SysUserUpdateQO {
   @NotNull(message = "角色列表不能为空")
   private List<Long> roleIds;
   @Schema(title = "部门ID")
-  @Min(value = 1, message = "部门错误")
-  private Long deptId;
+  @Size(min = 1, message = "部门列表不能为空")
+  @NotNull(message = "部门列表不能为空")
+  private List<Long> deptIds;
   @Schema(title = "岗位列表")
   @Size(min = 1, message = "岗位列表不能为空")
   private List<Long> postIds;

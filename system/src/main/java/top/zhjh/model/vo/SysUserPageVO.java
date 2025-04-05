@@ -29,9 +29,9 @@ public class SysUserPageVO extends PageVO {
   @Schema(title = "角色名称列表")
   private List<String> roleNames;
   @Schema(title = "部门ID")
-  private Long deptId;
+  private List<Long> deptIds;
   @Schema(title = "部门名称")
-  private String deptName;
+  private List<String> deptNames;
   @Schema(title = "岗位ID列表")
   private List<Long> postIds;
   @Schema(title = "岗位名称列表")

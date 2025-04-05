@@ -213,4 +213,8 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
     }
     return this.save(SysRoleStruct.INSTANCE.to(obj));
   }
+
+  public SysRole getSuperAdmin() {
+    return this.lambdaQuery().eq(SysRole::getCode, RoleEnum.SUPER_ADMIN.getCode()).one();
+  }
 }

@@ -3,7 +3,6 @@ package top.zhjh.model.qo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -30,8 +29,7 @@ public class SysUserSaveQO {
   @NotNull(message = "角色列表不能为空")
   private List<Long> roleIds;
   @Schema(title = "部门ID")
-  @Min(value = 1, message = "部门错误")
-  private Long deptId;
+  private List<Long> deptIds;
   @Schema(title = "岗位ID列表")
   private List<Long> postIds;
 }

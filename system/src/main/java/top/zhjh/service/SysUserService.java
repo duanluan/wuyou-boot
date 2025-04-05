@@ -26,6 +26,7 @@ import top.zhjh.mybatis.MyServiceImpl;
 import top.zhjh.struct.SysUserStruct;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -163,6 +164,93 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
   }
 
   /**
+   * 关联角色
+   *
+   * @param sysUser 用户
+   * @param roleIds 角色 ID 列表
+   */
+  private void assignRole(SysUser sysUser, List<Long> roleIds) {
+    if (CollUtil.isEmpty(roleIds)) {
+      return;
+    }
+    Long sysUserId = sysUser.getId();
+    List<String> roleNames = new ArrayList<>();
+    List<SysRoleUser> roleUserList = new ArrayList<>();
+    for (Long roleId : roleIds) {
+      SysRole role = sysRoleService.lambdaQuery()
+        .select(SysRole::getName)
+        .eq(SysRole::getId, roleId).one();
+      if (role == null) {
+        log.error("角色不存在: {}", roleId);
+        throw new ServiceException("角色不存在");
+      }
+      roleNames.add(role.getName());
+      roleUserList.add(new SysRoleUser(roleId, sysUserId));
+    }
+    sysRoleUserService.saveBatch(roleUserList);
+    sysUser.setRoleIds(roleIds);
+    sysUser.setRoleNames(roleNames);
+  }
+
+  /**
+   * 关联部门
+   *
+   * @param sysUser 用户
+   * @param deptIds 部门 ID 列表
+   */
+  private void assignDept(SysUser sysUser, List<Long> deptIds) {
+    if (CollUtil.isEmpty(deptIds)) {
+      return;
+    }
+    Long sysUserId = sysUser.getId();
+    List<String> deptNames = new ArrayList<>();
+    List<SysDeptUser> deptUserList = new ArrayList<>();
+    for (Long deptId : deptIds) {
+      SysDept dept = sysDeptService.lambdaQuery()
+        .select(SysDept::getName)
+        .eq(SysDept::getId, deptId).one();
+      if (dept == null) {
+        log.error("部门不存在: {}", deptId);
+        throw new ServiceException("部门不存在");
+      }
+      deptNames.add(dept.getName());
+      deptUserList.add(new SysDeptUser(deptId, sysUserId));
+    }
+    sysDeptUserService.saveBatch(deptUserList);
+    sysUser.setDeptIds(deptIds);
+    sysUser.setDeptNames(deptNames);
+  }
+
+  /**
+   * 关联岗位
+   *
+   * @param sysUser 用户
+   * @param postIds 岗位 ID 列表
+   */
+  private void assignPost(SysUser sysUser, List<Long> postIds) {
+    if (CollUtil.isEmpty(postIds)) {
+      return;
+    }
+    Long sysUserId = sysUser.getId();
+    List<String> postNames = new ArrayList<>();
+    List<SysPostUser> postUserList = new ArrayList<>();
+    for (Long postId : postIds) {
+      SysPost post = sysPostService.lambdaQuery()
+        .select(SysPost::getName)
+        .eq(SysPost::getId, postId).one();
+      if (post == null) {
+        log.error("岗位不存在: {}", postId);
+        throw new ServiceException("岗位不存在");
+      }
+      postNames.add(post.getName());
+      postUserList.add(new SysPostUser(postId, sysUserId));
+    }
+    sysPostUserService.saveBatch(postUserList);
+    sysUser.setPostIds(postIds);
+    sysUser.setPostNames(postNames);
+  }
+
+  /**
    * 保存
    *
    * @param obj 保存入参
@@ -181,36 +269,16 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
     }
     Long sysUserId = sysUser.getId();
 
+    SysUser updateObj = new SysUser();
+    updateObj.setId(sysUserId);
     // 关联角色
-    for (Long roleId : obj.getRoleIds()) {
-      SysRole role = sysRoleService.getById(roleId);
-      if (role == null) {
-        log.error("角色不存在: {}", roleId);
-        throw new ServiceException("角色不存在");
-      }
-      sysRoleUserService.save(new SysRoleUser(roleId, sysUserId));
-    }
-
+    this.assignRole(updateObj, obj.getRoleIds());
     // 关联部门
-    if (obj.getDeptId() != null) {
-      if (sysDeptService.countById(obj.getDeptId()) == 0) {
-        log.error("部门不存在: {}", obj.getDeptId());
-        throw new ServiceException("部门不存在");
-      }
-      sysDeptUserService.save(new SysDeptUser(obj.getDeptId(), sysUserId));
-    }
-
+    this.assignDept(updateObj, obj.getDeptIds());
     // 关联岗位
-    for (Long postId : obj.getPostIds()) {
-      SysPost sysPost = sysPostService.getById(postId);
-      if (sysPost == null) {
-        log.error("岗位不存在: {}", postId);
-        throw new ServiceException("岗位不存在");
-      }
-      sysPostUserService.save(new SysPostUser(postId, sysUserId));
-    }
+    this.assignPost(updateObj, obj.getPostIds());
 
-    return true;
+    return this.updateById(updateObj);
   }
 
   /**
@@ -221,48 +289,32 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
    */
   @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
   public boolean update(SysUserUpdateQO obj) {
-    Long id = obj.getId();
-    SysUser user = this.getById(id);
-    if (user == null) {
-      log.error("用户不存在: {}", id);
+    Long sysUserId = obj.getId();
+    if (this.countById(sysUserId) == 0) {
+      log.error("用户不存在: {}", sysUserId);
       throw new ServiceException("用户不存在");
     }
     List<Long> roleIds = obj.getRoleIds();
-    for (Long roleId : roleIds) {
-      SysRole role = sysRoleService.getById(roleId);
-      if (role == null) {
-        log.error("角色不存在: {}", roleId);
-        throw new ServiceException("角色不存在");
-      }
-    }
-    SysRole superAdminRole = sysRoleService.lambdaQuery().eq(SysRole::getCode, RoleEnum.SUPER_ADMIN.getCode()).one();
+    SysUser updateObj = SysUserStruct.INSTANCE.to(obj);
+    // 关联角色
+    this.assignRole(updateObj, roleIds);
+    // 检查是否有超级管理员角色
+    SysRole superAdminRole = sysRoleService.getSuperAdmin();
     List<SysRoleUser> roleUserList = sysRoleUserService.lambdaQuery().eq(SysRoleUser::getRoleId, superAdminRole.getId()).list();
-    if (roleUserList.size() == 1 && roleUserList.get(0).getUserId().equals(user.getId()) && !roleIds.contains(superAdminRole.getId())) {
+    if (roleUserList.size() == 1 && roleUserList.get(0).getUserId().equals(sysUserId) && !roleIds.contains(superAdminRole.getId())) {
       throw new ServiceException("至少保留一个编码为" + RoleEnum.SUPER_ADMIN.getCode() + "角色的用户");
     }
-    // 重新关联角色
-    sysRoleUserService.lambdaUpdate().eq(SysRoleUser::getUserId, id).remove();
-    for (Long roleId : roleIds) {
-      sysRoleUserService.save(new SysRoleUser(roleId, id));
-    }
+    // 关联部门
+    this.assignDept(updateObj, updateObj.getDeptIds());
+    // 关联岗位
+    this.assignPost(updateObj, updateObj.getPostIds());
 
-    // 重新关联部门
-    if (obj.getDeptId() != null) {
-      if (sysDeptService.countById(obj.getDeptId()) == 0) {
-        log.error("部门不存在: {}", obj.getDeptId());
-        throw new ServiceException("部门不存在");
-      }
-      sysDeptUserService.lambdaUpdate().eq(SysDeptUser::getUserId, id).remove();
-      sysDeptUserService.save(new SysDeptUser(obj.getDeptId(), id));
-    }
+    // 删除旧关联
+    sysRoleUserService.lambdaUpdate().eq(SysRoleUser::getUserId, sysUserId).remove();
+    sysDeptUserService.lambdaUpdate().eq(SysDeptUser::getUserId, sysUserId).remove();
+    sysPostUserService.lambdaUpdate().eq(SysPostUser::getUserId, sysUserId).remove();
 
-    // 重新关联岗位
-    sysPostUserService.lambdaUpdate().eq(SysPostUser::getUserId, id).remove();
-    for (Long postId : obj.getPostIds()) {
-      sysPostUserService.save(new SysPostUser(postId, id));
-    }
-
-    return this.updateById(SysUserStruct.INSTANCE.to(obj));
+    return this.updateById(updateObj);
   }
 
   /**
@@ -277,9 +329,12 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
     if (CollUtil.isEmpty(ids)) {
       return false;
     }
-    SysRole superAdminRole = sysRoleService.lambdaQuery().eq(SysRole::getCode, RoleEnum.SUPER_ADMIN.getCode()).one();
+    SysRole superAdminRole = sysRoleService.getSuperAdmin();
     List<SysRoleUser> roleUserList = sysRoleUserService.lambdaQuery().eq(SysRoleUser::getRoleId, superAdminRole.getId()).list();
 
+    List<Long> roleUserIds = new ArrayList<>();
+    List<Long> deptUserIds = new ArrayList<>();
+    List<Long> postUserIds = new ArrayList<>();
     for (Long id : ids) {
       SysUser user = this.getById(id);
       if (user == null) {
@@ -289,18 +344,21 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
       if (roleUserList.size() == 1 && roleUserList.get(0).getUserId().equals(user.getId())) {
         throw new ServiceException("至少保留一个编码为" + RoleEnum.SUPER_ADMIN.getCode() + "角色的用户");
       }
-      // 删除关联角色
-      sysRoleUserService.lambdaUpdate().eq(SysRoleUser::getUserId, id).remove();
-      // 删除关联部门
-      sysDeptUserService.lambdaUpdate().eq(SysDeptUser::getUserId, id).remove();
-      // 删除关联岗位
-      sysPostUserService.lambdaUpdate().eq(SysPostUser::getUserId, id).remove();
+      roleUserIds.add(id);
+      deptUserIds.add(id);
+      postUserIds.add(id);
     }
+    // 删除关联
+    sysRoleUserService.lambdaUpdate().in(SysRoleUser::getUserId, roleUserIds).remove();
+    sysDeptUserService.lambdaUpdate().in(SysDeptUser::getUserId, deptUserIds).remove();
+    sysPostUserService.lambdaUpdate().in(SysPostUser::getUserId, postUserIds).remove();
+    // 删除用户
     return this.removeBatchByIds(ids);
   }
 
   /**
    * 修改密码
+   *
    * @param obj 修改密码入参
    * @return 是否成功
    */

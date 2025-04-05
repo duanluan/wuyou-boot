@@ -14,7 +14,7 @@ import top.zhjh.base.model.BaseEntity;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -32,7 +32,7 @@ public class CodeGenerator {
   private static final String OUTPUT_DIR = FileUtil.getProjectPath() + "/generator/src/main/java";
 
   static {
-    Map<String, Object> yamlMap = YamlUtil.load(FileUtil.getProjectPath() + "/admin/src/main/resources/application.yml");
+    Map<String, Object> yamlMap = YamlUtil.load(FileUtil.getProjectPath() + "/admin/src/main/resources/application-local.yml");
 
     Object urlObj = YamlUtil.get(yamlMap, "spring.datasource.url");
     DB_URL = urlObj != null ? urlObj.toString() : "";
@@ -84,7 +84,7 @@ public class CodeGenerator {
     customFile.put("struct:Struct", "/generator/struct.java");
 
     // 删除之前生成的文件
-    Files.deleteIfExists(Path.of(OUTPUT_DIR));
+    Files.deleteIfExists(Paths.get(OUTPUT_DIR));
 
     // 代码生成器
     new AutoGenerator(configBuilder(new DataSourceConfig.Builder(DB_URL, DB_USERNAME, DB_PASSWORD)))

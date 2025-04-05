@@ -47,7 +47,6 @@
     <dependency>
       <groupId>cn.dev33</groupId>
       <artifactId>sa-token-jwt</artifactId>
-      <version>1.40.0</version>
     </dependency>
   </dependencies>
 </project>

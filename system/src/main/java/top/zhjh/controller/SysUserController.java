@@ -74,7 +74,7 @@ public class SysUserController extends BaseController {
     return updateR(sysUserService.update(obj));
   }
 
-  @Operation(summary = "更新用户")
+  @Operation(summary = "更新用户基本信息")
   @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
   @PutMapping("/{id}/profile")
   public R updateProfile(@RequestBody @Validated(SysUserUpdateQO.UpdateProfileGroup.class) SysUserUpdateQO obj) {

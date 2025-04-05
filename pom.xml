@@ -19,12 +19,11 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <zutil.version>2.0.0-alpha13</zutil.version>
-    <fastjson.version>2.0.30</fastjson.version>
+    <fastjson.version>2.0.56</fastjson.version>
     <spring.boot.version>2.7.18</spring.boot.version>
-    <mybatis.plus.version>3.5.3.2</mybatis.plus.version>
-    <mybatis.plus.gen.version>3.5.3.2</mybatis.plus.gen.version>
+    <mybatis.plus.version>3.5.11</mybatis.plus.version>
     <mariadb.version>3.4.1</mariadb.version>
-    <satoken.version>1.40.0</satoken.version>
+    <satoken.version>1.41.0</satoken.version>
     <springdoc.version>1.6.14</springdoc.version>
     <knife4j.version>3.0.3</knife4j.version>
     <mapstruct.version>1.5.3.Final</mapstruct.version>
@@ -78,7 +77,13 @@
       <dependency>
         <groupId>com.baomidou</groupId>
         <artifactId>mybatis-plus-generator</artifactId>
-        <version>${mybatis.plus.gen.version}</version>
+        <version>${mybatis.plus.version}</version>
+      </dependency>
+      <!-- MyBatis Plus 依赖 JSQLParser -->
+      <dependency>
+        <groupId>com.baomidou</groupId>
+        <artifactId>mybatis-plus-jsqlparser</artifactId>
+        <version>${mybatis.plus.version}</version>
       </dependency>
 
       <!-- JDBC -->
