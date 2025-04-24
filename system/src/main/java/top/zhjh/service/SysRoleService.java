@@ -214,7 +214,15 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
     return this.save(SysRoleStruct.INSTANCE.to(obj));
   }
 
+  /**
+   * 获取超级管理员角色
+   *
+   * @return 超级管理员角色
+   */
   public SysRole getSuperAdmin() {
-    return this.lambdaQuery().eq(SysRole::getCode, RoleEnum.SUPER_ADMIN.getCode()).one();
+    StpExtUtil.disableTenant();
+    SysRole result = this.lambdaQuery().eq(SysRole::getCode, RoleEnum.SUPER_ADMIN.getCode()).one();
+    StpExtUtil.enableTenant();
+    return result;
   }
 }

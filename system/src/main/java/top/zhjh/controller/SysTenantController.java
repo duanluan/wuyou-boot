@@ -1,5 +1,6 @@
 package top.zhjh.controller;
 
+import cn.dev33.satoken.annotation.SaIgnore;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,7 @@ public class SysTenantController extends BaseController {
   @Resource
   private SysTenantService sysTenantService;
 
+  @SaIgnore
   @Operation(summary = "租户列表")
   @GetMapping
   public R<?> list(@Validated SysTenantPageQO query) {

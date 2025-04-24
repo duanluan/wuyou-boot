@@ -3,6 +3,7 @@ package top.zhjh.config.satoken;
 import cn.dev33.satoken.stp.StpInterface;
 import org.springframework.stereotype.Component;
 import top.zhjh.service.SysUserService;
+import top.zhjh.util.StpExtUtil;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -21,7 +22,12 @@ public class StpInterfaceImpl implements StpInterface {
    */
   @Override
   public List<String> getRoleList(Object loginId, String loginType) {
-    return sysUserService.listRoleCodes( Long.parseLong(loginId.toString()));
+    // 临时禁用租户
+    StpExtUtil.disableTenant();
+    List<String> result = sysUserService.listRoleCodes(Long.parseLong(loginId.toString()));
+    // 重新启用租户
+    StpExtUtil.enableTenant();
+    return result;
   }
 
   /**
@@ -29,6 +35,11 @@ public class StpInterfaceImpl implements StpInterface {
    */
   @Override
   public List<String> getPermissionList(Object loginId, String loginType) {
-    return sysUserService.listPermission(Long.parseLong(loginId.toString()));
+    // 临时禁用租户
+    StpExtUtil.disableTenant();
+    List<String> result = sysUserService.listPermission(Long.parseLong(loginId.toString()));
+    // 重新启用租户
+    StpExtUtil.enableTenant();
+    return result;
   }
 }

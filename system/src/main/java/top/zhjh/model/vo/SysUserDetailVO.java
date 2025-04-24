@@ -22,8 +22,14 @@ public class SysUserDetailVO {
   private String createdTime;
   @Schema(title = "角色名称列表")
   private List<String> roleNames;
-  @Schema(title = "部门名称")
-  private String deptName;
+  @Schema(title = "角色编码列表")
+  private List<String> roleCodes;
+  @Schema(title = "部门名称列表")
+  private List<String> deptNames;
   @Schema(title = "岗位名称列表")
   private List<String> postNames;
+  @Schema(title = "租户名称列表")
+  private List<String> tenantNames;
+  @Schema(title = "是否为超级管理员")
+  private Boolean isSuperAdmin;
 }

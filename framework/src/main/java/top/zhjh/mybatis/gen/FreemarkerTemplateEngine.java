@@ -1,4 +1,4 @@
-package top.zhjh.mybatis;
+package top.zhjh.mybatis.gen;
 
 import com.baomidou.mybatisplus.generator.config.OutputFile;
 import com.baomidou.mybatisplus.generator.config.builder.CustomFile;

@@ -74,3 +74,18 @@ sa-token:
 springdoc:
   swagger-ui:
     display-request-duration: true
+
+wuyou:
+  # 租户
+  tenant:
+    # 忽略表名，即没有 tenant_id 的表
+    ignore-tables:
+      - sys_tenant
+      - sys_user
+      - sys_tenant_user
+      - sys_role_user
+      - sys_dept_user
+      - sys_role_dept
+      - sys_post_user
+      - sys_menu
+      - sys_role_menu

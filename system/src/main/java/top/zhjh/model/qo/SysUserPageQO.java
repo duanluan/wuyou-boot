@@ -18,4 +18,6 @@ public class SysUserPageQO extends PageQO<SysUser> {
   private String nickName;
   @Schema(title = "用户名")
   private String username;
+  @Schema(title = "租户ID")
+  private Long tenantId;
 }

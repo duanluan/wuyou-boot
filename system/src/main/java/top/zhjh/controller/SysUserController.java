@@ -30,13 +30,6 @@ public class SysUserController extends BaseController {
   @Resource
   private SysUserService sysUserService;
 
-  @Operation(summary = "注册")
-  @PostMapping("/register")
-  public R register(@Validated SysUserRegisterQO query) {
-    sysUserService.register(query.getNickname(), query.getUsername(), query.getPassword());
-    return ok();
-  }
-
   @SaIgnore
   @Operation(summary = "登录")
   @PostMapping("/login")

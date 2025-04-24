@@ -24,7 +24,7 @@ public class SysDeptUpdateQO {
   @NotBlank(message = "名称不能为空", groups = {UpdateGroup.class})
   private String name;
   @Schema(title = "父级 ID")
-  @Min(value = 1, message = "父级ID错误", groups = {UpdateGroup.class})
+  @Min(value = 0, message = "父级ID错误", groups = {UpdateGroup.class})
   private Long parentId;
   @Schema(title = "顺序")
   @Min(value = 1, message = "顺序错误", groups = {UpdateGroup.class})

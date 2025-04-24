@@ -12,6 +12,6 @@ public class SysDeptListQO {
 
   @Schema(title = "名称")
   private String name;
-  @Schema(title = "父级 ID")
+  @Schema(title = "父级ID")
   private Long parentId;
 }

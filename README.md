@@ -17,3 +17,7 @@
 ![菜单管理](https://github.com/user-attachments/assets/933fae8a-7563-428c-9fc7-35218a56f821)
 ![租户管理](https://github.com/user-attachments/assets/00b2a62b-b31c-4e7e-9da7-958974b4a9ca)
 ![个人中心](https://github.com/user-attachments/assets/a1bfa986-4821-4351-af64-ddf99849765e)
+
+# 多租户
+
+超级管理员进行用户管理时可以绑定租户，一个用户可以属于多个租户，租户间数据隔离。

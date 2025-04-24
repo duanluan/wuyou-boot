@@ -36,4 +36,8 @@ public class SysUserPageVO extends PageVO {
   private List<Long> postIds;
   @Schema(title = "岗位名称列表")
   private List<String> postNames;
+  @Schema(title = "租户ID列表")
+  private List<Long> tenantIds;
+  @Schema(title = "租户名称列表")
+  private List<String> tenantNames;
 }

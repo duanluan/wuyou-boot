@@ -19,4 +19,6 @@ public interface SysUserStruct {
   SysUser to(SysUserUpdateQO obj);
 
   SysUserListQO to(SysUserPageQO query);
+
+  SysUserDetailVO toDetailVO(SysUser sysUser);
 }

@@ -1,4 +1,4 @@
-package top.zhjh.mybatis;
+package top.zhjh.mybatis.gen;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.generator.AutoGenerator;

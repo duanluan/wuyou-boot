@@ -1,11 +1,9 @@
 package top.zhjh.service;
 
-import cn.dev33.satoken.stp.SaLoginConfig;
 import cn.dev33.satoken.stp.StpUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import cn.dev33.satoken.stp.parameter.SaLoginParameter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -13,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import top.csaf.bean.BeanUtil;
 import top.csaf.coll.CollUtil;
 import top.csaf.crypto.DigestUtil;
+import top.csaf.lang.NumberUtil;
 import top.zhjh.base.model.BaseEntity;
 import top.zhjh.base.model.PageVO;
 import top.zhjh.enums.RoleEnum;
@@ -24,9 +23,11 @@ import top.zhjh.model.vo.SysUserDetailVO;
 import top.zhjh.model.vo.SysUserPageVO;
 import top.zhjh.mybatis.MyServiceImpl;
 import top.zhjh.struct.SysUserStruct;
+import top.zhjh.util.StpExtUtil;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -40,7 +41,7 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
   private SysUserMapper sysUserMapper;
   @Resource
   private SysRoleUserService sysRoleUserService;
-  @Autowired
+  @Resource
   private SysRoleService sysRoleService;
   @Resource
   private SysPostUserService sysPostUserService;
@@ -50,6 +51,10 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
   private SysDeptService sysDeptService;
   @Resource
   private SysDeptUserService sysDeptUserService;
+  @Resource
+  private SysTenantService sysTenantService;
+  @Resource
+  private SysTenantUserService sysTenantUserService;
 
   /**
    * 列出用户角色编码
@@ -74,39 +79,6 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
   }
 
   /**
-   * 注册
-   *
-   * @param nickName 昵称
-   * @param username 用户名
-   * @param password 密码
-   */
-  @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
-  public void register(String nickName, String username, String password) {
-    SysUser user = this.getOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getNickName, username));
-    if (user != null) {
-      throw new ServiceException(HttpStatus.CONFLICT, "昵称已存在");
-    }
-    user = this.getOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUsername, username));
-    if (user != null) {
-      throw new ServiceException(HttpStatus.CONFLICT, "用户名已存在");
-    }
-    SysUser user1 = new SysUser();
-    user1.setNickName(nickName);
-    user1.setUsername(username);
-    user1.setPassword(DigestUtil.sha512Hex(password));
-    if (!this.save(user1)) {
-      throw new ServiceException("注册失败");
-    }
-    Long id = user1.getId();
-    SysUser updateObj = new SysUser();
-    updateObj.setId(id);
-    updateObj.setPassword(DigestUtil.sha512Hex(password));
-    if (!this.updateById(updateObj)) {
-      throw new ServiceException("注册失败");
-    }
-  }
-
-  /**
    * 登录
    *
    * @param username 用户名
@@ -115,16 +87,25 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
    * @return 登录用户
    */
   public SysUserDetailVO login(@NonNull final String username, @NonNull final String password, final Long tenantId) {
-    SysUser user = this.lambdaQuery().select(SysUser::getId, SysUser::getPassword).eq(SysUser::getUsername, username).one();
+    SysUser user = this.lambdaQuery()
+      .select(SysUser::getRoleCodes, SysUser::getTenantIds, SysUser::getId, SysUser::getPassword)
+      .eq(SysUser::getUsername, username).one();
     if (user == null) {
-      throw new ServiceException(HttpStatus.UNAUTHORIZED, "用户名或密码错误");
+      throw new ServiceException(HttpStatus.INTERNAL_SERVER_ERROR, "用户名或密码错误");
     }
-    if (!user.getPassword().equals(DigestUtil.sha512Hex(password))) {
-      throw new ServiceException(HttpStatus.UNAUTHORIZED, "用户名或密码错误");
+    // 密码是否正确
+    if (!user.getPassword().equals(DigestUtil.sha512Hex(password))
+      // 非超管判断租户是否一致
+      && (!StpExtUtil.isSuperAdmin(user.getRoleCodes()) && !CollUtil.contains(user.getTenantIds(), tenantId))
+    ) {
+      throw new ServiceException(HttpStatus.INTERNAL_SERVER_ERROR, "用户名或密码错误");
     }
-    StpUtil.login(user.getId(),
-      // 扩展参数：租户 ID
-      SaLoginConfig.setExtra(BeanUtil.getPropertyName(BaseEntity::getTenantId), tenantId));
+    SaLoginParameter saLoginParameter = new SaLoginParameter();
+    // 扩展参数：租户 ID
+    if (tenantId != null) {
+      saLoginParameter.setExtra(BeanUtil.getPropertyName(BaseEntity::getTenantId), tenantId);
+    }
+    StpUtil.login(user.getId(), saLoginParameter);
     return this.getDetail(user.getId());
   }
 
@@ -135,6 +116,7 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
    * @return 列表
    */
   public List<SysUserPageVO> list(SysUserListQO query) {
+    query.setTenantId(StpExtUtil.getTenantId());
     return sysUserMapper.list(query);
   }
 
@@ -145,6 +127,7 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
    * @return 分页列表
    */
   public PageVO<SysUserPageVO> page(SysUserPageQO query) {
+    query.setTenantId(StpExtUtil.getTenantId());
     List<SysUserPageVO> records = sysUserMapper.page(query);
     return new PageVO<SysUserPageVO>(query).setRecords(records);
   }
@@ -160,7 +143,10 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
     if (sysUser == null) {
       throw new ServiceException("用户不存在");
     }
-    return sysUserMapper.getDetail(id);
+    SysUserDetailVO result = SysUserStruct.INSTANCE.toDetailVO(sysUser);
+    // 是否为超管
+    result.setIsSuperAdmin(StpExtUtil.isSuperAdmin(sysUser.getRoleCodes()));
+    return result;
   }
 
   /**
@@ -171,25 +157,29 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
    */
   private void assignRole(SysUser sysUser, List<Long> roleIds) {
     if (CollUtil.isEmpty(roleIds)) {
+      log.warn("角色ID列表为空");
       return;
     }
     Long sysUserId = sysUser.getId();
     List<String> roleNames = new ArrayList<>();
+    List<String> roleCodes = new ArrayList<>();
     List<SysRoleUser> roleUserList = new ArrayList<>();
     for (Long roleId : roleIds) {
       SysRole role = sysRoleService.lambdaQuery()
-        .select(SysRole::getName)
+        .select(SysRole::getName, SysRole::getCode)
         .eq(SysRole::getId, roleId).one();
       if (role == null) {
         log.error("角色不存在: {}", roleId);
         throw new ServiceException("角色不存在");
       }
       roleNames.add(role.getName());
+      roleCodes.add(role.getCode());
       roleUserList.add(new SysRoleUser(roleId, sysUserId));
     }
     sysRoleUserService.saveBatch(roleUserList);
     sysUser.setRoleIds(roleIds);
     sysUser.setRoleNames(roleNames);
+    sysUser.setRoleCodes(roleCodes);
   }
 
   /**
@@ -200,6 +190,7 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
    */
   private void assignDept(SysUser sysUser, List<Long> deptIds) {
     if (CollUtil.isEmpty(deptIds)) {
+      log.warn("部门ID列表为空");
       return;
     }
     Long sysUserId = sysUser.getId();
@@ -229,6 +220,7 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
    */
   private void assignPost(SysUser sysUser, List<Long> postIds) {
     if (CollUtil.isEmpty(postIds)) {
+      log.warn("岗位ID列表为空");
       return;
     }
     Long sysUserId = sysUser.getId();
@@ -248,6 +240,29 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
     sysPostUserService.saveBatch(postUserList);
     sysUser.setPostIds(postIds);
     sysUser.setPostNames(postNames);
+  }
+
+  /**
+   * 关联租户
+   *
+   * @param sysUser  用户
+   * @param tenantId 租户 ID
+   */
+  private void assignTenant(SysUser sysUser, Long tenantId) {
+    if (NumberUtil.leZero(tenantId)) {
+      log.error("租户ID为空");
+      return;
+    }
+    SysTenant tenant = sysTenantService.lambdaQuery()
+      .select(SysTenant::getName)
+      .eq(SysTenant::getId, tenantId).one();
+    if (tenant == null) {
+      log.error("租户不存在: {}", tenantId);
+      throw new ServiceException("岗位不存在");
+    }
+    sysTenantUserService.save(new SysTenantUser(tenantId, sysUser.getId()));
+    sysUser.setTenantIds(Collections.singletonList(tenantId));
+    sysUser.setTenantNames(Collections.singletonList(tenant.getName()));
   }
 
   /**
@@ -277,6 +292,8 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
     this.assignDept(updateObj, obj.getDeptIds());
     // 关联岗位
     this.assignPost(updateObj, obj.getPostIds());
+    // 关联租户
+    this.assignTenant(updateObj, StpExtUtil.getTenantId());
 
     return this.updateById(updateObj);
   }
@@ -329,8 +346,8 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
     if (CollUtil.isEmpty(ids)) {
       return false;
     }
-    SysRole superAdminRole = sysRoleService.getSuperAdmin();
-    List<SysRoleUser> roleUserList = sysRoleUserService.lambdaQuery().eq(SysRoleUser::getRoleId, superAdminRole.getId()).list();
+    // SysRole superAdminRole = sysRoleService.getSuperAdmin();
+    // List<SysRoleUser> roleUserList = sysRoleUserService.lambdaQuery().eq(SysRoleUser::getRoleId, superAdminRole.getId()).list();
 
     List<Long> roleUserIds = new ArrayList<>();
     List<Long> deptUserIds = new ArrayList<>();
@@ -341,9 +358,12 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
         log.error("用户不存在: {}", id);
         throw new ServiceException("用户不存在");
       }
-      if (roleUserList.size() == 1 && roleUserList.get(0).getUserId().equals(user.getId())) {
-        throw new ServiceException("至少保留一个编码为" + RoleEnum.SUPER_ADMIN.getCode() + "角色的用户");
+      if (id.equals(StpUtil.getLoginIdAsLong())) {
+        throw new ServiceException("不能删除自己");
       }
+      // if (roleUserList.size() == 1 && roleUserList.getFirst().getUserId().equals(user.getId())) {
+      //   throw new ServiceException("至少保留一个编码为" + RoleEnum.SUPER_ADMIN.getCode() + "角色的用户");
+      // }
       roleUserIds.add(id);
       deptUserIds.add(id);
       postUserIds.add(id);

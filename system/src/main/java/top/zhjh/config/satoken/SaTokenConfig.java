@@ -20,15 +20,16 @@ import javax.annotation.Resource;
 @Configuration
 public class SaTokenConfig implements WebMvcConfigurer {
 
+  // @Lazy
   @Resource
   private SysMenuService sysMenuService;
 
   /**
    * Sa-Token 整合 JWT（Simple 简单模式）
    *
-   * @return StpLogic
+   * @return StpLogicJwtForSimple
    */
-  @Bean
+  @Bean("stpLogicJwt")
   public StpLogic getStpLogicJwt() {
     return new StpLogicJwtForSimple();
   }

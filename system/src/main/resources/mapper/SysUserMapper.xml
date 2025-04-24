@@ -30,9 +30,20 @@
       su.dept_ids,
       su.dept_names,
       su.post_ids,
-      su.post_names
+      su.post_names,
+      su.tenant_ids,
+      su.tenant_names
     from sys_user su
     where su.deleted = 0
+    <if test="nickName != null and nickName != ''">
+      and su.nick_name = #{nickName}
+    </if>
+    <if test="username != null and username != ''">
+      and su.username = #{username}
+    </if>
+    <if test="tenantId != null and tenantId > 0">
+      and json_contains(su.tenant_ids, #{tenantId})
+    </if>
     group by su.id
   </sql>
 
@@ -43,6 +54,8 @@
     <result property="deptNames" column="dept_names" typeHandler="com.baomidou.mybatisplus.extension.handlers.Fastjson2TypeHandler"/>
     <result property="postIds" column="post_ids" typeHandler="com.baomidou.mybatisplus.extension.handlers.Fastjson2TypeHandler"/>
     <result property="postNames" column="post_names" typeHandler="com.baomidou.mybatisplus.extension.handlers.Fastjson2TypeHandler"/>
+    <result property="tenantIds" column="tenant_ids" typeHandler="com.baomidou.mybatisplus.extension.handlers.Fastjson2TypeHandler"/>
+    <result property="tenantNames" column="tenant_names" typeHandler="com.baomidou.mybatisplus.extension.handlers.Fastjson2TypeHandler"/>
   </resultMap>
 
   <select id="list" resultMap="listMap">
@@ -54,8 +67,10 @@
   </select>
 
   <resultMap id="getDetailMap" type="top.zhjh.model.vo.SysUserDetailVO">
-    <result property="roleNames" column="roleNames" typeHandler="top.zhjh.mybatis.handler.CommasToStrListTypeHandler"/>
-    <result property="postNames" column="postNames" typeHandler="top.zhjh.mybatis.handler.CommasToStrListTypeHandler"/>
+    <result property="roleNames" column="role_names" typeHandler="com.baomidou.mybatisplus.extension.handlers.Fastjson2TypeHandler"/>
+    <result property="deptNames" column="dept_names" typeHandler="com.baomidou.mybatisplus.extension.handlers.Fastjson2TypeHandler"/>
+    <result property="postNames" column="post_names" typeHandler="com.baomidou.mybatisplus.extension.handlers.Fastjson2TypeHandler"/>
+    <result property="tenantNames" column="tenant_names" typeHandler="com.baomidou.mybatisplus.extension.handlers.Fastjson2TypeHandler"/>
   </resultMap>
 
   <select id="getDetail" resultMap="getDetailMap">
@@ -64,16 +79,11 @@
         su.username,
         su.nick_name,
         su.created_time,
-        group_concat(sr.name order by sr.sort) as roleNames,
-        group_concat(sp.name order by sp.sort) as postNames,
-        sd.name deptName
+        su.role_names,
+        su.dept_names,
+        su.post_names,
+        su.tenant_names
       from sys_user su
-      left join sys_role_user sru on su.id = sru.user_id
-      left join sys_role sr on sru.role_id = sr.id
-      left join sys_post_user spu on su.id = spu.user_id
-      left join sys_post sp on spu.post_id = sp.id
-      left join sys_dept_user sdu on su.id = sdu.user_id
-      left join sys_dept sd on sdu.dept_id = sd.id
       where su.deleted = 0 and su.id = #{id}
       group by su.id
   </select>
