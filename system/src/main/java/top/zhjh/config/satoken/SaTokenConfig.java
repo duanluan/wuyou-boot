@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import top.zhjh.config.tenant.TenantContext;
 import top.zhjh.model.entity.SysMenu;
 import top.zhjh.service.SysMenuService;
 
@@ -46,7 +47,8 @@ public class SaTokenConfig implements WebMvcConfigurer {
         // 所有路由登录校验
         SaRouter.match("/**", r -> StpUtil.checkLogin());
 
-        // 循环有路径、权限，需登录的菜单
+        TenantContext.disable();
+        // 循环有路径、权限，需登录的菜单 TODO 缓存
         for (SysMenu sysMenu : sysMenuService.lambdaQuery()
           .isNotNull(SysMenu::getPath)
           .isNotNull(SysMenu::getPermission)

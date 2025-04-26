@@ -78,6 +78,10 @@ springdoc:
 wuyou:
   # 租户
   tenant:
+    # 是否开启多租户，默认 false
+    enabled: true
+    # 租户 ID 列名，默认为 tenant_id
+    tenant-id-column: tenant_id
     # 忽略表名，即没有 tenant_id 的表
     ignore-tables:
       - sys_tenant

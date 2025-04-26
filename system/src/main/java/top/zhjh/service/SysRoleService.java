@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import top.csaf.coll.CollUtil;
 import top.csaf.lang.StrUtil;
+import top.zhjh.config.tenant.TenantContext;
 import top.zhjh.enums.CommonStatus;
 import top.zhjh.enums.DataScopeActionType;
 import top.zhjh.enums.DataScopeType;
@@ -220,9 +221,7 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
    * @return 超级管理员角色
    */
   public SysRole getSuperAdmin() {
-    StpExtUtil.disableTenant();
-    SysRole result = this.lambdaQuery().eq(SysRole::getCode, RoleEnum.SUPER_ADMIN.getCode()).one();
-    StpExtUtil.enableTenant();
-    return result;
+    TenantContext.disable();
+    return this.lambdaQuery().eq(SysRole::getCode, RoleEnum.SUPER_ADMIN.getCode()).one();
   }
 }

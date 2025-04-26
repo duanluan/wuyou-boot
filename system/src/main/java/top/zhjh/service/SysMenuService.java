@@ -7,6 +7,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import top.csaf.tree.TreeNode;
 import top.csaf.tree.TreeUtil;
+import top.zhjh.config.tenant.TenantContext;
 import top.zhjh.enums.CommonStatus;
 import top.zhjh.enums.MenuType;
 import top.zhjh.exception.ServiceException;
@@ -15,7 +16,6 @@ import top.zhjh.model.entity.SysMenu;
 import top.zhjh.model.qo.SysMenuTreeTableQO;
 import top.zhjh.model.qo.SysMenuUpdateQO;
 import top.zhjh.struct.SysMenuStruct;
-import top.zhjh.util.StpExtUtil;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
@@ -35,14 +35,14 @@ public class SysMenuService extends ServiceImpl<SysMenuMapper, SysMenu> {
    *
    * @return 树
    */
-  @Cacheable(value = "menuTree", keyGenerator = "roleCodesCacheKeyGen")
+  // @Cacheable(value = "menuTree", keyGenerator = "roleCodesCacheKeyGen")
   public List<TreeNode> listTree() {
     // 树只能查询用户所属的启用的目录 、菜单
     SysMenuTreeTableQO query = new SysMenuTreeTableQO();
     query.setStatus(CommonStatus.ENABLE);
     query.setTypes(Arrays.asList(MenuType.DIR, MenuType.MENU));
     query.setRoleCodes(StpUtil.getRoleList());
-    StpExtUtil.disableTenant();
+    TenantContext.disable();
     return TreeUtil.build(sysMenuMapper.listTree(query));
   }
 
@@ -53,7 +53,7 @@ public class SysMenuService extends ServiceImpl<SysMenuMapper, SysMenu> {
    * @return 树
    */
   public List<TreeNode> listTreeTable(@NonNull final SysMenuTreeTableQO query) {
-    StpExtUtil.disableTenant();
+    TenantContext.disable();
     if (Boolean.TRUE.equals(query.getNotBuildTree())) {
       return sysMenuMapper.listTree(query);
     }

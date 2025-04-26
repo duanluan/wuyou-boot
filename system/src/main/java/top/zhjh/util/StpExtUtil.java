@@ -1,8 +1,6 @@
 package top.zhjh.util;
 
 import cn.dev33.satoken.stp.StpUtil;
-import com.baomidou.mybatisplus.core.plugins.IgnoreStrategy;
-import com.baomidou.mybatisplus.core.plugins.InterceptorIgnoreHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import top.csaf.bean.BeanUtil;
@@ -111,45 +109,5 @@ public class StpExtUtil {
     //   return null;
     // }
     return NumberUtil.createLong(StpUtil.getExtra(BeanUtil.getPropertyName(BaseEntity::getTenantId)));
-  }
-
-  private static final String IS_ENABLE_TENANT_KEY = "isEnableTenant";
-
-  /**
-   * 当前线程是否启用租户
-   *
-   * @return 是否启用租户
-   */
-  public static boolean isEnableTenant() {
-    // Object value = ThreadLocalUtil.get(IS_ENABLE_TENANT_KEY);
-    // if (value == null) {
-    //   return true;
-    // }
-    // return (boolean) value;
-    return InterceptorIgnoreHelper.hasIgnoreStrategy();
-  }
-
-  /**
-   * 当前线程禁用租户
-   */
-  public static void disableTenant() {
-    // if (!isEnableTenant()) {
-    //   return;
-    // }
-    // log.debug("禁用租户过滤，线程ID: {}", Thread.currentThread().getId(), new Exception("调用栈"));
-    // ThreadLocalUtil.set(IS_ENABLE_TENANT_KEY, false);
-    InterceptorIgnoreHelper.handle(IgnoreStrategy.builder().tenantLine(true).build());
-  }
-
-  /**
-   * 当前线程启用租户
-   */
-  public static void enableTenant() {
-    // if (isEnableTenant()) {
-    //   return;
-    // }
-    // log.debug("启用租户过滤，线程ID: {}", Thread.currentThread().getId(), new Exception("调用栈"));
-    // ThreadLocalUtil.set(IS_ENABLE_TENANT_KEY, true);
-    InterceptorIgnoreHelper.clearIgnoreStrategy();
   }
 }
