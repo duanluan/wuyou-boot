@@ -224,4 +224,22 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
     TenantContext.disable();
     return this.lambdaQuery().eq(SysRole::getCode, RoleEnum.SUPER_ADMIN.getCode()).one();
   }
+
+  /**
+   * 角色是否全部已禁用
+   *
+   * @param roleCodes 角色编码列表
+   * @return {@code true} 角色编码列表中的角色全部已禁用
+   */
+  public boolean isAllDisabled(List<String> roleCodes) {
+    List<SysRole> sysRoleList = this.lambdaQuery()
+      .select(SysRole::getStatus)
+      .in(SysRole::getCode, roleCodes).list();
+    for (SysRole sysRole : sysRoleList) {
+      if (!CommonStatus.DISABLE.equals(sysRole.getStatus())) {
+        return false;
+      }
+    }
+    return true;
+  }
 }

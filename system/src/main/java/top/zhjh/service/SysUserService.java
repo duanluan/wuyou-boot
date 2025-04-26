@@ -93,12 +93,20 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
     if (user == null) {
       throw new ServiceException(HttpStatus.INTERNAL_SERVER_ERROR, "用户名或密码错误");
     }
+    List<String> roleCodes = user.getRoleCodes();
     // 密码是否正确
     if (!user.getPassword().equals(DigestUtil.sha512Hex(password))
       // 非超管判断租户是否一致
-      && (!StpExtUtil.isSuperAdmin(user.getRoleCodes()) && !CollUtil.contains(user.getTenantIds(), tenantId))
+      && (!StpExtUtil.isSuperAdmin(roleCodes) && !CollUtil.contains(user.getTenantIds(), tenantId))
     ) {
       throw new ServiceException(HttpStatus.INTERNAL_SERVER_ERROR, "用户名或密码错误");
+    }
+    if (CollUtil.isEmpty(roleCodes)) {
+      throw new ServiceException(HttpStatus.INTERNAL_SERVER_ERROR, "用户未配置角色");
+    }
+    // 角色是否全部禁用
+    if(sysRoleService.isAllDisabled(roleCodes)) {
+      throw new ServiceException(HttpStatus.INTERNAL_SERVER_ERROR, "用户角色已禁用");
     }
     SaLoginParameter saLoginParameter = new SaLoginParameter();
     // 扩展参数：租户 ID
