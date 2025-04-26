@@ -22,6 +22,7 @@ import top.zhjh.model.qo.*;
 import top.zhjh.model.vo.SysUserDetailVO;
 import top.zhjh.model.vo.SysUserPageVO;
 import top.zhjh.mybatis.MyServiceImpl;
+import top.zhjh.mybatis.wrapper.MyLambdaQueryWrapper;
 import top.zhjh.struct.SysUserStruct;
 import top.zhjh.util.StpExtUtil;
 
@@ -29,6 +30,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 用户 服务实现
@@ -105,7 +107,7 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
       throw new ServiceException(HttpStatus.INTERNAL_SERVER_ERROR, "用户未配置角色");
     }
     // 角色是否全部禁用
-    if(sysRoleService.isAllDisabled(roleCodes)) {
+    if (sysRoleService.isAllDisabled(roleCodes)) {
       throw new ServiceException(HttpStatus.INTERNAL_SERVER_ERROR, "用户角色已禁用");
     }
     SaLoginParameter saLoginParameter = new SaLoginParameter();
@@ -411,5 +413,20 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
     updateObj.setPassword(DigestUtil.sha512Hex(obj.getNewPassword()));
 
     return this.updateById(updateObj);
+  }
+
+  /**
+   * 获取超管用户 ID 列表
+   *
+   * @return 超管用户 ID 列表
+   */
+  public List<Long> getSuperAdminUserIds() {
+    List<SysUser> sysUserList = this.list(new MyLambdaQueryWrapper<SysUser>()
+      .jsonContains(SysUser::getRoleCodes, RoleEnum.SUPER_ADMIN.getCode())
+      .select(SysUser::getId));
+    if (CollUtil.isEmpty(sysUserList)) {
+      return new ArrayList<>();
+    }
+    return sysUserList.stream().map(SysUser::getId).collect(Collectors.toList());
   }
 }

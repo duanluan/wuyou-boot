@@ -24,7 +24,8 @@ public class SysMenuGetQO extends BaseGetQO {
   @NotNull(message = "创建时间不能为空")
   private LocalDateTime createdTime;
   @Schema(title = "父级 ID")
-  @NotBlank(message = "父级ID不能为空")
+  @Min(value = 0, message = "父级ID错误")
+  @NotNull(message = "父级ID不能为空")
   private Long parentId;
   @Schema(title = "类型：1: 目录, 2: 菜单, 3: 按钮")
   private Boolean type;

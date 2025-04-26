@@ -77,7 +77,7 @@ public class SysMenuController extends BaseController {
   @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
   @PostMapping
   public R save(@RequestBody @Validated SysMenuSaveQO obj) {
-    return saveR(sysMenuService.save(SysMenuStruct.INSTANCE.to(obj)));
+    return saveR(sysMenuService.save(obj));
   }
 
   @CacheEvict(value = "menuTree", keyGenerator = "roleCodesCacheKeyGen")

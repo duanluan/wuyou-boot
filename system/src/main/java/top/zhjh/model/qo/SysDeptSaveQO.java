@@ -5,6 +5,7 @@ import lombok.Data;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * 部门保存入参
@@ -18,6 +19,7 @@ public class SysDeptSaveQO {
   private String name;
   @Schema(title = "父级 ID")
   @Min(value = 0, message = "父级ID错误")
+  @NotNull(message = "父级ID不能为空")
   private Long parentId;
   @Schema(title = "顺序")
   @Min(value = 1, message = "顺序错误")

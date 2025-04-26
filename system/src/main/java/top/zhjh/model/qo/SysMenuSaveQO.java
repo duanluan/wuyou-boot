@@ -7,6 +7,7 @@ import top.zhjh.enums.CommonStatus;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * 菜单保存入参
@@ -17,7 +18,7 @@ public class SysMenuSaveQO  {
 
   @Schema(title = "父级 ID")
   @Min(value = 1, message = "父级错误")
-  @NotBlank(message = "父级不能为空")
+  @NotNull(message = "父级不能为空")
   private Long parentId;
   @Schema(title = "类型：1: 目录, 2: 菜单, 3: 按钮")
   private Integer type;

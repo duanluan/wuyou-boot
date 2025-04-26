@@ -13,6 +13,8 @@ import top.zhjh.enums.MenuType;
 import top.zhjh.exception.ServiceException;
 import top.zhjh.mapper.SysMenuMapper;
 import top.zhjh.model.entity.SysMenu;
+import top.zhjh.model.entity.SysRoleMenu;
+import top.zhjh.model.qo.SysMenuSaveQO;
 import top.zhjh.model.qo.SysMenuTreeTableQO;
 import top.zhjh.model.qo.SysMenuUpdateQO;
 import top.zhjh.struct.SysMenuStruct;
@@ -29,6 +31,10 @@ public class SysMenuService extends ServiceImpl<SysMenuMapper, SysMenu> {
 
   @Resource
   private SysMenuMapper sysMenuMapper;
+  @Resource
+  private SysRoleMenuService sysRoleMenuService;
+  @Resource
+  private SysRoleService sysRoleService;
 
   /**
    * 列出树
@@ -75,5 +81,19 @@ public class SysMenuService extends ServiceImpl<SysMenuMapper, SysMenu> {
       throw new ServiceException("菜单不存在");
     }
     return this.updateById(SysMenuStruct.INSTANCE.to(obj));
+  }
+
+  /**
+   * 保存菜单，给超管授权菜单
+   * @param obj 菜单保存入参
+   * @return 是否保存菜单成功 && 给超管授权菜单成功
+   */
+  public boolean save(SysMenuSaveQO obj) {
+    SysMenu sysMenu = SysMenuStruct.INSTANCE.to(obj);
+    if (this.save(sysMenu)) {
+      // 菜单保存成功后，给超管授权
+      return sysRoleMenuService.save(new SysRoleMenu(sysRoleService.getSuperAdmin().getId(), sysMenu.getId()));
+    }
+    return false;
   }
 }
