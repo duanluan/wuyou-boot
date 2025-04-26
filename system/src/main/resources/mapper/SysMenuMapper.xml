@@ -11,17 +11,24 @@
 
   <sql id="listTreeSql">
     select
-      sm.id,
-      sm.created_time createdTime,
-      sm.parent_id parentId,
-      sm.type,
-      sm.name,
-      sm.sort,
-      sm.status,
-      sm.icon,
-      sm.path,
-      sm.method,
-      sm.permission
+      <choose>
+        <when test="checkedOnlyId != null and checkedOnlyId">
+          sm.id
+        </when>
+        <otherwise>
+          sm.id,
+          sm.created_time createdTime,
+          sm.parent_id parentId,
+          sm.type,
+          sm.name,
+          sm.sort,
+          sm.status,
+          sm.icon,
+          sm.path,
+          sm.method,
+          sm.permission
+        </otherwise>
+      </choose>
     from sys_menu sm
     where sm.deleted = 0
     <if test="name != null and name != ''">
@@ -30,20 +37,20 @@
     <if test="status != null">
       and sm.status = #{status}
     </if>
-    <if test="roleCodes != null">
-      and sm.id in (
-        select menu_id from sys_role_menu where role_id in (
-          select id from sys_role where code in
-          <foreach collection="roleCodes" item="roleCode" open="(" separator="," close=")">
-            #{roleCode}
-          </foreach>
-        )
-      )
-    </if>
     <if test="types != null">
       <foreach collection="types" item="type" open="and (" separator="or" close=")">
         sm.type = #{type}
       </foreach>
+    </if>
+    <if test="checkedRoleCodes != null">
+      and sm.id in (
+        select menu_id from sys_role_menu where role_id in (
+          select id from sys_role where code in
+          <foreach collection="checkedRoleCodes" item="roleCode" open="(" separator="," close=")">
+            #{roleCode}
+          </foreach>
+        )
+      )
     </if>
     order by sort, created_time desc
   </sql>
@@ -64,14 +71,41 @@
           sm.method,
           sm.permission,
           case
-            when sm.id in (select id from (<include refid="listTreeSql"/>) t) then true
+            when sm.id in (select id from (
+              <include refid="listTreeSql">
+                <property name="checkedOnlyId" value="true"/>
+              </include>
+            ) t) then true
             else false
           end as checked
         from sys_menu sm
         where sm.deleted = 0
+        <if test="name != null and name != ''">
+          and sm.name like concat('%', #{name}, '%')
+        </if>
+        <if test="status != null">
+          and sm.status = #{status}
+        </if>
+        <if test="types != null">
+          <foreach collection="types" item="type" open="and (" separator="or" close=")">
+            sm.type = #{type}
+          </foreach>
+        </if>
+        <if test="roleCodes != null">
+          and sm.id in (
+            select menu_id from sys_role_menu where role_id in (
+              select id from sys_role where code in
+              <foreach collection="roleCodes" item="roleCode" open="(" separator="," close=")">
+                #{roleCode}
+              </foreach>
+            )
+          )
+        </if>
       </when>
       <otherwise>
-        <include refid="listTreeSql"/>
+        <include refid="listTreeSql">
+          <property name="checkedOnlyId" value="false"/>
+        </include>
       </otherwise>
     </choose>
   </select>

@@ -74,6 +74,7 @@ public class TenantInterceptor implements Interceptor {
   @Override
   public Object intercept(Invocation invocation) throws Throwable {
     try {
+      // 全局配置是否禁用租户
       if (tenantConf.disabled()) {
         return invocation.proceed();
       }
