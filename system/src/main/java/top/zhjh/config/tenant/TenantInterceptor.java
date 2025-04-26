@@ -1,5 +1,6 @@
 package top.zhjh.config.tenant;
 
+import cn.dev33.satoken.annotation.SaIgnore;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
@@ -25,12 +26,20 @@ import org.apache.ibatis.plugin.Signature;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.HandlerExecutionChain;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import top.csaf.coll.CollUtil;
 import top.zhjh.prop.TenantConf;
 import top.zhjh.util.JSqlParserUtil;
 import top.zhjh.util.StpExtUtil;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Method;
 import java.util.List;
 
 /**
@@ -60,25 +69,52 @@ public class TenantInterceptor implements Interceptor {
     return StpExtUtil.isSuperAdmin();
   }
 
-  /**
-   * 指定表是否跳过租户拦截
-   *
-   * @param tableName 表名
-   * @return {@code true} 跳过租户拦截
-   */
-  private boolean ignoreTable(String tableName) {
-    return CollUtil.contains(tenantConf.getIgnoreTables(), tableName);
-  }
+  @Resource
+  private RequestMappingHandlerMapping handlerMapping;
 
+  /**
+   * 请求方法或类上是否有 @SaIgnore 注解
+   *
+   * @return {@code true} 请求方法或类上有 @SaIgnore 注解
+   */
+  private boolean hasSaIgnore() {
+    try {
+      // 获取当前请求
+      RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+      if (requestAttributes == null) {
+        return false;
+      }
+      HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
+      HandlerExecutionChain handlerChain = handlerMapping.getHandler(request);
+      if (handlerChain != null && handlerChain.getHandler() instanceof HandlerMethod handlerMethod) {
+        Method method = handlerMethod.getMethod();
+        // 检查方法上是否有SaIgnore注解
+        SaIgnore saIgnore = method.getAnnotation(SaIgnore.class);
+        if (saIgnore != null) {
+          return true;
+        }
+        // 检查类上是否有SaIgnore注解
+        saIgnore = method.getDeclaringClass().getAnnotation(SaIgnore.class);
+        return saIgnore != null;
+      }
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+    }
+    return false;
+  }
 
   @Override
   public Object intercept(Invocation invocation) throws Throwable {
     try {
-      // 全局配置是否禁用租户
+      // 接口方法或类上是否有 @SaIgnore 注解，有的话忽略租户拦截
+      if (this.hasSaIgnore()) {
+        return invocation.proceed();
+      }
+      // 全局配置是否禁用租户拦截
       if (tenantConf.disabled()) {
         return invocation.proceed();
       }
-      // 租户上下文是否禁用租户
+      // 租户上下文是否禁用租户拦截
       if (TenantContext.disabled()) {
         return invocation.proceed();
       }
@@ -152,6 +188,16 @@ public class TenantInterceptor implements Interceptor {
       // 始终清除租户上下文
       TenantContext.clear();
     }
+  }
+
+  /**
+   * 指定表是否跳过租户拦截
+   *
+   * @param tableName 表名
+   * @return {@code true} 跳过租户拦截
+   */
+  private boolean ignoreTable(String tableName) {
+    return CollUtil.contains(tenantConf.getIgnoreTables(), tableName);
   }
 
   /**
