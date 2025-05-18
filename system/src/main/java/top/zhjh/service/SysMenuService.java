@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.NonNull;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
+import top.csaf.coll.CollUtil;
 import top.csaf.tree.TreeNode;
 import top.csaf.tree.TreeUtil;
 import top.zhjh.config.tenant.TenantContext;
@@ -43,12 +44,17 @@ public class SysMenuService extends ServiceImpl<SysMenuMapper, SysMenu> {
    */
   // @Cacheable(value = "menuTree", keyGenerator = "roleCodesCacheKeyGen")
   public List<TreeNode> listTree() {
+    List<String> roleList = StpUtil.getRoleList();
+    // 没有角色返回空
+    if (CollUtil.isEmpty(roleList)) {
+      return List.of();
+    }
     // 树只能查询用户所属的启用的目录 、菜单
     SysMenuTreeTableQO query = new SysMenuTreeTableQO();
     query.setStatus(CommonStatus.ENABLE);
     query.setTypes(Arrays.asList(MenuType.DIR, MenuType.MENU));
     // isAllAndChecked 为 false，只获取选中的，所以下面这个条件就相当于当前用户所属菜单
-    query.setCheckedRoleCodes(StpUtil.getRoleList());
+    query.setCheckedRoleCodes(roleList);
     TenantContext.disable();
     return TreeUtil.build(sysMenuMapper.listTree(query));
   }
