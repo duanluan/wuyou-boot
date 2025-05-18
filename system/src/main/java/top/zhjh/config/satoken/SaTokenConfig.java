@@ -7,6 +7,7 @@ import cn.dev33.satoken.stp.StpLogic;
 import cn.dev33.satoken.stp.StpUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import top.zhjh.config.tenant.TenantContext;
@@ -21,7 +22,7 @@ import javax.annotation.Resource;
 @Configuration
 public class SaTokenConfig implements WebMvcConfigurer {
 
-  // @Lazy
+  @Lazy
   @Resource
   private SysMenuService sysMenuService;
 
