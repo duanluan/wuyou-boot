@@ -154,8 +154,8 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
       throw new ServiceException("用户不存在");
     }
     SysUserDetailVO result = SysUserStruct.INSTANCE.toDetailVO(sysUser);
-    // 是否为超管
-    result.setIsSuperAdmin(StpExtUtil.isSuperAdmin(sysUser.getRoleCodes()));
+    // 是否显示租户
+    result.setIsShowTenant(StpExtUtil.isSuperAdmin(sysUser.getRoleCodes()));
     return result;
   }
 

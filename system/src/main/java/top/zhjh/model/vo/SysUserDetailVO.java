@@ -18,7 +18,7 @@ public class SysUserDetailVO {
   private String username;
   @Schema(title = "昵称")
   private String nickName;
-  @Schema(title="创建时间")
+  @Schema(title = "创建时间")
   private String createdTime;
   @Schema(title = "角色名称列表")
   private List<String> roleNames;
@@ -30,6 +30,6 @@ public class SysUserDetailVO {
   private List<String> postNames;
   @Schema(title = "租户名称列表")
   private List<String> tenantNames;
-  @Schema(title = "是否为超级管理员")
-  private Boolean isSuperAdmin;
+  @Schema(title = "是否显示租户", description = "是否在用户管理的列表中显示租户列，编辑中显示租户字段")
+  private Boolean isShowTenant;
 }

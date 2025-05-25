@@ -1,18 +1,14 @@
 package top.zhjh.controller;
 
-import cn.dev33.satoken.annotation.SaIgnore;
-import cn.dev33.satoken.stp.StpUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import top.zhjh.base.BaseController;
 import top.zhjh.base.model.R;
 import top.zhjh.model.qo.*;
-import top.zhjh.model.vo.SysUserDetailVO;
 import top.zhjh.service.SysUserService;
 import top.zhjh.struct.SysUserStruct;
 
@@ -23,26 +19,12 @@ import javax.annotation.Resource;
  */
 @Tag(name = "用户")
 @Slf4j
-@RequestMapping(value = "/sys/users", consumes = MediaType.ALL_VALUE)
+@RequestMapping(value = "/sys/users")
 @RestController
 public class SysUserController extends BaseController {
 
   @Resource
   private SysUserService sysUserService;
-
-  @SaIgnore
-  @Operation(summary = "登录")
-  @PostMapping("/login")
-  public R<SysUserDetailVO> login(@Validated SysUserLoginQO query) {
-    return ok(sysUserService.login(query.getUsername(), query.getPassword(), query.getTenantId()));
-  }
-
-  @Operation(summary = "登出")
-  @PostMapping("/logout")
-  public R logout() {
-    StpUtil.logout();
-    return ok();
-  }
 
   @Operation(summary = "用户列表")
   @GetMapping

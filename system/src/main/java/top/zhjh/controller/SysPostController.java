@@ -23,7 +23,7 @@ import javax.annotation.Resource;
  */
 @Tag(name = "岗位")
 @Slf4j
-@RequestMapping(value = "/sys/posts", consumes = MediaType.ALL_VALUE)
+@RequestMapping(value = "/sys/posts")
 @RestController
 public class SysPostController extends BaseController {
 

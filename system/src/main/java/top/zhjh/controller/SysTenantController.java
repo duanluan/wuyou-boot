@@ -24,7 +24,7 @@ import javax.annotation.Resource;
  */
 @Tag(name = "租户")
 @Slf4j
-@RequestMapping(value = "/sys/tenants", consumes = MediaType.ALL_VALUE)
+@RequestMapping(value = "/sys/tenants")
 @RestController
 public class SysTenantController extends BaseController {
 

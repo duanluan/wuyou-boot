@@ -22,7 +22,7 @@ import java.util.List;
  */
 @Tag(name = "部门")
 @Slf4j
-@RequestMapping(value = "/sys/depts", consumes = MediaType.ALL_VALUE)
+@RequestMapping(value = "/sys/depts")
 @RestController
 public class SysDeptController extends BaseController {
 
