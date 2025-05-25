@@ -36,10 +36,10 @@
     from sys_user su
     where su.deleted = 0
     <if test="nickName != null and nickName != ''">
-      and su.nick_name = #{nickName}
+      and su.nick_name concat('%', #{nickName}, '%')
     </if>
     <if test="username != null and username != ''">
-      and su.username = #{username}
+      and su.username concat('%', #{username}, '%')
     </if>
     <if test="tenantId != null and tenantId > 0">
       and json_contains(su.tenant_ids, #{tenantId})
@@ -87,4 +87,33 @@
       where su.deleted = 0 and su.id = #{id}
       group by su.id
   </select>
+
+  <update id="updateById">
+    update sys_user
+    <set>
+      <if test="username != null and username != ''">
+        username = #{username},
+      </if>
+      <if test="nickName != null and nickName != ''">
+        nick_name = #{nickName},
+      </if>
+      <if test="roleIds != null and roleIds.size() > 0">
+        role_ids = #{roleIds, typeHandler=com.baomidou.mybatisplus.extension.handlers.Fastjson2TypeHandler},
+      </if>
+      <if test="roleNames != null and roleNames.size() > 0">
+        role_names = #{roleNames, typeHandler=com.baomidou.mybatisplus.extension.handlers.Fastjson2TypeHandler},
+      </if>
+      <if test="tenantIds != null and tenantIds.size() > 0">
+        tenant_ids = #{tenantIds, typeHandler=com.baomidou.mybatisplus.extension.handlers.Fastjson2TypeHandler},
+      </if>
+      <if test="tenantNames != null and tenantNames.size() > 0">
+        tenant_names = #{tenantNames, typeHandler=com.baomidou.mybatisplus.extension.handlers.Fastjson2TypeHandler},
+      </if>
+      dept_ids = #{deptIds, typeHandler=com.baomidou.mybatisplus.extension.handlers.Fastjson2TypeHandler},
+      dept_names = #{deptNames, typeHandler=com.baomidou.mybatisplus.extension.handlers.Fastjson2TypeHandler},
+      post_ids = #{postIds, typeHandler=com.baomidou.mybatisplus.extension.handlers.Fastjson2TypeHandler},
+      post_names = #{postNames, typeHandler=com.baomidou.mybatisplus.extension.handlers.Fastjson2TypeHandler},
+    </set>
+    where id = #{id}
+  </update>
 </mapper>

@@ -61,7 +61,7 @@ public class TenantInterceptor implements Interceptor {
   private TenantConf tenantConf;
 
   /**
-   * 当前用户是否跳过租户拦截
+   * 登录用户是否跳过租户拦截
    *
    * @return {@code true} 跳过租户拦截
    */
@@ -118,7 +118,7 @@ public class TenantInterceptor implements Interceptor {
       if (TenantContext.disabled()) {
         return invocation.proceed();
       }
-      // 是否忽略当前用户
+      // 是否忽略登录用户
       if (this.ignoreCurrentUser()) {
         return invocation.proceed();
       }
@@ -145,7 +145,7 @@ public class TenantInterceptor implements Interceptor {
 
         // 加入租户条件
         Select select = (Select) CCJSqlParserUtil.parse(boundSql.getSql());
-        this.handlePlainSelect(select.getPlainSelect());
+        this.handleSelect(select);
         BoundSql newBoundSql = new BoundSql(mappedStatement.getConfiguration(), select.toString(), boundSql.getParameterMappings(), parameter);
 
         // 复制原始 BoundSql 中的 additionalParameters 到新的 BoundSql 中，否则会报错“org.apache.ibatis.reflection.ReflectionException: There is no getter for property named '__frch_……”
@@ -165,7 +165,9 @@ public class TenantInterceptor implements Interceptor {
           case Insert insert -> {
             for (Expression expression : insert.getValues().getExpressions()) {
               if (expression instanceof ParenthesedSelect) {
-                this.handlePlainSelect(this.getPlainSelect((ParenthesedSelect) expression));
+                this.handleSelect(this.getPlainSelect((ParenthesedSelect) expression));
+              } else if (expression instanceof SetOperationList) {
+                this.handleSelect((SetOperationList) expression);
               }
             }
           }
@@ -198,6 +200,21 @@ public class TenantInterceptor implements Interceptor {
    */
   private boolean ignoreTable(String tableName) {
     return CollUtil.contains(tenantConf.getIgnoreTables(), tableName);
+  }
+
+  /**
+   * 处理查询中的子查询 或 setOperationList（union、union all 等）
+   *
+   * @param select 查询
+   */
+  private void handleSelect(Select select) {
+    if (select instanceof PlainSelect plainSelect) {
+      this.handlePlainSelect(plainSelect);
+    } else if (select instanceof SetOperationList setOperationList) {
+      for (Select select1 : setOperationList.getSelects()) {
+        this.handleSelect(select1);
+      }
+    }
   }
 
   /**

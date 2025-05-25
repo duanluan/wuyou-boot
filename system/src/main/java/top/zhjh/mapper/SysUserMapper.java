@@ -25,4 +25,6 @@ public interface SysUserMapper extends MyBaseMapper<SysUser> {
   List<SysUserPageVO> page(SysUserPageQO query);
 
   SysUserDetailVO getDetail(@NonNull @Param("id") Long id);
+
+  int updateById(SysUser obj);
 }

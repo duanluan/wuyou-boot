@@ -44,9 +44,9 @@ public class StpExtUtil {
   }
 
   /**
-   * 当前用户是否为超级管理员
+   * 登录用户是否为超级管理员
    *
-   * @return 当前用户是否为超级管理员
+   * @return 登录用户是否为超级管理员
    */
   public static boolean isSuperAdmin() {
     List<String> roleList = StpUtil.getRoleList();
@@ -99,9 +99,9 @@ public class StpExtUtil {
   // }
 
   /**
-   * 获取当前用户的租户 ID
+   * 获取登录用户的租户 ID
    *
-   * @return 当前用户的租户 ID
+   * @return 登录用户的租户 ID
    */
   public static Long getTenantId() {
     // // JWT 未初始化返回 null

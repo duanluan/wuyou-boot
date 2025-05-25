@@ -4,6 +4,7 @@ import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.stp.parameter.SaLoginParameter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import top.csaf.crypto.DigestUtil;
 import top.csaf.lang.NumberUtil;
 import top.zhjh.base.model.BaseEntity;
 import top.zhjh.base.model.PageVO;
+import top.zhjh.config.tenant.TenantContext;
 import top.zhjh.enums.RoleEnum;
 import top.zhjh.exception.ServiceException;
 import top.zhjh.mapper.SysUserMapper;
@@ -30,6 +32,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -57,6 +60,8 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
   private SysTenantService sysTenantService;
   @Resource
   private SysTenantUserService sysTenantUserService;
+  @Resource
+  private CacheManager cacheManager;
 
   /**
    * 列出用户角色编码
@@ -175,6 +180,7 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
     List<String> roleCodes = new ArrayList<>();
     List<SysRoleUser> roleUserList = new ArrayList<>();
     for (Long roleId : roleIds) {
+      TenantContext.disable();
       SysRole role = sysRoleService.lambdaQuery()
         .select(SysRole::getName, SysRole::getCode)
         .eq(SysRole::getId, roleId).one();
@@ -190,6 +196,9 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
     sysUser.setRoleIds(roleIds);
     sysUser.setRoleNames(roleNames);
     sysUser.setRoleCodes(roleCodes);
+
+    // 清除用户-角色编码缓存
+    Objects.requireNonNull(cacheManager.getCache("userRoleCodes")).evict(sysUserId);
   }
 
   /**
@@ -200,7 +209,6 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
    */
   private void assignDept(SysUser sysUser, List<Long> deptIds) {
     if (CollUtil.isEmpty(deptIds)) {
-      log.warn("部门ID列表为空");
       return;
     }
     Long sysUserId = sysUser.getId();
@@ -230,7 +238,6 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
    */
   private void assignPost(SysUser sysUser, List<Long> postIds) {
     if (CollUtil.isEmpty(postIds)) {
-      log.warn("岗位ID列表为空");
       return;
     }
     Long sysUserId = sysUser.getId();
@@ -305,7 +312,7 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
     // 关联租户
     this.assignTenant(updateObj, StpExtUtil.getTenantId());
 
-    return this.updateById(updateObj);
+    return sysUserMapper.updateById(updateObj) > 0;
   }
 
   /**
@@ -321,6 +328,12 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
       log.error("用户不存在: {}", sysUserId);
       throw new ServiceException("用户不存在");
     }
+
+    // 删除旧关联
+    sysRoleUserService.lambdaUpdate().eq(SysRoleUser::getUserId, sysUserId).remove();
+    sysDeptUserService.lambdaUpdate().eq(SysDeptUser::getUserId, sysUserId).remove();
+    sysPostUserService.lambdaUpdate().eq(SysPostUser::getUserId, sysUserId).remove();
+
     List<Long> roleIds = obj.getRoleIds();
     SysUser updateObj = SysUserStruct.INSTANCE.to(obj);
     // 关联角色
@@ -336,12 +349,7 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
     // 关联岗位
     this.assignPost(updateObj, updateObj.getPostIds());
 
-    // 删除旧关联
-    sysRoleUserService.lambdaUpdate().eq(SysRoleUser::getUserId, sysUserId).remove();
-    sysDeptUserService.lambdaUpdate().eq(SysDeptUser::getUserId, sysUserId).remove();
-    sysPostUserService.lambdaUpdate().eq(SysPostUser::getUserId, sysUserId).remove();
-
-    return this.updateById(updateObj);
+    return sysUserMapper.updateById(updateObj) > 0;
   }
 
   /**

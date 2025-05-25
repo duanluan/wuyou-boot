@@ -10,6 +10,8 @@ public interface SysRoleStruct {
 
   SysRoleStruct INSTANCE = Mappers.getMapper(SysRoleStruct.class);
 
+  SysRoleListQO to(SysRolePageQO query);
+
   SysRole to(SysRoleSaveQO obj);
 
   SysRole to(SysRoleUpdateQO obj);

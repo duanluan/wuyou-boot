@@ -31,10 +31,7 @@ public class SysUserUpdateQO {
   @NotNull(message = "角色列表不能为空")
   private List<Long> roleIds;
   @Schema(title = "部门ID")
-  @Size(min = 1, message = "部门列表不能为空")
-  @NotNull(message = "部门列表不能为空")
   private List<Long> deptIds;
   @Schema(title = "岗位列表")
-  @Size(min = 1, message = "岗位列表不能为空")
   private List<Long> postIds;
 }

@@ -2,14 +2,10 @@ package top.zhjh.model.qo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import top.zhjh.base.model.PageQO;
-import top.zhjh.model.entity.SysRole;
 
-@Schema(title = "角色分页入参")
-@EqualsAndHashCode(callSuper = true)
+@Schema(title = "角色列表入参")
 @Data
-public class SysRolePageQO extends PageQO<SysRole> {
+public class SysRoleListQO {
 
   @Schema(title = "是否添加登录用户角色", hidden = true)
   private Boolean isAddLoginUserRole;

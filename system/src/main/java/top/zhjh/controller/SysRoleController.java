@@ -1,21 +1,21 @@
 package top.zhjh.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import cn.dev33.satoken.stp.StpUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import top.csaf.lang.StrUtil;
 import top.zhjh.base.BaseController;
 import top.zhjh.base.model.R;
-import top.zhjh.model.entity.SysRole;
+import top.zhjh.config.tenant.TenantContext;
 import top.zhjh.model.qo.*;
 import top.zhjh.model.vo.SysRoleGetVO;
 import top.zhjh.service.SysRoleService;
+import top.zhjh.struct.SysRoleStruct;
+import top.zhjh.util.StpExtUtil;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * 角色 控制器
@@ -31,16 +31,17 @@ public class SysRoleController extends BaseController {
 
   @Operation(summary = "角色列表")
   @GetMapping
-  public R<List<SysRole>> list(@Validated SysRolePageQO query) {
-    LambdaQueryWrapper<SysRole> queryWrapper = new LambdaQueryWrapper<SysRole>()
-      .like(StrUtil.isNotBlank(query.getName()), SysRole::getName, query.getName())
-      .like(StrUtil.isNotBlank(query.getCode()), SysRole::getCode, query.getCode())
-      .orderByAsc(SysRole::getSort)
-      .orderByDesc( SysRole::getId);
+  public R<?> list(@Validated SysRolePageQO query) {
+    TenantContext.disable();
+    // 添加登录用户（没有租户的）角色
+    query.setIsAddLoginUserRole(true);
+    query.setLoginUserId(StpUtil.getLoginIdAsLong());
+    query.setTenantId(StpExtUtil.getTenantId());
+
     if (query.getCurrent() == 0) {
-      return ok(sysRoleService.list(queryWrapper));
+      return ok(sysRoleService.list(SysRoleStruct.INSTANCE.to(query)));
     }
-    return ok(sysRoleService.page(query, queryWrapper));
+    return ok(sysRoleService.page(query));
   }
 
   @Operation(summary = "角色详情")

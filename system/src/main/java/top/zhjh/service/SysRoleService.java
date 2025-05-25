@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import top.csaf.coll.CollUtil;
 import top.csaf.lang.StrUtil;
+import top.zhjh.base.model.PageVO;
 import top.zhjh.config.tenant.TenantContext;
 import top.zhjh.enums.CommonStatus;
 import top.zhjh.enums.DataScopeActionType;
@@ -18,6 +19,7 @@ import top.zhjh.model.entity.SysRoleDept;
 import top.zhjh.model.entity.SysRoleMenu;
 import top.zhjh.model.entity.SysRoleUser;
 import top.zhjh.model.qo.*;
+import top.zhjh.model.vo.SysRolePageVO;
 import top.zhjh.struct.SysRoleStruct;
 import top.zhjh.util.StpExtUtil;
 
@@ -40,6 +42,27 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
   private SysRoleMenuService sysRoleMenuService;
   @Resource
   private SysRoleDeptService sysRoleDeptService;
+
+  /**
+   * 列出
+   *
+   * @param query 查询参数
+   * @return 列表
+   */
+  public List<SysRolePageVO> list(SysRoleListQO query) {
+    return sysRoleMapper.list(query);
+  }
+
+  /**
+   * 分页
+   *
+   * @param query 查询参数
+   * @return 分页列表
+   */
+  public PageVO<SysRolePageVO> page(SysRolePageQO query) {
+    List<SysRolePageVO> records = sysRoleMapper.page(query);
+    return new PageVO<SysRolePageVO>(query).setRecords(records);
+  }
 
   /**
    * 更新
