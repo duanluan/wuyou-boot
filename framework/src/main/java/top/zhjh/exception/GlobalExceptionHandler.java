@@ -31,14 +31,14 @@ public class GlobalExceptionHandler {
   @ResponseBody
   public ResponseEntity<R<?>> handleConnectException(ConnectException e) {
     log.error("连接异常", e);
-    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new R(HttpStatus.INTERNAL_SERVER_ERROR.value(), "系统维护中"));
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new R<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), "系统维护中"));
   }
 
   @ExceptionHandler(SQLException.class)
   @ResponseBody
   public ResponseEntity<R<?>> handleSqlExcxeption(SQLException e) {
     log.error("数据库异常", e);
-    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new R(HttpStatus.INTERNAL_SERVER_ERROR.value(), "系统维护中"));
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new R<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), "系统维护中"));
   }
 
   @ExceptionHandler({BindException.class})
@@ -57,7 +57,7 @@ public class GlobalExceptionHandler {
         msgList.add(error.getDefaultMessage());
       }
     }
-    return ResponseEntity.status(status).body(new R(status.value(), StrUtil.join(msgList, "；")));
+    return ResponseEntity.status(status).body(new R<>(status.value(), StrUtil.join(msgList, "；")));
   }
 
   @ExceptionHandler({ServiceException.class})
@@ -65,7 +65,7 @@ public class GlobalExceptionHandler {
   public ResponseEntity<R<?>> handleServiceException(ServiceException e) {
     log.error("服务异常", e);
     HttpStatus status = e.getStatus();
-    return ResponseEntity.status(status).body(new R(status.value(), e.getMessage()));
+    return ResponseEntity.status(status).body(new R<>(status.value(), e.getMessage()));
   }
 
   @ExceptionHandler(NotLoginException.class)
@@ -73,27 +73,21 @@ public class GlobalExceptionHandler {
   public ResponseEntity<R<?>> handlerNotLoginException(NotLoginException nle, HttpServletRequest request, HttpServletResponse response) {
     log.error("登录异常", nle);
     // 判断场景值，定制化异常信息
-    String message;
-    if (nle.getType().equals(NotLoginException.NOT_TOKEN)) {
-      message = "未提供Token";
-    } else if (nle.getType().equals(NotLoginException.INVALID_TOKEN)) {
-      message = "Token无效";
-    } else if (nle.getType().equals(NotLoginException.TOKEN_TIMEOUT)) {
-      message = "Token已过期";
-    } else if (nle.getType().equals(NotLoginException.BE_REPLACED)) {
-      message = "Token已被顶下线";
-    } else if (nle.getType().equals(NotLoginException.KICK_OUT)) {
-      message = "Token已被踢下线";
-    } else {
-      message = "当前会话未登录";
-    }
-    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new R(nle.getCode(), message));
+    String message = switch (nle.getType()) {
+      case NotLoginException.NOT_TOKEN -> "未提供Token";
+      case NotLoginException.INVALID_TOKEN -> "Token无效";
+      case NotLoginException.TOKEN_TIMEOUT -> "Token已过期";
+      case NotLoginException.BE_REPLACED -> "Token已被顶下线";
+      case NotLoginException.KICK_OUT -> "Token已被踢下线";
+      default -> "当前会话未登录";
+    };
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new R<>(nle.getCode(), message));
   }
 
   @ExceptionHandler({Exception.class})
   @ResponseBody
   public ResponseEntity<R<?>> handleException(Exception e) {
     log.error("系统异常", e);
-    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new R(HttpStatus.INTERNAL_SERVER_ERROR.value(), "系统异常"));
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new R<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), "系统异常"));
   }
 }
