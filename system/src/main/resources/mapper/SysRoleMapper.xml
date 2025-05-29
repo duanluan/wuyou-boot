@@ -13,6 +13,8 @@
         sr.status,
         sr.tenant_name,
         sr.created_time,
+        sr.query_data_scope,
+        sr.update_data_scope,
         st.sort sort1
       from sys_role sr
       left join sys_tenant st on sr.tenant_id = st.id
@@ -32,6 +34,8 @@
       sr.status,
       sr.tenant_name,
       sr.created_time,
+      sr.query_data_scope,
+      sr.update_data_scope,
       st.sort sort1
     from sys_role sr
     left join sys_tenant st on sr.tenant_id = st.id

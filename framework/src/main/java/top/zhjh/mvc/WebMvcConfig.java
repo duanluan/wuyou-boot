@@ -48,7 +48,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     );
     // 序列化：转 JSON
     config.setWriterFeatures(
-      // // 序列化枚举值为前端返回值
+      // // 序列化枚举值为前端返回值：https://baomidou.com/guides/auto-convert-enum
       // JSONWriter.Feature.WriteEnumUsingToString
       // 将 Long 序列化为 String
       WriteLongAsString
