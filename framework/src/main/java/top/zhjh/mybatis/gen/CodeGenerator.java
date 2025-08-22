@@ -32,7 +32,7 @@ public class CodeGenerator {
   private static final String OUTPUT_DIR = FileUtil.getProjectPath() + "/generator/src/main/java";
 
   static {
-    Map<String, Object> yamlMap = YamlUtil.load(FileUtil.getProjectPath() + "/admin/src/main/resources/application-local.yml");
+    Map<String, Object> yamlMap = YamlUtil.load(FileUtil.getProjectPath() + "/admin/src/main/resources/application-dev.yml");
 
     Object urlObj = YamlUtil.get(yamlMap, "spring.datasource.url");
     DB_URL = urlObj != null ? urlObj.toString() : "";
