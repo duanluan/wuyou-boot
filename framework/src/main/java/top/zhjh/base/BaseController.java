@@ -25,7 +25,11 @@ public class BaseController {
     return new R<>(OK_VAL, null, msg);
   }
 
-  protected R ok(Object data) {
+  protected R okObj(Object data) {
+    return new R<>(OK_VAL, null, data);
+  }
+
+  protected <T> R<T> ok(T data) {
     return new R<>(OK_VAL, null, data);
   }
 

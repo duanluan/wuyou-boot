@@ -14,7 +14,6 @@ import top.zhjh.base.BaseController;
 import top.zhjh.base.model.R;
 import top.zhjh.model.entity.SysMenu;
 import top.zhjh.model.qo.*;
-import top.zhjh.model.vo.SysMenuGetVO;
 import top.zhjh.service.SysMenuService;
 import top.zhjh.struct.SysMenuStruct;
 
@@ -68,7 +67,7 @@ public class SysMenuController extends BaseController {
 
   @Operation(summary = "菜单详情")
   @GetMapping("/{id}")
-  public R<SysMenuGetVO> get(@Validated SysMenuGetQO query) {
+  public R<SysMenu> get(@Validated SysMenuGetQO query) {
     return ok(sysMenuService.getById(query.getId()));
   }
 

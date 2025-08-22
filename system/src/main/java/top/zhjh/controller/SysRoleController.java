@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import top.zhjh.base.BaseController;
 import top.zhjh.base.model.R;
 import top.zhjh.config.tenant.TenantContext;
+import top.zhjh.model.entity.SysRole;
 import top.zhjh.model.qo.*;
-import top.zhjh.model.vo.SysRoleGetVO;
 import top.zhjh.service.SysRoleService;
 import top.zhjh.struct.SysRoleStruct;
 import top.zhjh.util.StpExtUtil;
@@ -46,7 +46,7 @@ public class SysRoleController extends BaseController {
 
   @Operation(summary = "角色详情")
   @GetMapping("/{id}")
-  public R<SysRoleGetVO> get(@Validated SysRoleGetQO query) {
+  public R<SysRole> get(@Validated SysRoleGetQO query) {
     return ok(sysRoleService.getById(query.getId()));
   }
 
