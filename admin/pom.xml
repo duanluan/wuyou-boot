@@ -60,6 +60,14 @@
         <!--    </exclude>-->
         <!--  </excludes>-->
         <!--</configuration>-->
+        <executions>
+          <!-- 将 repackage 绑定到 package 阶段，否则打包的 jar 没有依赖 -->
+          <execution>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <!-- Apache Maven Surefire Plugin：配置 test 生命周期阶段 https://maven.apache.org/surefire/maven-surefire-plugin/ -->
       <plugin>
