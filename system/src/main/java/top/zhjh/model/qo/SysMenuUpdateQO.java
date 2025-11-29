@@ -2,7 +2,6 @@ package top.zhjh.model.qo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import top.zhjh.enums.CommonStatus;
 
 import javax.validation.constraints.Min;
@@ -27,7 +26,7 @@ public class SysMenuUpdateQO {
   @NotNull(message = "ID不能为空")
   private Long id;
   @Schema(title = "父级 ID")
-  @Min(value = 1, message = "父级错误", groups = {UpdateGroup.class})
+  @Min(value = 0, message = "父级错误", groups = {UpdateGroup.class})
   @NotNull(message = "父级不能为空", groups = {UpdateGroup.class})
   private Long parentId;
   @Schema(title = "类型")

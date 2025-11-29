@@ -2,7 +2,6 @@ package top.zhjh.model.qo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import top.zhjh.enums.CommonStatus;
 
 import javax.validation.constraints.Min;
@@ -17,7 +16,7 @@ import javax.validation.constraints.NotNull;
 public class SysMenuSaveQO  {
 
   @Schema(title = "父级 ID")
-  @Min(value = 1, message = "父级错误")
+  @Min(value = 0, message = "父级错误")
   @NotNull(message = "父级不能为空")
   private Long parentId;
   @Schema(title = "类型：1: 目录, 2: 菜单, 3: 按钮")
