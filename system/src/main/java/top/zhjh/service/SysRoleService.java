@@ -2,6 +2,7 @@ package top.zhjh.service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import top.csaf.coll.CollUtil;
@@ -14,10 +15,7 @@ import top.zhjh.enums.DataScopeType;
 import top.zhjh.enums.RoleEnum;
 import top.zhjh.exception.ServiceException;
 import top.zhjh.mapper.SysRoleMapper;
-import top.zhjh.model.entity.SysRole;
-import top.zhjh.model.entity.SysRoleDept;
-import top.zhjh.model.entity.SysRoleMenu;
-import top.zhjh.model.entity.SysRoleUser;
+import top.zhjh.model.entity.*;
 import top.zhjh.model.qo.*;
 import top.zhjh.model.vo.SysRolePageVO;
 import top.zhjh.struct.SysRoleStruct;
@@ -42,6 +40,8 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
   private SysRoleMenuService sysRoleMenuService;
   @Resource
   private SysRoleDeptService sysRoleDeptService;
+  @Autowired
+  private SysTenantService sysTenantService;
 
   /**
    * 列出
@@ -72,20 +72,37 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
    */
   @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
   public boolean update(SysRoleUpdateQO obj) {
-    SysRole role = this.getById(obj.getId());
-    if (role == null) {
+    SysRole existRole = this.lambdaQuery()
+      .select(SysRole::getCode, SysRole::getStatus)
+      .eq(SysRole::getId, obj.getId()).one();
+    if (existRole == null) {
       log.error("角色不存在: {}", obj.getId());
-      throw new ServiceException("角色不存在");
+      throw new ServiceException("参数错误");
     }
-    if (StpExtUtil.isSuperAdmin(role)) {
-      if (!role.getCode().equals(obj.getCode())) {
+    if (StpExtUtil.isSuperAdmin(existRole)) {
+      if (!existRole.getCode().equals(obj.getCode())) {
         throw new ServiceException("不能修改编码为" + RoleEnum.SUPER_ADMIN.getCode() + "角色的编码");
       }
-      if (!role.getStatus().equals(obj.getStatus())) {
+      if (!existRole.getStatus().equals(obj.getStatus())) {
         throw new ServiceException("不能修改编码为" + RoleEnum.SUPER_ADMIN.getCode() + "角色的状态");
       }
     }
-    this.updateById(SysRoleStruct.INSTANCE.to(obj));
+
+    SysRole sysRole = SysRoleStruct.INSTANCE.to(obj);
+
+    Long tenantId = obj.getTenantId();
+    if (tenantId != null) {
+      SysTenant tenant = sysTenantService.lambdaQuery()
+        .select(SysTenant::getName)
+        .eq(SysTenant::getId, tenantId).one();
+      if (tenant == null) {
+        log.error("租户不存在: {}", tenantId);
+        throw new ServiceException("参数错误");
+      }
+      sysRole.setTenantName(tenant.getName());
+    }
+
+    this.updateById(sysRole);
     return true;
   }
 
@@ -220,22 +237,37 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
   @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
   public boolean save(SysRoleSaveQO obj) {
     // 名称或编码是否重复
-    List<SysRole> roleList = this.lambdaQuery().select(SysRole::getName, SysRole::getCode)
+    List<SysRole> existRoleList = this.lambdaQuery()
+      .select(SysRole::getName, SysRole::getCode)
       .and(c -> c.eq(SysRole::getName, obj.getName()).or().eq(SysRole::getCode, obj.getCode()))
       .list();
-    if (CollUtil.isNotEmpty(roleList)) {
+    if (CollUtil.isNotEmpty(existRoleList)) {
       List<String> errorMsgFields = new ArrayList<>();
-      for (SysRole role : roleList) {
-        if (role.getName().equals(obj.getName())) {
+      for (SysRole existRole : existRoleList) {
+        if (existRole.getName().equals(obj.getName())) {
           errorMsgFields.add("名称");
         }
-        if (role.getCode().equals(obj.getCode())) {
+        if (existRole.getCode().equals(obj.getCode())) {
           errorMsgFields.add("编码");
         }
       }
       throw new ServiceException(StrUtil.join(errorMsgFields, "、") + "已存在");
     }
-    return this.save(SysRoleStruct.INSTANCE.to(obj));
+
+    SysRole sysRole = SysRoleStruct.INSTANCE.to(obj);
+    Long tenantId = obj.getTenantId();
+    if (tenantId != null) {
+      SysTenant tenant = sysTenantService.lambdaQuery()
+        .select(SysTenant::getName)
+        .eq(SysTenant::getId, tenantId).one();
+      if (tenant == null) {
+        log.error("租户不存在: {}", tenantId);
+        throw new ServiceException("参数错误");
+      }
+      sysRole.setTenantName(tenant.getName());
+    }
+
+    return this.save(sysRole);
   }
 
   /**

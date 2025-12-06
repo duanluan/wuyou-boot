@@ -2,7 +2,6 @@ package top.zhjh.model.qo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import top.zhjh.enums.CommonStatus;
 
 import javax.validation.constraints.Min;
@@ -33,4 +32,6 @@ public class SysRoleUpdateQO {
   @Schema(title = "状态")
   @NotNull(message = "状态不能为空")
   private CommonStatus status;
+  @Schema(title = "租户ID")
+  private Long tenantId;
 }

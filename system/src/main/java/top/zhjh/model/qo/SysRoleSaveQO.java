@@ -2,9 +2,11 @@ package top.zhjh.model.qo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+import top.zhjh.enums.CommonStatus;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * 角色保存入参
@@ -21,4 +23,12 @@ public class SysRoleSaveQO  {
   private String name;
   @Schema(title = "描述")
   private String description;
+  @Schema(title = "顺序")
+  @Min(value = 1, message = "顺序不能为空")
+  private Long sort;
+  @Schema(title = "状态")
+  @NotNull(message = "状态不能为空")
+  private CommonStatus status;
+  @Schema(title = "租户ID")
+  private Long tenantId;
 }
