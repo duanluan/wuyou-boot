@@ -88,21 +88,30 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
       }
     }
 
-    SysRole sysRole = SysRoleStruct.INSTANCE.to(obj);
-
-    Long tenantId = obj.getTenantId();
-    if (tenantId != null) {
-      SysTenant tenant = sysTenantService.lambdaQuery()
-        .select(SysTenant::getName)
-        .eq(SysTenant::getId, tenantId).one();
-      if (tenant == null) {
-        log.error("租户不存在: {}", tenantId);
-        throw new ServiceException("参数错误");
-      }
-      sysRole.setTenantName(tenant.getName());
-    }
-
-    this.updateById(sysRole);
+    this.lambdaUpdate().eq(SysRole::getId, obj.getId())
+      .func(wrapper -> {
+        Long tenantId = obj.getTenantId();
+        if (tenantId == null) {
+          wrapper.set(SysRole::getTenantId, null);
+          wrapper.set(SysRole::getTenantName, null);
+        }else{
+          SysTenant tenant = sysTenantService.lambdaQuery()
+            .select(SysTenant::getName)
+            .eq(SysTenant::getId, tenantId).one();
+          if (tenant == null) {
+            log.error("租户不存在: {}", tenantId);
+            throw new ServiceException("参数错误");
+          }
+          wrapper.set(SysRole::getTenantId, tenantId);
+          wrapper.set(SysRole::getTenantName, tenant.getName());
+        }
+      })
+      .set(StrUtil.isNotBlank(obj.getCode()), SysRole::getCode, obj.getCode())
+      .set(StrUtil.isNotBlank(obj.getName()), SysRole::getName, obj.getName())
+      .set(obj.getStatus() != null, SysRole::getStatus, obj.getStatus())
+      .set(obj.getSort() != null, SysRole::getSort, obj.getSort())
+      .set(SysRole::getDescription, obj.getDescription())
+      .update();
     return true;
   }
 
