@@ -2,6 +2,7 @@ package top.zhjh.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -16,6 +17,7 @@ import top.zhjh.struct.SysRoleStruct;
 import top.zhjh.util.StpExtUtil;
 
 import javax.annotation.Resource;
+import javax.validation.constraints.Min;
 
 /**
  * 角色 控制器
@@ -46,8 +48,8 @@ public class SysRoleController extends BaseController {
 
   @Operation(summary = "角色详情")
   @GetMapping("/{id}")
-  public R<SysRole> get(@Validated SysRoleGetQO query) {
-    return ok(sysRoleService.getById(query.getId()));
+  public R<SysRole> get(@Schema(title = "角色ID") @Min(value = 1, message = "ID错误") @PathVariable Long id) {
+    return ok(sysRoleService.getById(id));
   }
 
   @Operation(summary = "保存角色")

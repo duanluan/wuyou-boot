@@ -51,6 +51,10 @@ public class SysRole extends BaseEntity {
    */
   @Schema(title = "增删改数据权限：1: 全部, 2: 自定义, 3: 本部门及以下, 4: 本部门, 5: 仅本人")
   private DataScopeType updateDataScope;
+
+  @Schema(title = "租户ID")
+  private Long tenantId;
+
   @Schema(title = "租户名称")
   private String tenantName;
 }
