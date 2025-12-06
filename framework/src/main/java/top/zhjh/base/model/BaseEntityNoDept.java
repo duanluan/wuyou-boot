@@ -7,14 +7,12 @@ import lombok.EqualsAndHashCode;
 import java.io.Serializable;
 
 /**
- * 基础实体，有租户控制和数据权限
+ * 基础实体，没有数据权限
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class BaseEntity extends BaseEntityNoTenant implements Serializable {
+public class BaseEntityNoDept extends BaseEntityNoTenant implements Serializable {
 
   @Schema(title = "租户 ID")
   private Long tenantId;
-  @Schema(title = "部门 ID")
-  private Long deptId;
 }

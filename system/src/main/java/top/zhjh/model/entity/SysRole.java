@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import top.zhjh.base.model.BaseEntity;
+import top.zhjh.base.model.BaseEntityNoDept;
 import top.zhjh.enums.CommonStatus;
 import top.zhjh.enums.DataScopeType;
 
@@ -15,7 +15,7 @@ import top.zhjh.enums.DataScopeType;
 @TableName("sys_role")
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class SysRole extends BaseEntity {
+public class SysRole extends BaseEntityNoDept {
   /**
    * 编码
    */

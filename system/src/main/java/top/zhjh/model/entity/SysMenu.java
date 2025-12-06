@@ -3,7 +3,7 @@ package top.zhjh.model.entity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import top.zhjh.base.model.BaseEntity;
+import top.zhjh.base.model.BaseEntityNoDept;
 import top.zhjh.enums.CommonStatus;
 
 /**
@@ -12,7 +12,7 @@ import top.zhjh.enums.CommonStatus;
 @Schema(title = "菜单")
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class SysMenu extends BaseEntity {
+public class SysMenu extends BaseEntityNoDept {
 
   /**
    * 父级 ID

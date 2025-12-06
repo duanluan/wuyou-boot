@@ -3,7 +3,7 @@ package top.zhjh.model.entity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import top.zhjh.base.model.BaseEntity;
+import top.zhjh.base.model.BaseEntityNoDept;
 import top.zhjh.enums.CommonStatus;
 
 /**
@@ -11,7 +11,7 @@ import top.zhjh.enums.CommonStatus;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class SysDept extends BaseEntity {
+public class SysDept extends BaseEntityNoDept {
   /**
    * 名称
    */

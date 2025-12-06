@@ -8,6 +8,9 @@ import lombok.Data;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+/**
+ * 基础实体，没有租户控制和数据权限
+ */
 @Data
 public class BaseEntityNoTenant implements Serializable {
 
