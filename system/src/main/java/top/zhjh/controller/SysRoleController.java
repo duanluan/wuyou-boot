@@ -12,6 +12,7 @@ import top.zhjh.base.model.R;
 import top.zhjh.config.tenant.TenantContext;
 import top.zhjh.model.entity.SysRole;
 import top.zhjh.model.qo.*;
+import top.zhjh.model.vo.SysRoleDataScopeVO;
 import top.zhjh.service.SysRoleService;
 import top.zhjh.struct.SysRoleStruct;
 import top.zhjh.util.StpExtUtil;
@@ -50,6 +51,12 @@ public class SysRoleController extends BaseController {
   @GetMapping("/{id}")
   public R<SysRole> get(@Schema(title = "角色ID") @Min(value = 1, message = "ID错误") @PathVariable Long id) {
     return ok(sysRoleService.getById(id));
+  }
+
+  @Operation(summary = "角色数据权限详情")
+  @GetMapping("/{id}/dataScope")
+  public R<SysRoleDataScopeVO> getDataScope(@Schema(title = "角色ID") @Min(value = 1, message = "ID错误") @PathVariable Long id) {
+    return ok(sysRoleService.getDataScope(id));
   }
 
   @Operation(summary = "保存角色")

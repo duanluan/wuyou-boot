@@ -17,6 +17,7 @@ import top.zhjh.exception.ServiceException;
 import top.zhjh.mapper.SysRoleMapper;
 import top.zhjh.model.entity.*;
 import top.zhjh.model.qo.*;
+import top.zhjh.model.vo.SysRoleDataScopeVO;
 import top.zhjh.model.vo.SysRolePageVO;
 import top.zhjh.struct.SysRoleStruct;
 import top.zhjh.util.StpExtUtil;
@@ -24,6 +25,7 @@ import top.zhjh.util.StpExtUtil;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 角色 服务实现
@@ -62,6 +64,40 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
   public PageVO<SysRolePageVO> page(SysRolePageQO query) {
     List<SysRolePageVO> records = sysRoleMapper.page(query);
     return new PageVO<SysRolePageVO>(query).setRecords(records);
+  }
+
+  /**
+   * 获取数据权限详情
+   *
+   * @param id 角色ID
+   * @return 数据权限详情
+   */
+  public SysRoleDataScopeVO getDataScope(Long id) {
+    SysRole role = this.getById(id);
+    if (role == null) {
+      log.error("角色不存在: {}", id);
+      throw new ServiceException("角色不存在");
+    }
+
+    SysRoleDataScopeVO vo = new SysRoleDataScopeVO();
+    vo.setId(role.getId());
+    vo.setName(role.getName());
+    vo.setCode(role.getCode());
+    vo.setQueryDataScope(role.getQueryDataScope());
+    vo.setUpdateDataScope(role.getUpdateDataScope());
+
+    List<SysRoleDept> roleDeptList = sysRoleDeptService.lambdaQuery().eq(SysRoleDept::getRoleId, id).list();
+    if (CollUtil.isNotEmpty(roleDeptList)) {
+      vo.setQueryDataScopeDeptIds(roleDeptList.stream()
+        .filter(item -> DataScopeActionType.QUERY.equals(item.getDataScopeActionType()))
+        .map(SysRoleDept::getDeptId)
+        .collect(Collectors.toList()));
+      vo.setUpdateDataScopeDeptIds(roleDeptList.stream()
+        .filter(item -> DataScopeActionType.UPDATE.equals(item.getDataScopeActionType()))
+        .map(SysRoleDept::getDeptId)
+        .collect(Collectors.toList()));
+    }
+    return vo;
   }
 
   /**
