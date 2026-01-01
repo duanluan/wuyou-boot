@@ -103,16 +103,27 @@
       <if test="roleNames != null and roleNames.size() > 0">
         role_names = #{roleNames, typeHandler=com.baomidou.mybatisplus.extension.handlers.Fastjson2TypeHandler},
       </if>
+      <if test="roleCodes != null and roleCodes.size() > 0">
+        role_codes = #{roleCodes, typeHandler=com.baomidou.mybatisplus.extension.handlers.Fastjson2TypeHandler},
+      </if>
       <if test="tenantIds != null and tenantIds.size() > 0">
         tenant_ids = #{tenantIds, typeHandler=com.baomidou.mybatisplus.extension.handlers.Fastjson2TypeHandler},
       </if>
       <if test="tenantNames != null and tenantNames.size() > 0">
         tenant_names = #{tenantNames, typeHandler=com.baomidou.mybatisplus.extension.handlers.Fastjson2TypeHandler},
       </if>
-      dept_ids = #{deptIds, typeHandler=com.baomidou.mybatisplus.extension.handlers.Fastjson2TypeHandler},
-      dept_names = #{deptNames, typeHandler=com.baomidou.mybatisplus.extension.handlers.Fastjson2TypeHandler},
-      post_ids = #{postIds, typeHandler=com.baomidou.mybatisplus.extension.handlers.Fastjson2TypeHandler},
-      post_names = #{postNames, typeHandler=com.baomidou.mybatisplus.extension.handlers.Fastjson2TypeHandler},
+      <if test="deptIds != null and deptIds.size() > 0">
+        dept_ids = #{deptIds, typeHandler=com.baomidou.mybatisplus.extension.handlers.Fastjson2TypeHandler},
+      </if>
+      <if test="deptNames != null and deptNames.size() > 0">
+        dept_names = #{deptNames, typeHandler=com.baomidou.mybatisplus.extension.handlers.Fastjson2TypeHandler},
+      </if>
+      <if test="postIds != null and postIds.size() > 0">
+        post_ids = #{postIds, typeHandler=com.baomidou.mybatisplus.extension.handlers.Fastjson2TypeHandler},
+      </if>
+      <if test="postNames != null and postNames.size() > 0">
+        post_names = #{postNames, typeHandler=com.baomidou.mybatisplus.extension.handlers.Fastjson2TypeHandler},
+      </if>
     </set>
     where id = #{id}
   </update>
