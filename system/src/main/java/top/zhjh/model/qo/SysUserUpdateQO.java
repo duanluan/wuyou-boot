@@ -34,4 +34,6 @@ public class SysUserUpdateQO {
   private List<Long> deptIds;
   @Schema(title = "岗位列表")
   private List<Long> postIds;
+  @Schema(title = "租户 ID 列表")
+  private List<Long> tenantIds;
 }

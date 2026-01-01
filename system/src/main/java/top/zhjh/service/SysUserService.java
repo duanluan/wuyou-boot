@@ -262,24 +262,36 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
   /**
    * 关联租户
    *
-   * @param sysUser  用户
-   * @param tenantId 租户 ID
+   * @param sysUser   用户
+   * @param tenantIds 租户 ID 列表
    */
-  private void assignTenant(SysUser sysUser, Long tenantId) {
-    if (NumberUtil.leZero(tenantId)) {
-      log.error("租户ID为空");
-      return;
+  private void assignTenant(SysUser sysUser, List<Long> tenantIds) {
+    if (CollUtil.isEmpty(tenantIds)) {
+      Long currentTenantId = StpExtUtil.getTenantId();
+      if (currentTenantId == null) {
+        return;
+      } else {
+        tenantIds = new ArrayList<>();
+        tenantIds.add(currentTenantId);
+      }
     }
-    SysTenant tenant = sysTenantService.lambdaQuery()
-      .select(SysTenant::getName)
-      .eq(SysTenant::getId, tenantId).one();
-    if (tenant == null) {
-      log.error("租户不存在: {}", tenantId);
-      throw new ServiceException("岗位不存在");
+    Long sysUserId = sysUser.getId();
+    List<String> tenantNames = new ArrayList<>();
+    List<SysTenantUser> tenantUserList = new ArrayList<>();
+    for (Long tenantId : tenantIds) {
+      SysTenant tenant = sysTenantService.lambdaQuery()
+        .select(SysTenant::getName)
+        .eq(SysTenant::getId, tenantId).one();
+      if (tenant == null) {
+        log.error("租户不存在: {}", tenantId);
+        throw new ServiceException("租户不存在");
+      }
+      tenantNames.add(tenant.getName());
+      tenantUserList.add(new SysTenantUser(tenantId, sysUserId));
     }
-    sysTenantUserService.save(new SysTenantUser(tenantId, sysUser.getId()));
-    sysUser.setTenantIds(Collections.singletonList(tenantId));
-    sysUser.setTenantNames(Collections.singletonList(tenant.getName()));
+    sysTenantUserService.saveBatch(tenantUserList);
+    sysUser.setTenantIds(tenantIds);
+    sysUser.setTenantNames(tenantNames);
   }
 
   /**
@@ -310,7 +322,7 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
     // 关联岗位
     this.assignPost(updateObj, obj.getPostIds());
     // 关联租户
-    this.assignTenant(updateObj, StpExtUtil.getTenantId());
+    this.assignTenant(updateObj, obj.getTenantIds());
 
     return sysUserMapper.updateById(updateObj) > 0;
   }
@@ -333,6 +345,7 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
     sysRoleUserService.lambdaUpdate().eq(SysRoleUser::getUserId, sysUserId).remove();
     sysDeptUserService.lambdaUpdate().eq(SysDeptUser::getUserId, sysUserId).remove();
     sysPostUserService.lambdaUpdate().eq(SysPostUser::getUserId, sysUserId).remove();
+    sysTenantUserService.lambdaUpdate().eq(SysTenantUser::getUserId, sysUserId).remove();
 
     List<Long> roleIds = obj.getRoleIds();
     SysUser updateObj = SysUserStruct.INSTANCE.to(obj);
@@ -348,6 +361,8 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
     this.assignDept(updateObj, updateObj.getDeptIds());
     // 关联岗位
     this.assignPost(updateObj, updateObj.getPostIds());
+    // 关联租户
+    this.assignTenant(updateObj, updateObj.getTenantIds());
 
     return sysUserMapper.updateById(updateObj) > 0;
   }
