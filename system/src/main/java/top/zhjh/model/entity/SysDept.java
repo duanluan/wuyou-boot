@@ -32,4 +32,9 @@ public class SysDept extends BaseEntityNoDept {
    */
   @Schema(title = "状态：0: 禁用, 1: 启用")
   private CommonStatus status;
+  /**
+   * 组级列表
+   */
+  @Schema(title = "祖级列表")
+  private String ancestors;
 }
