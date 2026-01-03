@@ -6,6 +6,7 @@
     <if test="isAddLoginUserRole != null and isAddLoginUserRole and loginUserId != null">
       select
         sr.id,
+        sr.tenant_id,
         sr.code,
         sr.name,
         sr.description,
@@ -27,6 +28,7 @@
     </if>
     select
       sr.id,
+      sr.tenant_id,
       sr.code,
       sr.name,
       sr.description,

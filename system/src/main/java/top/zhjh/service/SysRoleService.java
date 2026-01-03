@@ -123,6 +123,10 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
         throw new ServiceException("不能修改编码为" + RoleEnum.SUPER_ADMIN.getCode() + "角色的状态");
       }
     }
+    // 如果当前角色是“公共角色”（tenantId 为空），且当前登录人不是超级管理员，则禁止修改
+    if (existRole.getTenantId() == null && !StpExtUtil.isSuperAdmin()) {
+      throw new ServiceException("无权修改系统公共角色");
+    }
 
     this.lambdaUpdate().eq(SysRole::getId, obj.getId())
       .func(wrapper -> {
@@ -170,6 +174,9 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
     if (StpExtUtil.isSuperAdmin(role)) {
       throw new ServiceException("不能修改编码为" + RoleEnum.SUPER_ADMIN.getCode() + "角色的状态");
     }
+    if (role.getTenantId() == null && !StpExtUtil.isSuperAdmin()) {
+      throw new ServiceException("无权修改系统公共角色状态");
+    }
     return this.updateById(SysRoleStruct.INSTANCE.to(obj));
   }
 
@@ -189,6 +196,9 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
     }
     if (StpExtUtil.isSuperAdmin(role)) {
       throw new ServiceException("不能修改编码为" + RoleEnum.SUPER_ADMIN.getCode() + "角色的菜单权限");
+    }
+    if (role.getTenantId() == null && !StpExtUtil.isSuperAdmin()) {
+      throw new ServiceException("无权修改系统公共角色菜单权限");
     }
     sysRoleMenuService.lambdaUpdate().eq(SysRoleMenu::getRoleId, obj.getId()).remove();
     if (CollUtil.isNotEmpty(obj.getMenuIds())) {
@@ -219,6 +229,9 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
     }
     if (StpExtUtil.isSuperAdmin(role)) {
       throw new ServiceException("不能修改编码为" + RoleEnum.SUPER_ADMIN.getCode() + "角色的数据权限");
+    }
+    if (role.getTenantId() == null && !StpExtUtil.isSuperAdmin()) {
+      throw new ServiceException("无权修改系统公共角色数据权限");
     }
     sysRoleDeptService.lambdaUpdate().eq(SysRoleDept::getRoleId, obj.getId()).remove();
     if (DataScopeType.CUSTOM.equals(obj.getQueryDataScope()) && CollUtil.isNotEmpty(obj.getQueryDataScopeDeptIds())) {
@@ -266,6 +279,9 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
       }
       if (sysRoleUserService.lambdaQuery().eq(SysRoleUser::getRoleId, id).count() > 0) {
         throw new ServiceException("不能删除关联了用户的角色");
+      }
+      if (role.getTenantId() == null && !StpExtUtil.isSuperAdmin()) {
+        throw new ServiceException("无权删除系统公共角色");
       }
       // 删除关联菜单
       sysRoleMenuService.lambdaUpdate().eq(SysRoleMenu::getRoleId, id).remove();

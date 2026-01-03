@@ -186,9 +186,9 @@ public class TenantInterceptor implements Interceptor {
         JSqlParserUtil.resetSql2Invocation(invocation, statement.toString());
         return invocation.proceed();
       }
-    } finally {
-      // 始终清除租户上下文
-      TenantContext.clear();
+    } catch (Exception e) {
+      log.error("租户拦截异常：{}", e.getMessage(), e);
+      throw e;
     }
   }
 

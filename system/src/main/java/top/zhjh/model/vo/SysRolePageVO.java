@@ -16,6 +16,8 @@ public class SysRolePageVO extends PageVO {
 
   @Schema(title = "ID")
   private Long id;
+  @Schema(title = "租户ID")
+  private Long tenantId;
   @Schema(title = "编码")
   private String code;
   @Schema(title = "名称")

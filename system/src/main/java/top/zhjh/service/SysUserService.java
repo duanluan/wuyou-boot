@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import top.csaf.bean.BeanUtil;
 import top.csaf.coll.CollUtil;
 import top.csaf.crypto.DigestUtil;
-import top.csaf.lang.NumberUtil;
 import top.zhjh.base.model.BaseEntity;
 import top.zhjh.base.model.PageVO;
 import top.zhjh.config.tenant.TenantContext;
@@ -30,7 +29,6 @@ import top.zhjh.util.StpExtUtil;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -339,6 +337,11 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
     if (this.countById(sysUserId) == 0) {
       log.error("用户不存在: {}", sysUserId);
       throw new ServiceException("用户不存在");
+    }
+    if (sysUserId.equals(StpUtil.getLoginIdAsLong())) {
+      if (obj.getRoleIds() != null) {
+        throw new ServiceException("不能修改自己的角色");
+      }
     }
 
     // 删除旧关联
