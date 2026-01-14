@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="top.zhjh.mapper.SysTestDataMapper">
+
+  <select id="page" resultType="top.zhjh.model.vo.SysTestDataPageVO">
+    SELECT
+      t.id,
+      t.value,
+      t.dept_id,
+      t.created_by,
+      t.created_time,
+      -- 关联查询部门名称
+      d.name AS deptName,
+      -- 关联查询用户昵称作为创建人名称
+      u.nick_name AS creatorName
+    FROM sys_test_data t
+    -- 关联部门表
+    LEFT JOIN sys_dept d ON t.dept_id = d.id
+    -- 关联用户表
+    LEFT JOIN sys_user u ON t.created_by = u.id
+    <where>
+      t.deleted = 0
+      <if test="query.value != null and query.value != ''">
+        AND t.value LIKE CONCAT('%', #{query.value}, '%')
+      </if>
+      </where>
+    ORDER BY t.created_time DESC
+  </select>
+
+</mapper>

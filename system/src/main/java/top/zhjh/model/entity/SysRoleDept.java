@@ -2,11 +2,13 @@ package top.zhjh.model.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import top.zhjh.enums.DataScopeActionType;
 
 /**
  * 角色-部门（数据权限自定义）
  */
+@NoArgsConstructor
 @AllArgsConstructor
 @Data
 public class SysRoleDept {
