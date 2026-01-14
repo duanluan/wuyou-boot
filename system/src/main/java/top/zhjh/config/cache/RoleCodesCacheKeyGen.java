@@ -1,4 +1,4 @@
-package top.zhjh.config;
+package top.zhjh.config.cache;
 
 import cn.dev33.satoken.stp.StpUtil;
 import org.springframework.cache.interceptor.KeyGenerator;
