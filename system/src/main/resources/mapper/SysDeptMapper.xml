@@ -77,4 +77,13 @@
       </otherwise>
     </choose>
   </select>
+
+  <select id="listChildrenIds" resultType="java.lang.Long">
+    SELECT id
+    FROM sys_dept
+    WHERE id = #{deptId}
+    OR ancestors LIKE concat('%,', #{deptId}, ',%')
+    OR ancestors LIKE concat(#{deptId}, ',%')
+    OR ancestors LIKE concat('%,', #{deptId})
+  </select>
 </mapper>
