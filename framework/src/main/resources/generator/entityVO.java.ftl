@@ -46,7 +46,7 @@ import lombok.experimental.Accessors;
 <#if fileNameSuffix?contains("PageVO")>
 public class ${entity + fileNameSuffix} extends PageVO {
 <#elseif fileNameSuffix?contains('GetVO')>
-public class ${entity + fileNameSuffix} extends BaseEntity {
+public class ${entity + fileNameSuffix} extends BaseEntityNoDept {
 <#else>
 public class ${entity + fileNameSuffix} <#if entitySerialVersionUID>implements Serializable</#if> {
 </#if>
