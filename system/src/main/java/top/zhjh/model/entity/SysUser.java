@@ -22,6 +22,18 @@ import java.util.List;
 @Data
 public class SysUser extends BaseEntityNoTenant {
 
+  @Schema(title = "租户 ID 列表")
+  @TableField(typeHandler = Fastjson2TypeHandler.class)
+  private List<Long> tenantIds;
+  @Schema(title = "租户名称列表")
+  @TableField(typeHandler = Fastjson2TypeHandler.class)
+  private List<String> tenantNames;
+  @Schema(title = "部门 ID 列表")
+  @TableField(typeHandler = Fastjson2TypeHandler.class)
+  private List<Long> deptIds;
+  @Schema(title = "部门名称列表")
+  @TableField(typeHandler = Fastjson2TypeHandler.class)
+  private List<String> deptNames;
   @Schema(title = "用户名")
   private String username;
   @Schema(title = "密码")
@@ -37,22 +49,10 @@ public class SysUser extends BaseEntityNoTenant {
   @Schema(title = "角色编码列表")
   @TableField(typeHandler = Fastjson2TypeHandler.class)
   private List<String> roleCodes;
-  @Schema(title = "部门 ID 列表")
-  @TableField(typeHandler = Fastjson2TypeHandler.class)
-  private List<Long> deptIds;
-  @Schema(title = "部门名称列表")
-  @TableField(typeHandler = Fastjson2TypeHandler.class)
-  private List<String> deptNames;
   @Schema(title = "岗位 ID 列表")
   @TableField(typeHandler = Fastjson2TypeHandler.class)
   private List<Long> postIds;
   @Schema(title = "岗位名称列表")
   @TableField(typeHandler = Fastjson2TypeHandler.class)
   private List<String> postNames;
-  @Schema(title = "租户 ID 列表")
-  @TableField(typeHandler = Fastjson2TypeHandler.class)
-  private List<Long> tenantIds;
-  @Schema(title = "租户名称列表")
-  @TableField(typeHandler = Fastjson2TypeHandler.class)
-  private List<String> tenantNames;
 }
