@@ -1,6 +1,7 @@
 package top.zhjh.util;
 
 import net.sf.jsqlparser.expression.*;
+import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.*;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -39,6 +40,32 @@ public class JSqlParserUtil {
       case IncludesExpression includesExpression -> includesExpression.getRightExpression();
       case null, default -> null;
     };
+  }
+
+  /**
+   * 拼接 AND 条件
+   *
+   * @param left  左条件
+   * @param right 右条件
+   * @return AND 表达式
+   */
+  public static Expression and(Expression left, Expression right) {
+    if (left == null) {
+      return right;
+    }
+    if (right == null) {
+      return left;
+    }
+
+    // JSqlParser 5.0+ 废弃了 Parenthesis，使用 ParenthesedExpressionList 替代
+    // 它位于 operators.relational 包下，已经包含在 import net.sf.jsqlparser.expression.operators.relational.* 中
+    ParenthesedExpressionList<Expression> leftP = new ParenthesedExpressionList<>();
+    leftP.add(left);
+
+    ParenthesedExpressionList<Expression> rightP = new ParenthesedExpressionList<>();
+    rightP.add(right);
+
+    return new AndExpression(leftP, rightP);
   }
 
   private static MappedStatement newMappedStatement(MappedStatement ms, SqlSource newSqlSource) {
