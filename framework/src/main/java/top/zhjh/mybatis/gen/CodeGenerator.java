@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import top.csaf.io.FileUtil;
+import top.csaf.lang.StrUtil;
 import top.csaf.yaml.YamlUtil;
 import top.zhjh.base.BaseController;
 import top.zhjh.base.model.BaseEntity;
@@ -32,7 +33,12 @@ public class CodeGenerator {
   private static final String OUTPUT_DIR = FileUtil.getProjectPath() + "/generator/src/main/java";
 
   static {
-    Map<String, Object> yamlMap = YamlUtil.load(FileUtil.getProjectPath() + "/admin/src/main/resources/application-dev.yml");
+    Map<String, Object> yamlMap;
+    try {
+      yamlMap = YamlUtil.load(FileUtil.getProjectPath() + "/admin/src/main/resources/application-dev.yml");
+    } catch (Exception e) {
+      yamlMap = new HashMap<>();
+    }
 
     Object urlObj = YamlUtil.get(yamlMap, "spring.datasource.url");
     DB_URL = urlObj != null ? urlObj.toString() : "";
@@ -70,6 +76,10 @@ public class CodeGenerator {
   }
 
   public static void main(String[] args) throws IOException {
+    if (StrUtil.isAnyBlank(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+      return;
+    }
+
     // 自定义模板，key 为“自定义的包名:Entity 后缀”，value 为模板路径
     Map<String, String> customFile = new HashMap<>(8);
     customFile.put("model/qo:GetQO", "/generator/entityQO.java");
