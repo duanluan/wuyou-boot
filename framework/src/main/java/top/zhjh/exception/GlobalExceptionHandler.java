@@ -2,6 +2,8 @@ package top.zhjh.exception;
 
 import cn.dev33.satoken.exception.NotLoginException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.exceptions.PersistenceException;
+import org.mybatis.spring.MyBatisSystemException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
@@ -68,6 +70,18 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(status).body(new R<>(status.value(), e.getMessage()));
   }
 
+  @ExceptionHandler({MyBatisSystemException.class, PersistenceException.class})
+  @ResponseBody
+  public ResponseEntity<R<?>> handleMyBatisException(Exception e) {
+    ServiceException serviceException = findServiceException(e);
+    if (serviceException != null) {
+      return handleServiceException(serviceException);
+    }
+    log.error("数据库异常", e);
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .body(new R<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), "系统异常"));
+  }
+
   @ExceptionHandler(NotLoginException.class)
   @ResponseBody
   public ResponseEntity<R<?>> handlerNotLoginException(NotLoginException nle, HttpServletRequest request, HttpServletResponse response) {
@@ -87,7 +101,22 @@ public class GlobalExceptionHandler {
   @ExceptionHandler({Exception.class})
   @ResponseBody
   public ResponseEntity<R<?>> handleException(Exception e) {
+    ServiceException serviceException = findServiceException(e);
+    if (serviceException != null) {
+      return handleServiceException(serviceException);
+    }
     log.error("系统异常", e);
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new R<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), "系统异常"));
+  }
+
+  private ServiceException findServiceException(Throwable throwable) {
+    Throwable current = throwable;
+    while (current != null) {
+      if (current instanceof ServiceException serviceException) {
+        return serviceException;
+      }
+      current = current.getCause();
+    }
+    return null;
   }
 }

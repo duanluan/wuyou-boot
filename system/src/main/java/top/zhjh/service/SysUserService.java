@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import top.csaf.bean.BeanUtil;
 import top.csaf.coll.CollUtil;
-import top.csaf.crypto.DigestUtil;
 import top.zhjh.base.model.BaseEntity;
 import top.zhjh.base.model.PageVO;
 import top.zhjh.config.tenant.TenantContext;
@@ -25,6 +24,7 @@ import top.zhjh.model.vo.SysUserPageVO;
 import top.zhjh.mybatis.MyServiceImpl;
 import top.zhjh.mybatis.wrapper.MyLambdaQueryWrapper;
 import top.zhjh.struct.SysUserStruct;
+import top.zhjh.util.PasswordCipher;
 import top.zhjh.util.StpExtUtil;
 
 import javax.annotation.Resource;
@@ -34,7 +34,12 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * 用户 服务实现
+ * 用户服务实现。
+ * <p>
+ * 负责用户登录、查询、保存、更新、删除与密码修改；
+ * 维护用户与角色/部门/岗位/租户的关联数据；
+ * 结合权限缓存、租户上下文以及数据权限相关逻辑提供统一入口。
+ * </p>
  */
 @Slf4j
 @Service
@@ -60,12 +65,17 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
   private SysTenantUserService sysTenantUserService;
   @Resource
   private CacheManager cacheManager;
+  @Resource
+  private PasswordCipher passwordCipher;
 
   /**
-   * 列出用户角色编码
+   * 获取用户角色编码列表。
+   * <p>
+   * 结果会缓存到 {@code userRoleCodes}，用于鉴权与权限校验。
+   * </p>
    *
    * @param id 用户 ID
-   * @return 用户角色编码列表
+   * @return 角色编码列表
    */
   @Cacheable(value = "userRoleCodes", key = "#id", condition = "#id != null && #id != ''")
   public List<String> listRoleCodes(Long id) {
@@ -73,10 +83,13 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
   }
 
   /**
-   * 列出用户权限
+   * 获取用户权限列表。
+   * <p>
+   * 结果会缓存到 {@code userPermissions}，用于鉴权与权限校验。
+   * </p>
    *
    * @param id 用户 ID
-   * @return 用户权限列表
+   * @return 权限列表
    */
   @Cacheable(value = "userPermissions", key = "#id", condition = "#id != null && #id != ''")
   public List<String> listPermission(Long id) {
@@ -84,12 +97,22 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
   }
 
   /**
-   * 登录
+   * 登录。
+   * <p>
+   * 校验流程：
+   * <ol>
+   *   <li>校验用户名与密码是否正确。</li>
+   *   <li>非超管校验租户是否匹配。</li>
+   *   <li>校验角色是否存在且未全部禁用。</li>
+   *   <li>写入租户扩展参数并完成登录。</li>
+   * </ol>
+   * 若检测到旧的 SHA-512 密码，会在登录成功后自动升级为新密文格式。
+   * </p>
    *
    * @param username 用户名
    * @param password 密码
    * @param tenantId 租户 ID
-   * @return 登录用户
+   * @return 登录用户详情
    */
   public SysUserDetailVO login(@NonNull final String username, @NonNull final String password, final Long tenantId) {
     SysUser user = this.lambdaQuery()
@@ -100,11 +123,19 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
     }
     List<String> roleCodes = user.getRoleCodes();
     // 密码是否正确
-    if (!user.getPassword().equals(DigestUtil.sha512Hex(password))
-      // 非超管判断租户是否一致
-      && (!StpExtUtil.isSuperAdmin(roleCodes) && !CollUtil.contains(user.getTenantIds(), tenantId))
-    ) {
+    if (!passwordCipher.matches(password, user.getPassword())) {
       throw new ServiceException(HttpStatus.INTERNAL_SERVER_ERROR, "用户名或密码错误");
+    }
+    // 非超管判断租户是否一致
+    if (!StpExtUtil.isSuperAdmin(roleCodes) && !CollUtil.contains(user.getTenantIds(), tenantId)) {
+      throw new ServiceException(HttpStatus.INTERNAL_SERVER_ERROR, "用户名或密码错误");
+    }
+    // 登录成功后自动升级旧的 SHA-512 密码。
+    if (passwordCipher.shouldUpgradeLegacy(user.getPassword())) {
+      SysUser updateObj = new SysUser();
+      updateObj.setId(user.getId());
+      updateObj.setPassword(passwordCipher.encode(password));
+      this.updateById(updateObj);
     }
     if (CollUtil.isEmpty(roleCodes)) {
       throw new ServiceException(HttpStatus.INTERNAL_SERVER_ERROR, "用户未配置角色");
@@ -123,7 +154,10 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
   }
 
   /**
-   * 列出
+   * 列出用户列表。
+   * <p>
+   * 自动注入当前登录租户，用于多租户隔离。
+   * </p>
    *
    * @param query 查询参数
    * @return 列表
@@ -134,7 +168,10 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
   }
 
   /**
-   * 分页
+   * 分页查询用户列表。
+   * <p>
+   * 自动注入当前登录租户，用于多租户隔离。
+   * </p>
    *
    * @param query 查询参数
    * @return 分页列表
@@ -146,10 +183,13 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
   }
 
   /**
-   * 获取详情
+   * 获取用户详情。
+   * <p>
+   * 若不存在则抛出异常；同时根据角色判断是否展示租户信息。
+   * </p>
    *
-   * @param id ID
-   * @return 详情
+   * @param id 用户 ID
+   * @return 用户详情
    */
   public SysUserDetailVO getDetail(@NonNull final Long id) {
     SysUser sysUser = this.getById(id);
@@ -163,7 +203,11 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
   }
 
   /**
-   * 关联角色
+   * 关联角色并回填用户的角色信息字段。
+   * <p>
+   * 过程包括：读取角色信息、保存用户-角色关联、回写 roleIds/roleNames/roleCodes，
+   * 并清理对应的角色编码缓存。
+   * </p>
    *
    * @param sysUser 用户
    * @param roleIds 角色 ID 列表
@@ -178,10 +222,9 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
     List<String> roleCodes = new ArrayList<>();
     List<SysRoleUser> roleUserList = new ArrayList<>();
     for (Long roleId : roleIds) {
-      TenantContext.disable();
-      SysRole role = sysRoleService.lambdaQuery()
+      SysRole role = TenantContext.supplyWithoutTenant(() -> sysRoleService.lambdaQuery()
         .select(SysRole::getName, SysRole::getCode)
-        .eq(SysRole::getId, roleId).one();
+        .eq(SysRole::getId, roleId).one());
       if (role == null) {
         log.error("角色不存在: {}", roleId);
         throw new ServiceException("角色不存在");
@@ -200,7 +243,7 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
   }
 
   /**
-   * 关联部门
+   * 关联部门并回填用户的部门信息字段。
    *
    * @param sysUser 用户
    * @param deptIds 部门 ID 列表
@@ -229,7 +272,7 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
   }
 
   /**
-   * 关联岗位
+   * 关联岗位并回填用户的岗位信息字段。
    *
    * @param sysUser 用户
    * @param postIds 岗位 ID 列表
@@ -258,7 +301,10 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
   }
 
   /**
-   * 关联租户
+   * 关联租户并回填用户的租户信息字段。
+   * <p>
+   * 当未传入租户列表时，默认绑定当前登录租户。
+   * </p>
    *
    * @param sysUser   用户
    * @param tenantIds 租户 ID 列表
@@ -293,7 +339,17 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
   }
 
   /**
-   * 保存
+   * 保存用户。
+   * <p>
+   * 处理流程：
+   * <ol>
+   *   <li>校验用户名唯一性。</li>
+   *   <li>保存用户基本信息（含加密密码）。</li>
+   *   <li>关联角色、部门、岗位、租户。</li>
+   *   <li>回写扩展字段并更新用户。</li>
+   * </ol>
+   * 整个过程受事务保护，保证一致性。
+   * </p>
    *
    * @param obj 保存入参
    * @return 是否成功
@@ -305,7 +361,7 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
       throw new ServiceException("用户名已存在");
     }
     SysUser sysUser = SysUserStruct.INSTANCE.to(obj);
-    sysUser.setPassword(DigestUtil.sha512Hex(sysUser.getPassword()));
+    sysUser.setPassword(passwordCipher.encode(sysUser.getPassword()));
     if (!this.save(sysUser)) {
       throw new ServiceException("保存失败");
     }
@@ -326,7 +382,18 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
   }
 
   /**
-   * 更新
+   * 更新用户。
+   * <p>
+   * 处理流程：
+   * <ol>
+   *   <li>校验用户是否存在。</li>
+   *   <li>禁止当前用户修改自身角色。</li>
+   *   <li>删除旧的角色/部门/岗位/租户关联。</li>
+   *   <li>重新绑定关联并回写扩展字段。</li>
+   *   <li>校验至少保留一个超级管理员。</li>
+   * </ol>
+   * 整个过程受事务保护，保证一致性。
+   * </p>
    *
    * @param obj 更新入参
    * @return 是否成功
@@ -371,7 +438,15 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
   }
 
   /**
-   * 删除
+   * 删除用户。
+   * <p>
+   * 处理流程：
+   * <ol>
+   *   <li>校验用户是否存在并禁止删除自己。</li>
+   *   <li>删除用户与角色/部门/岗位的关联。</li>
+   *   <li>批量删除用户记录。</li>
+   * </ol>
+   * </p>
    *
    * @param query 删除入参
    * @return 是否成功
@@ -413,7 +488,11 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
   }
 
   /**
-   * 修改密码
+   * 修改密码。
+   * <p>
+   * 校验旧密码、新密码与确认密码的一致性，
+   * 并使用 {@link PasswordCipher} 进行加密后更新。
+   * </p>
    *
    * @param obj 修改密码入参
    * @return 是否成功
@@ -425,7 +504,7 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
       log.error("用户不存在: {}", id);
       throw new ServiceException("用户不存在");
     }
-    if (!user.getPassword().equals(DigestUtil.sha512Hex(obj.getOldPassword()))) {
+    if (!passwordCipher.matches(obj.getOldPassword(), user.getPassword())) {
       throw new ServiceException("旧密码错误");
     }
     if (!obj.getNewPassword().equals(obj.getConfirmPassword())) {
@@ -436,13 +515,16 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
     }
     SysUser updateObj = new SysUser();
     updateObj.setId(id);
-    updateObj.setPassword(DigestUtil.sha512Hex(obj.getNewPassword()));
+    updateObj.setPassword(passwordCipher.encode(obj.getNewPassword()));
 
     return this.updateById(updateObj);
   }
 
   /**
-   * 获取超管用户 ID 列表
+   * 获取超管用户 ID 列表。
+   * <p>
+   * 通过 JSON 字段中的角色编码过滤，返回符合条件的用户 ID。
+   * </p>
    *
    * @return 超管用户 ID 列表
    */

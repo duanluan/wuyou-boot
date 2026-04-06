@@ -26,5 +26,5 @@ public interface SysUserMapper extends MyBaseMapper<SysUser> {
 
   SysUserDetailVO getDetail(@NonNull @Param("id") Long id);
 
-  int updateById(SysUser obj);
+  int updateById(@Param("et") SysUser obj);
 }

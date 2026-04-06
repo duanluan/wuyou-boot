@@ -17,29 +17,53 @@ import java.sql.SQLException;
 public class JSqlParserUtil {
 
   public static Expression getLeftExpression(Expression expression) {
-    return switch (expression) {
-      case BinaryExpression binaryExpression -> binaryExpression.getLeftExpression();
-      case InExpression inExpression -> inExpression.getLeftExpression();
-      case TimezoneExpression timezoneExpression -> timezoneExpression.getLeftExpression();
-      case CastExpression castExpression -> castExpression.getLeftExpression();
-      case CollateExpression collateExpression -> collateExpression.getLeftExpression();
-      case Between between -> between.getLeftExpression();
-      case ExcludesExpression excludesExpression -> excludesExpression.getLeftExpression();
-      case IncludesExpression includesExpression -> includesExpression.getLeftExpression();
-      case IsBooleanExpression isBooleanExpression -> isBooleanExpression.getLeftExpression();
-      case IsNullExpression isNullExpression -> isNullExpression.getLeftExpression();
-      case null, default -> null;
-    };
+    if (expression instanceof BinaryExpression) {
+      return ((BinaryExpression) expression).getLeftExpression();
+    }
+    if (expression instanceof InExpression) {
+      return ((InExpression) expression).getLeftExpression();
+    }
+    if (expression instanceof TimezoneExpression) {
+      return ((TimezoneExpression) expression).getLeftExpression();
+    }
+    if (expression instanceof CastExpression) {
+      return ((CastExpression) expression).getLeftExpression();
+    }
+    if (expression instanceof CollateExpression) {
+      return ((CollateExpression) expression).getLeftExpression();
+    }
+    if (expression instanceof Between) {
+      return ((Between) expression).getLeftExpression();
+    }
+    if (expression instanceof ExcludesExpression) {
+      return ((ExcludesExpression) expression).getLeftExpression();
+    }
+    if (expression instanceof IncludesExpression) {
+      return ((IncludesExpression) expression).getLeftExpression();
+    }
+    if (expression instanceof IsBooleanExpression) {
+      return ((IsBooleanExpression) expression).getLeftExpression();
+    }
+    if (expression instanceof IsNullExpression) {
+      return ((IsNullExpression) expression).getLeftExpression();
+    }
+    return null;
   }
 
   public static Expression getRightExpression(Expression expression) {
-    return switch (expression) {
-      case BinaryExpression binaryExpression -> binaryExpression.getRightExpression();
-      case InExpression inExpression -> inExpression.getRightExpression();
-      case ExcludesExpression excludesExpression -> excludesExpression.getRightExpression();
-      case IncludesExpression includesExpression -> includesExpression.getRightExpression();
-      case null, default -> null;
-    };
+    if (expression instanceof BinaryExpression) {
+      return ((BinaryExpression) expression).getRightExpression();
+    }
+    if (expression instanceof InExpression) {
+      return ((InExpression) expression).getRightExpression();
+    }
+    if (expression instanceof ExcludesExpression) {
+      return ((ExcludesExpression) expression).getRightExpression();
+    }
+    if (expression instanceof IncludesExpression) {
+      return ((IncludesExpression) expression).getRightExpression();
+    }
+    return null;
   }
 
   /**

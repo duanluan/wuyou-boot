@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.generator.config.*;
 import com.baomidou.mybatisplus.generator.config.builder.ConfigBuilder;
 import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
 import top.csaf.io.FileUtil;
 import top.csaf.lang.StrUtil;
 import top.csaf.yaml.YamlUtil;
@@ -23,7 +22,6 @@ import java.util.Scanner;
 /**
  * 代码生成器
  */
-@Component
 public class CodeGenerator {
 
   private static final String DB_URL;

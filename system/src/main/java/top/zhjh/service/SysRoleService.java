@@ -337,8 +337,8 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
    * @return 超级管理员角色
    */
   public SysRole getSuperAdmin() {
-    TenantContext.disable();
-    return this.lambdaQuery().eq(SysRole::getCode, RoleEnum.SUPER_ADMIN.getCode()).one();
+    return TenantContext.supplyWithoutTenant(() -> this.lambdaQuery()
+      .eq(SysRole::getCode, RoleEnum.SUPER_ADMIN.getCode()).one());
   }
 
   /**

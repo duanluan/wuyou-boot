@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import top.csaf.coll.CollUtil;
 import top.zhjh.base.model.PageVO;
+import top.zhjh.config.tenant.TenantContext;
 import top.zhjh.enums.DataScopeActionType;
 import top.zhjh.enums.DataScopeType;
 import top.zhjh.exception.ServiceException;
@@ -93,7 +94,7 @@ public class SysTestDataService extends ServiceImpl<SysTestDataMapper, SysTestDa
     if (user == null || CollUtil.isEmpty(user.getRoleIds())) {
       throw new ServiceException("无权操作：用户无角色");
     }
-    List<SysRole> roles = sysRoleService.listByIds(user.getRoleIds());
+    List<SysRole> roles = TenantContext.supplyWithoutTenant(() -> sysRoleService.listByIds(user.getRoleIds()));
 
     // 计算用户的（增删改）数据权限范围
     Set<Long> allowedDeptIds = new HashSet<>();

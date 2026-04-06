@@ -35,16 +35,17 @@ public class SysRoleController extends BaseController {
   @Operation(summary = "角色列表")
   @GetMapping
   public R<?> list(@Validated SysRolePageQO query) {
-    TenantContext.disable();
     // 添加登录用户（没有租户的）角色
     query.setIsAddLoginUserRole(true);
     query.setLoginUserId(StpUtil.getLoginIdAsLong());
     query.setTenantId(StpExtUtil.getTenantId());
 
-    if (query.getCurrent() == 0) {
-      return ok(sysRoleService.list(SysRoleStruct.INSTANCE.to(query)));
-    }
-    return ok(sysRoleService.page(query));
+    return TenantContext.supplyWithoutTenant(() -> {
+      if (query.getCurrent() == 0) {
+        return ok(sysRoleService.list(SysRoleStruct.INSTANCE.to(query)));
+      }
+      return ok(sysRoleService.page(query));
+    });
   }
 
   @Operation(summary = "角色详情")

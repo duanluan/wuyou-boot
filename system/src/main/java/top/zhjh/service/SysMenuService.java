@@ -55,8 +55,7 @@ public class SysMenuService extends ServiceImpl<SysMenuMapper, SysMenu> {
     query.setTypes(Arrays.asList(MenuType.DIR, MenuType.MENU));
     // isAllAndChecked 为 false，只获取选中的，所以下面这个条件就相当于登录用户所属菜单
     query.setCheckedRoleCodes(roleList);
-    TenantContext.disable();
-    return TreeUtil.build(sysMenuMapper.listTree(query));
+    return TenantContext.supplyWithoutTenant(() -> TreeUtil.build(sysMenuMapper.listTree(query)));
   }
 
   /**
@@ -66,13 +65,12 @@ public class SysMenuService extends ServiceImpl<SysMenuMapper, SysMenu> {
    * @return 树
    */
   public List<TreeNode> listTreeTable(@NonNull final SysMenuTreeTableQO query) {
-    TenantContext.disable();
     // 登录用户所属菜单
     query.setRoleCodes(StpUtil.getRoleList());
     if (Boolean.TRUE.equals(query.getNotBuildTree())) {
-      return sysMenuMapper.listTree(query);
+      return TenantContext.supplyWithoutTenant(() -> sysMenuMapper.listTree(query));
     }
-    return TreeUtil.build(sysMenuMapper.listTree(query));
+    return TenantContext.supplyWithoutTenant(() -> TreeUtil.build(sysMenuMapper.listTree(query)));
   }
 
   /**

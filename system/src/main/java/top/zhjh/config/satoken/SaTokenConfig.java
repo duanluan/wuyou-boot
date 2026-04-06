@@ -52,15 +52,16 @@ public class SaTokenConfig implements WebMvcConfigurer {
         // 所有路由登录校验
         SaRouter.match("/**", r -> StpUtil.checkLogin());
 
-        TenantContext.disable();
-        // 循环有路径、权限，需登录的菜单 TODO 缓存
-        for (SysMenu sysMenu : sysMenuService.lambdaQuery()
-          .isNotNull(SysMenu::getPath)
-          .isNotNull(SysMenu::getPermission)
-          .eq(SysMenu::getNeedToLogin, true).list()) {
-          // 校验权限
-          SaRouter.match(sysMenu.getPath(), r -> StpUtil.checkPermission(sysMenu.getPermission()));
-        }
+        TenantContext.runWithoutTenant(() -> {
+          // 循环有路径、权限，需登录的菜单 TODO 缓存
+          for (SysMenu sysMenu : sysMenuService.lambdaQuery()
+            .isNotNull(SysMenu::getPath)
+            .isNotNull(SysMenu::getPermission)
+            .eq(SysMenu::getNeedToLogin, true).list()) {
+            // 校验权限
+            SaRouter.match(sysMenu.getPath(), r -> StpUtil.checkPermission(sysMenu.getPermission()));
+          }
+        });
       })).addPathPatterns("/**")
       .excludePathPatterns("/sys/tenants");
 

@@ -25,6 +25,7 @@ import org.apache.ibatis.plugin.Invocation;
 import org.apache.ibatis.plugin.Signature;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -33,6 +34,7 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import top.csaf.coll.CollUtil;
+import top.zhjh.exception.ServiceException;
 import top.zhjh.prop.TenantConf;
 import top.zhjh.util.JSqlParserUtil;
 import top.zhjh.util.StpExtUtil;
@@ -161,26 +163,24 @@ public class TenantInterceptor implements Interceptor {
         BoundSql boundSql = mappedStatement.getBoundSql(parameter);
         Statement statement = CCJSqlParserUtil.parse(boundSql.getSql());
         // 加入租户条件
-        switch (statement) {
-          case Insert insert -> {
-            for (Expression expression : insert.getValues().getExpressions()) {
-              if (expression instanceof ParenthesedSelect) {
-                this.handleSelect(this.getPlainSelect((ParenthesedSelect) expression));
-              } else if (expression instanceof SetOperationList) {
-                this.handleSelect((SetOperationList) expression);
-              }
+        if (statement instanceof Insert insert) {
+          for (Expression expression : insert.getValues().getExpressions()) {
+            if (expression instanceof ParenthesedSelect) {
+              this.handleSelect(this.getPlainSelect((ParenthesedSelect) expression));
+            } else if (expression instanceof SetOperationList) {
+              this.handleSelect((SetOperationList) expression);
             }
           }
-          case Update update -> {
-            this.handleFromItem(update.getFromItem(), null);
-            this.handleJoins(update.getJoins());
-            this.handleWhere(update.getWhere());
-          }
-          case Delete delete -> {
-            this.handleJoins(delete.getJoins());
-            this.handleWhere(delete.getWhere());
-          }
-          case null, default -> log.warn("Unsupported tenant SQL statement: {}", statement);
+        } else if (statement instanceof Update update) {
+          this.handleJoins(update.getJoins());
+          this.handleWhere(update.getWhere());
+          this.applyTenantWhere(update);
+        } else if (statement instanceof Delete delete) {
+          this.handleJoins(delete.getJoins());
+          this.handleWhere(delete.getWhere());
+          this.applyTenantWhere(delete);
+        } else {
+          log.warn("Unsupported tenant SQL statement: {}", statement);
         }
 
         JSqlParserUtil.resetSql2Invocation(invocation, statement.toString());
@@ -270,11 +270,14 @@ public class TenantInterceptor implements Interceptor {
         return;
       }
 
+      // join 中的表会以 plainSelect=null 调用到这里，此时不做 where 追加，交给 handleJoins 处理
+      if (plainSelect == null) {
+        return;
+      }
+
       // where 加入租户条件
       Expression where = plainSelect.getWhere();
-      EqualsTo tenantCondition = new EqualsTo();
-      tenantCondition.setLeftExpression(new Column(tenantConf.getTenantIdColumn()));
-      tenantCondition.setRightExpression(new LongValue(StpExtUtil.getTenantId()));
+      EqualsTo tenantCondition = buildTenantCondition(table);
       if (where != null) {
         AndExpression newCondition = new AndExpression(where, tenantCondition);
         plainSelect.setWhere(newCondition);
@@ -296,12 +299,77 @@ public class TenantInterceptor implements Interceptor {
     for (Join join : joins) {
       FromItem fromItem = join.getFromItem();
       // join 中的子查询
-      this.handleFromItem(fromItem, null);
+      if (fromItem instanceof ParenthesedSelect) {
+        this.handlePlainSelect(this.getPlainSelect((ParenthesedSelect) fromItem));
+      } else if (fromItem instanceof Table table) {
+        if (!ignoreTable(table.getName())) {
+          Expression tenantCondition = buildTenantCondition(table);
+          if (CollUtil.isEmpty(join.getOnExpressions())) {
+            join.setOnExpressions(List.of(tenantCondition));
+          } else {
+            Expression mergedOnExpression = null;
+            for (Expression onExpression : join.getOnExpressions()) {
+              if (mergedOnExpression == null) {
+                mergedOnExpression = onExpression;
+              } else {
+                mergedOnExpression = new AndExpression(mergedOnExpression, onExpression);
+              }
+            }
+            join.setOnExpressions(List.of(new AndExpression(mergedOnExpression, tenantCondition)));
+          }
+        }
+      }
       // join 中 on 的子查询
-      for (Expression on : join.getOnExpressions()) {
-        this.handleWhere(on);
+      if (CollUtil.isNotEmpty(join.getOnExpressions())) {
+        for (Expression on : join.getOnExpressions()) {
+          this.handleWhere(on);
+        }
       }
     }
+  }
+
+  private EqualsTo buildTenantCondition(Table table) {
+    return buildTenantCondition(table, StpExtUtil.getTenantId());
+  }
+
+  EqualsTo buildTenantCondition(Table table, Long tenantId) {
+    EqualsTo tenantCondition = new EqualsTo();
+    String columnName = tenantConf.getTenantIdColumn();
+    if (table.getAlias() != null && table.getAlias().getName() != null) {
+      columnName = table.getAlias().getName() + "." + columnName;
+    } else if (table.getName() != null) {
+      columnName = table.getName() + "." + columnName;
+    }
+    tenantCondition.setLeftExpression(new Column(columnName));
+    if (tenantId == null) {
+      throw new ServiceException(HttpStatus.UNAUTHORIZED, "未指定租户，请重新登录或选择租户");
+    }
+    tenantCondition.setRightExpression(new LongValue(tenantId));
+    return tenantCondition;
+  }
+
+  void applyTenantWhere(Update update) {
+    applyTenantWhere(update, StpExtUtil.getTenantId());
+  }
+
+  void applyTenantWhere(Update update, Long tenantId) {
+    Table table = update.getTable();
+    if (table == null || ignoreTable(table.getName())) {
+      return;
+    }
+    update.setWhere(JSqlParserUtil.and(update.getWhere(), buildTenantCondition(table, tenantId)));
+  }
+
+  void applyTenantWhere(Delete delete) {
+    applyTenantWhere(delete, StpExtUtil.getTenantId());
+  }
+
+  void applyTenantWhere(Delete delete, Long tenantId) {
+    Table table = delete.getTable();
+    if (table == null || ignoreTable(table.getName())) {
+      return;
+    }
+    delete.setWhere(JSqlParserUtil.and(delete.getWhere(), buildTenantCondition(table, tenantId)));
   }
 
   /**

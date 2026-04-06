@@ -93,3 +93,11 @@ wuyou:
       - sys_post_user
       - sys_menu
       - sys_role_menu
+  # 密码哈希配置
+  security:
+    password:
+      enabled: true
+      algorithm: PBKDF2WithHmacSHA256
+      iterations: 120000
+      salt-length: 16
+      hash-length: 32

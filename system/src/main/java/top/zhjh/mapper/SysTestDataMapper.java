@@ -34,10 +34,12 @@ public interface SysTestDataMapper extends BaseMapper<SysTestData> {
    * <p>
    * 1. MyBatis-Plus 3.5+ 中 removeByIds 底层调用的 SQL 方法名是 deleteByIds。
    * 2. 必须显式声明此方法，Interceptor 才能通过反射读取到 @DataScope 注解。
-   * 3. 覆盖为抽象方法后，会跳过 BaseMapper default 方法中的逻辑（如 fill），直接执行 SQL。
+   * 3. 保持为 default，继续复用 BaseMapper 自带的参数组装逻辑（含 mpFillEt）。
    * </p>
    */
   @Override
   @DataScope
-  int deleteByIds(@Param("coll") Collection<?> idList);
+  default int deleteByIds(Collection<?> idList) {
+    return BaseMapper.super.deleteByIds(idList);
+  }
 }

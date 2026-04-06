@@ -15,7 +15,7 @@
   </modules>
 
   <properties>
-    <java.version>21</java.version>
+    <java.version>17</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <zutil.version>2.0.0-alpha14</zutil.version>
@@ -154,11 +154,7 @@
           <version>3.14.0</version>
           <!-- compiler:compile https://maven.apache.org/plugins/maven-compiler-plugin/compile-mojo.html -->
           <configuration>
-            <!-- Setting the -source and -target of the Java Compiler https://maven.apache.org/plugins/maven-compiler-plugin/examples/set-compiler-source-and-target.html -->
-            <!-- Java 编译器的 -source 参数 https://maven.apache.org/plugins/maven-compiler-plugin/compile-mojo.html#source -->
-            <source>${java.version}</source>
-            <!-- Java 编译器的 -target 参数 https://maven.apache.org/plugins/maven-compiler-plugin/compile-mojo.html#target -->
-            <target>${java.version}</target>
+            <release>${java.version}</release>
             <!-- 显示编译警告 https://maven.apache.org/plugins/maven-compiler-plugin/compile-mojo.html#showWarnings -->
             <showWarnings>true</showWarnings>
           </configuration>

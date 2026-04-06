@@ -22,8 +22,7 @@ public class StpInterfaceImpl implements StpInterface {
    */
   @Override
   public List<String> getRoleList(Object loginId, String loginType) {
-    TenantContext.disable();
-    return sysUserService.listRoleCodes(Long.parseLong(loginId.toString()));
+    return TenantContext.supplyWithoutTenant(() -> sysUserService.listRoleCodes(Long.parseLong(loginId.toString())));
   }
 
   /**
@@ -31,7 +30,6 @@ public class StpInterfaceImpl implements StpInterface {
    */
   @Override
   public List<String> getPermissionList(Object loginId, String loginType) {
-    TenantContext.disable();
-    return sysUserService.listPermission(Long.parseLong(loginId.toString()));
+    return TenantContext.supplyWithoutTenant(() -> sysUserService.listPermission(Long.parseLong(loginId.toString())));
   }
 }

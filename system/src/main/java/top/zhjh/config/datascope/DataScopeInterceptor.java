@@ -26,6 +26,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import top.csaf.coll.CollUtil;
 import top.csaf.lang.StrUtil;
+import top.zhjh.config.tenant.TenantContext;
 import top.zhjh.enums.DataScopeActionType;
 import top.zhjh.enums.DataScopeType;
 import top.zhjh.model.entity.SysRole;
@@ -212,7 +213,7 @@ public class DataScopeInterceptor implements Interceptor {
       return "1 = 0"; // 用户不存在
     }
 
-    List<SysRole> roles = sysRoleService.listByIds(user.getRoleIds());
+    List<SysRole> roles = TenantContext.supplyWithoutTenant(() -> sysRoleService.listByIds(user.getRoleIds()));
     if (CollUtil.isEmpty(roles)) {
       return "1 = 0"; // 无角色
     }

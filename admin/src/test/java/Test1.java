@@ -1,3 +1,4 @@
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @ActiveProfiles("local")
 @SpringBootTest(classes = Application.class)
+@Disabled("manual scratch test")
 public class Test1 {
 
   @Resource

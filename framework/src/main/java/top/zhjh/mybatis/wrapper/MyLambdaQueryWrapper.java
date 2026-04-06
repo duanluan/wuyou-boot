@@ -16,12 +16,23 @@ import static top.zhjh.mybatis.wrapper.MyWrapperInnerInterceptor.DELIMITER;
 public class MyLambdaQueryWrapper<T> extends LambdaQueryWrapper<T> {
 
   public MyLambdaQueryWrapper<T> jsonContains(SFunction<T, ?> column, Object val) {
+    if (val == null) {
+      return this;
+    }
+    String valueExpr = "CAST({0} AS JSON)";
+    if (val instanceof String str) {
+      String trimmed = str.trim();
+      if (!(trimmed.startsWith("{") || trimmed.startsWith("[") || trimmed.startsWith("\""))) {
+        valueExpr = "JSON_QUOTE({0})";
+      }
+    }
     this.apply(
       DELIMITER +
-        DbType.MYSQL.getDb() + ":JSON_CONTAINS(" + super.columnsToString(column) + ", " + val + ")" +
+        DbType.MYSQL.getDb() + ":JSON_CONTAINS(" + super.columnsToString(column) + ", " + valueExpr + ")" +
         DELIMITER +
-        DbType.MARIADB.getDb() + ":JSON_CONTAINS(" + super.columnsToString(column) + ", " + val + ")" +
-        DELIMITER);
+        DbType.MARIADB.getDb() + ":JSON_CONTAINS(" + super.columnsToString(column) + ", " + valueExpr + ")" +
+        DELIMITER,
+      val);
     return this;
   }
 
