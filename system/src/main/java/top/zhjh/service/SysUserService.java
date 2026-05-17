@@ -67,6 +67,9 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
   private CacheManager cacheManager;
   @Resource
   private PasswordCipher passwordCipher;
+  @Resource
+  // 登录安全能力统一由该服务承接，避免验证码、锁定与密码强度逻辑分散在多处。
+  private LoginSecurityService loginSecurityService;
 
   /**
    * 获取用户角色编码列表。
@@ -109,26 +112,34 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
    * 若检测到旧的 SHA-512 密码，会在登录成功后自动升级为新密文格式。
    * </p>
    *
-   * @param username 用户名
-   * @param password 密码
-   * @param tenantId 租户 ID
+   * @param query 登录入参，包含用户名、密码、租户和验证码信息
    * @return 登录用户详情
    */
-  public SysUserDetailVO login(@NonNull final String username, @NonNull final String password, final Long tenantId) {
+  public SysUserDetailVO login(@NonNull final SysUserLoginQO query) {
+    String username = query.getUsername();
+    String password = query.getPassword();
+    Long tenantId = query.getTenantId();
+    // 先判断是否已被锁定，避免锁定用户还要先输入正确验证码才能看到锁定提示。
+    loginSecurityService.validateNotLocked(username, tenantId);
+    // 未锁定时再校验验证码；验证码错误不会进入用户名密码失败计数。
+    loginSecurityService.validateCaptcha(query.getCaptchaId(), query.getCaptchaCode());
     SysUser user = this.lambdaQuery()
       .select(SysUser::getRoleCodes, SysUser::getTenantIds, SysUser::getId, SysUser::getPassword)
       .eq(SysUser::getUsername, username).one();
     if (user == null) {
-      throw new ServiceException(HttpStatus.INTERNAL_SERVER_ERROR, "用户名或密码错误");
+      // 用户名不存在也统一记入失败次数，避免通过提示差异探测账号是否存在。
+      throw new ServiceException(HttpStatus.INTERNAL_SERVER_ERROR, loginSecurityService.recordLoginFailure(username, tenantId));
     }
     List<String> roleCodes = user.getRoleCodes();
     // 密码是否正确
     if (!passwordCipher.matches(password, user.getPassword())) {
-      throw new ServiceException(HttpStatus.INTERNAL_SERVER_ERROR, "用户名或密码错误");
+      // 密码错误时直接返回带剩余次数或锁定时间的动态提示。
+      throw new ServiceException(HttpStatus.INTERNAL_SERVER_ERROR, loginSecurityService.recordLoginFailure(username, tenantId));
     }
     // 非超管判断租户是否一致
     if (!StpExtUtil.isSuperAdmin(roleCodes) && !CollUtil.contains(user.getTenantIds(), tenantId)) {
-      throw new ServiceException(HttpStatus.INTERNAL_SERVER_ERROR, "用户名或密码错误");
+      // 非超管租户不匹配时同样按登录失败处理，不额外暴露租户信息。
+      throw new ServiceException(HttpStatus.INTERNAL_SERVER_ERROR, loginSecurityService.recordLoginFailure(username, tenantId));
     }
     // 登录成功后自动升级旧的 SHA-512 密码。
     if (passwordCipher.shouldUpgradeLegacy(user.getPassword())) {
@@ -138,11 +149,13 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
       this.updateById(updateObj);
     }
     if (CollUtil.isEmpty(roleCodes)) {
-      throw new ServiceException(HttpStatus.INTERNAL_SERVER_ERROR, "用户未配置角色");
+      // 用户未配置角色也视为登录失败场景，继续沿用统一的失败提示策略。
+      throw new ServiceException(HttpStatus.INTERNAL_SERVER_ERROR, loginSecurityService.recordLoginFailure(username, tenantId));
     }
     // 角色是否全部禁用
     if (sysRoleService.isAllDisabled(roleCodes)) {
-      throw new ServiceException(HttpStatus.INTERNAL_SERVER_ERROR, "用户角色已禁用");
+      // 角色全部禁用时也累加失败次数，避免只针对密码错误做防护。
+      throw new ServiceException(HttpStatus.INTERNAL_SERVER_ERROR, loginSecurityService.recordLoginFailure(username, tenantId));
     }
     SaLoginParameter saLoginParameter = new SaLoginParameter();
     // 扩展参数：租户 ID
@@ -150,6 +163,8 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
       saLoginParameter.setExtra(BeanUtil.getPropertyName(BaseEntity::getTenantId), tenantId);
     }
     StpUtil.login(user.getId(), saLoginParameter);
+    // 登录成功后清空失败次数和锁定状态，保证后续重新开始计数。
+    loginSecurityService.clearLoginFailure(username, tenantId);
     return this.getDetail(user.getId());
   }
 
@@ -356,6 +371,8 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
    */
   @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
   public boolean save(SysUserSaveQO obj) {
+    // 新增用户时直接复用统一的密码强度校验规则。
+    loginSecurityService.validatePasswordStrength(obj.getPassword());
     // 用户名是否重复
     if (this.lambdaQuery().eq(SysUser::getUsername, obj.getUsername()).count() > 0) {
       throw new ServiceException("用户名已存在");
@@ -513,6 +530,8 @@ public class SysUserService extends MyServiceImpl<SysUserMapper, SysUser> {
     if (obj.getNewPassword().equals(obj.getOldPassword())) {
       throw new ServiceException("新密码和旧密码不能相同");
     }
+    // 修改密码同样复用统一强度校验，确保新增与修改口径一致。
+    loginSecurityService.validatePasswordStrength(obj.getNewPassword());
     SysUser updateObj = new SysUser();
     updateObj.setId(id);
     updateObj.setPassword(passwordCipher.encode(obj.getNewPassword()));

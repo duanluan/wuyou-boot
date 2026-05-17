@@ -101,3 +101,26 @@ wuyou:
       iterations: 120000
       salt-length: 16
       hash-length: 32
+    login:
+      # 是否启用登录验证码。
+      captcha-enabled: true
+      # 验证码有效期，单位秒。
+      captcha-expire-seconds: 120
+      # 验证码图片宽度。
+      captcha-width: 120
+      # 验证码图片高度。
+      captcha-height: 40
+      # 验证码字符数量。
+      captcha-length: 4
+      # 连续失败达到该次数后立即锁定。
+      max-fail-count: 5
+      # 锁定时长，单位分钟。
+      lock-minutes: 15
+      # 失败次数统计窗口，单位分钟。
+      fail-expire-minutes: 30
+      # 密码最小长度。
+      min-password-length: 8
+      # 是否要求密码包含字母。
+      require-password-letter: true
+      # 是否要求密码包含数字。
+      require-password-digit: true
