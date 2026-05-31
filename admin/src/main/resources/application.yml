@@ -44,6 +44,7 @@ spring:
       key-prefix: "wuyou-boot:"
 
 mybatis-plus:
+  mapper-locations: classpath*:mapper/**/*.xml
   configuration:
     # 日志实现类，以打印 SQL 日志
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

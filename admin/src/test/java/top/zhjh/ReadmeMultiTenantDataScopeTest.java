@@ -54,7 +54,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @ActiveProfiles("local")
 @AutoConfigureMockMvc
-@SpringBootTest(classes = Application.class)
+@SpringBootTest(classes = Application.class, properties = "wuyou.security.login.captcha-enabled=false")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ReadmeMultiTenantDataScopeTest {
 

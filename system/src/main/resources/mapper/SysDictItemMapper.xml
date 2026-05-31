@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="top.zhjh.mapper.SysDictItemMapper">
+
+  <sql id="listSql">
+    select
+      sdi.*
+    from sys_dict_item sdi
+    left join sys_dict sd on sdi.dict_id = sd.id and sd.deleted = 0
+    where sdi.deleted = 0
+    <if test="superAdmin == null or !superAdmin">
+      and (
+        sd.tenant_id = #{tenantId}
+        or (
+          sd.tenant_id = 0
+          and sd.source_scope = 'PUBLIC_SYSTEM'
+        )
+      )
+    </if>
+    <if test="dictId != null">
+      and sdi.dict_id = #{dictId}
+    </if>
+    <if test="dictKey != null and dictKey != ''">
+      and sdi.dict_key = #{dictKey}
+    </if>
+    <if test="itemValue != null and itemValue != ''">
+      and sdi.item_value like concat('%', #{itemValue}, '%')
+    </if>
+    <if test="label != null and label != ''">
+      and sdi.label like concat('%', #{label}, '%')
+    </if>
+    <if test="description != null and description != ''">
+      and sdi.description like concat('%', #{description}, '%')
+    </if>
+    order by sdi.sort_order asc, sdi.created_time desc, sdi.id desc
+  </sql>
+
+  <select id="list" resultType="top.zhjh.model.vo.SysDictItemPageVO">
+    <include refid="listSql"/>
+  </select>
+
+  <select id="page" resultType="top.zhjh.model.vo.SysDictItemPageVO">
+    <include refid="listSql"/>
+  </select>
+</mapper>

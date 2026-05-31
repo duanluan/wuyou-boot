@@ -19,6 +19,8 @@ public class SysTenantService extends ServiceImpl<SysTenantMapper, SysTenant> {
 
   @Resource
   private SysTenantMapper sysTenantMapper;
+  @Resource
+  private SystemDictSyncService systemDictSyncService;
 
   /**
    * 列出
@@ -53,7 +55,12 @@ public class SysTenantService extends ServiceImpl<SysTenantMapper, SysTenant> {
       .eq(SysTenant::getName, obj.getName()).count() > 0) {
       throw new ServiceException("同级部门名称不能重复");
     }
-    return this.save(SysTenantStruct.INSTANCE.to(obj));
+    SysTenant sysTenant = SysTenantStruct.INSTANCE.to(obj);
+    boolean saved = this.save(sysTenant);
+    if (saved) {
+      systemDictSyncService.initTenantDictionaries(sysTenant.getId());
+    }
+    return saved;
   }
 
   /**

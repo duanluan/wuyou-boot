@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="top.zhjh.mapper.SysDictMapper">
+
+  <sql id="listSql">
+    select
+      sd.*,
+      st.name tenant_name
+    from sys_dict sd
+    left join sys_tenant st on sd.tenant_id = st.id and st.deleted = 0
+    where sd.deleted = 0
+    <if test="effectiveOnly != null and effectiveOnly">
+      <if test="superAdmin != null and superAdmin">
+        and sd.tenant_id = 0
+      </if>
+      <if test="superAdmin == null or !superAdmin">
+        and (
+          sd.tenant_id = #{tenantId}
+          or (
+            sd.tenant_id = 0
+            and not exists (
+              select 1
+              from sys_dict tenant_sd
+              where tenant_sd.deleted = 0
+                and tenant_sd.tenant_id = #{tenantId}
+                and tenant_sd.`key` = sd.`key`
+            )
+          )
+        )
+      </if>
+    </if>
+    <if test="effectiveOnly == null or !effectiveOnly">
+      <if test="superAdmin == null or !superAdmin">
+        and (
+          sd.tenant_id = #{tenantId}
+          or (
+            sd.tenant_id = 0
+            and sd.source_scope = 'PUBLIC_SYSTEM'
+          )
+        )
+      </if>
+    </if>
+    <if test="sourceScope != null">
+      and sd.source_scope = #{sourceScope}
+    </if>
+    <if test="keyword != null and keyword != ''">
+      and (
+        sd.name like concat('%', #{keyword}, '%')
+        or sd.`key` like concat('%', #{keyword}, '%')
+      )
+    </if>
+    order by sd.tenant_id desc, sd.created_time desc, sd.id desc
+  </sql>
+
+  <select id="list" resultType="top.zhjh.model.vo.SysDictPageVO">
+    <include refid="listSql"/>
+  </select>
+
+  <select id="page" resultType="top.zhjh.model.vo.SysDictPageVO">
+    <include refid="listSql"/>
+  </select>
+</mapper>

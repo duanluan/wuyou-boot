@@ -1,5 +1,6 @@
 package top.zhjh.mybatis.handler;
 
+import cn.dev33.satoken.exception.SaTokenContextException;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -28,15 +29,16 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
   @Override
   public void insertFill(MetaObject metaObject) {
     // 1. 自动填充创建人
-    if (StpUtil.isLogin()) {
+    boolean login = isLogin();
+    if (login) {
       this.strictInsertFill(metaObject, BeanUtil.getPropertyName(BaseEntity::getCreatedBy), StpUtil::getLoginIdAsLong, Long.class);
     }
 
     // 2. 自动填充租户 ID
-    if (metaObject.hasSetter("tenantId")) {
+    if (login && metaObject.hasSetter("tenantId")) {
       try {
         Long currentTenantId = securityContext.getTenantId();
-        boolean isSuperAdmin = StpUtil.isLogin() && securityContext.isSuperAdmin();
+        boolean isSuperAdmin = login && securityContext.isSuperAdmin();
 
         if (isSuperAdmin) {
           // 场景A：超级管理员
@@ -58,8 +60,16 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
   @Override
   public void updateFill(MetaObject metaObject) {
     // 自动填充更新人
-    if (StpUtil.isLogin()) {
+    if (isLogin()) {
       this.strictUpdateFill(metaObject, BeanUtil.getPropertyName(BaseEntity::getUpdatedBy), StpUtil::getLoginIdAsLong, Long.class);
+    }
+  }
+
+  private boolean isLogin() {
+    try {
+      return StpUtil.isLogin();
+    } catch (SaTokenContextException e) {
+      return false;
     }
   }
 }

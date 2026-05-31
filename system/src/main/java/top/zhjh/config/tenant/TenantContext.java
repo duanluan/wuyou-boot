@@ -45,7 +45,7 @@ public class TenantContext {
    * @return {@code true} 已启用租户
    */
   public static boolean enabled() {
-    if (tenantConf.disabled()) {
+    if (tenantConf == null || tenantConf.disabled()) {
       return false;
     }
     return Boolean.TRUE.equals(ThreadLocalUtil.get(IS_ENABLE_TENANT_KEY));
@@ -61,7 +61,7 @@ public class TenantContext {
    * @return {@code true} 已禁用租户
    */
   public static boolean disabled() {
-    if (tenantConf.disabled()) {
+    if (tenantConf == null || tenantConf.disabled()) {
       return true;
     }
     return Boolean.FALSE.equals(ThreadLocalUtil.get(IS_ENABLE_TENANT_KEY));

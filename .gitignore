@@ -37,5 +37,8 @@ build/
 /admin/target
 /generator
 
+### Local profile ###
+/admin/src/main/resources/application-local.yml
+
 ### PDManer ###
 !**/.back_wuyou-boot/
